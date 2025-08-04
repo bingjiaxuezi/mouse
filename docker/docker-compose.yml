@@ -13,7 +13,7 @@ services:
       MYSQL_PASSWORD: mouse_pass
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init:/docker-entrypoint-initdb.d

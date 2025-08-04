@@ -46,7 +46,48 @@
 
 ## 项目状态
 
-**当前阶段**：技术选型和系统设计阶段
+**当前阶段**：后端环境搭建完成 ✅
+
+### 已完成
+- ✅ 技术选型和系统设计
+- ✅ RuoYi后端框架集成
+- ✅ Docker环境配置
+- ✅ MySQL数据库搭建
+- ✅ 后端服务部署脚本
+
+### 进行中
+- 🔄 前端Vue.js应用开发
+- 🔄 Python数据采集端开发
+
+### 待开始
+- ⏳ 行为识别算法集成
+- ⏳ 移动端应用开发
+- ⏳ 系统集成测试
+
+## 快速开始
+
+### 环境要求
+- Docker Desktop
+- PowerShell（Windows）
+
+### 一键启动后端服务
+```powershell
+# 克隆项目后，在项目根目录执行
+.\scripts\quick-start.ps1
+```
+
+服务启动后访问：http://localhost:8092
+
+### 脚本工具
+
+项目提供了完整的自动化脚本，位于 `scripts/` 目录：
+
+- **`quick-start.ps1`** - 一键启动整个后端环境（推荐）
+- **`check-environment.ps1`** - 环境检查和诊断
+- **`init-database.ps1`** - 数据库初始化
+- **`start-backend.ps1`** - 手动启动后端服务
+
+详细使用说明请参考：[scripts/README.md](./scripts/README.md)
 
 **已完成**：
 - ✅ 技术选型调研和建议
