@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: mouse-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mouse123456
+      MYSQL_DATABASE: mouse_behavior
+      MYSQL_USER: mouse_user
+      MYSQL_PASSWORD: mouse_pass
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/conf:/etc/mysql/conf.d
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - mouse-network
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: mouse-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - mouse-network
+
+  # MinIO对象存储
+  minio:
+    image: minio/minio:latest
+    container_name: mouse-minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - mouse-network
+
+  # Spring Boot后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: mouse-backend:latest
+    container_name: mouse-backend
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mouse_behavior?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: mouse_user
+      SPRING_DATASOURCE_PASSWORD: mouse_pass
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_logs:/app/logs
+      - backend_uploads:/app/uploads
+    depends_on:
+      - mysql
+      - redis
+      - minio
+    networks:
+      - mouse-network
+
+  # Vue前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: mouse-frontend:latest
+    container_name: mouse-frontend
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - backend
+    networks:
+      - mouse-network
+
+  # Python数据采集端（可选，用于测试）
+  python-collector:
+    build:
+      context: ./python-collector
+      dockerfile: Dockerfile
+    image: mouse-python-collector:latest
+    container_name: mouse-python-collector
+    restart: always
+    environment:
+      API_BASE_URL: http://backend:8080
+      DEVICE_ID: test-device-001
+      API_KEY: test-api-key
+    volumes:
+      - collector_data:/app/data
+      - collector_logs:/app/logs
+    depends_on:
+      - backend
+    networks:
+      - mouse-network
+    # 如果需要访问摄像头，取消注释以下行
+    # devices:
+    #   - /dev/video0:/dev/video0
+    # privileged: true
+
+volumes:
+  mysql_data:
+  redis_data:
+  minio_data:
+  backend_logs:
+  backend_uploads:
+  collector_data:
+  collector_logs:
+
+networks:
+  mouse-network:
+    driver: bridge
