@@ -1,0 +1,32 @@
+# 忽略大文件
+OpenJDK17.msi
+
+# 忽略IDE文件
+.vscode/
+.idea/
+*.iml
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
+
+# 忽略日志文件
+*.log
+logs/
+
+# 忽略临时文件
+*.tmp
+*.temp
+
+# 忽略构建产物
+target/
+build/
+dist/
+
+# 忽略依赖
+node_modules/
+
+# 忽略环境配置
+.env
+.env.local
+.env.production
