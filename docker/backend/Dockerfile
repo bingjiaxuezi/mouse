@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 复制Maven构建产物
-COPY target/*.jar app.jar
+# 复制编译好的jar文件
+COPY backend/ruoyi-admin/target/ruoyi-admin.jar app.jar
 
 # 复制配置文件
-COPY src/main/resources/application-prod.yml /app/config/
+COPY backend/ruoyi-admin/src/main/resources/application-prod.yml /app/config/
 
 # 创建日志目录
 RUN mkdir -p /app/logs

@@ -56,8 +56,8 @@ services:
   # Spring Boot后端服务
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/backend/Dockerfile
     image: mouse-backend:latest
     container_name: mouse-backend
     restart: always
