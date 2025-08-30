@@ -30,3 +30,8 @@ node_modules/
 .env
 .env.local
 .env.production
+
+# 忽略Clash代理配置文件
+docs/Clash*.md
+docs/clash-config-example.yaml
+docs/clash-verge-config.yaml
