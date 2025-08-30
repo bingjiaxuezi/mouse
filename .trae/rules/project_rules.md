@@ -1,0 +1,1 @@
+项目编写完成后统一使用：PowerShell -ExecutionPolicy Bypass -File "D:\mouse\scripts\deploy.ps1" 一键构造项目，项目构造完成后，在项目根目录下使用：docker-compose up -d 一键启动项目，无需其他操作

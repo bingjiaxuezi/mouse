@@ -55,6 +55,8 @@ cd D:\mouse\backend
 # 切换到Docker目录
 cd D:\mouse\docker
 
+ cd D:\mouse\docker; docker stop mouse-backend; docker rm mouse-backend; docker-compose build backend --no-cache; docker-compose up backend -d
+
 # 启动基础服务
 docker-compose up -d mysql redis minio
 
@@ -223,7 +225,7 @@ docker logs mouse-backend
 docker ps
 
 # 查看应用启动日志
-docker logs mouse-backend --tail 20
+docker logs mouse-backend --tail 200
 
 # 测试接口访问
 curl http://localhost:8080/captcha/captchaImage

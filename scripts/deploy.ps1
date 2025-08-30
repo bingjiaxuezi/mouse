@@ -63,3 +63,5 @@ Write-Host $containerStatus
 
 Write-Host "Deployment process completed!" -ForegroundColor Green
 Write-Host "You can check logs with: docker logs mouse-backend" -ForegroundColor Yellow
+
+Write-Host "Step 5: docker logs mouse-backend --tail 20" -ForegroundColor Yellow

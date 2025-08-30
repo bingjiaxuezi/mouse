@@ -80,6 +80,7 @@ CREATE TABLE t_mouse (
     gender ENUM('male', 'female'),
     birth_date DATE,
     weight DECIMAL(5,2),
+    photo_url VARCHAR(500),
     cage_id BIGINT,
     experiment_id BIGINT,
     status TINYINT DEFAULT 1,
