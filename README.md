@@ -48,7 +48,7 @@
 
 **若依管理系统登录信息：**
 - 用户名：`admin`
-- 密码：`lczj*512191`
+- 密码：`admin`
 - 访问地址：http://localhost:8080
 
 **注意事项：**
@@ -58,59 +58,172 @@
 
 ## 项目状态
 
-**当前阶段**：后端核心功能开发完成 ✅
+**当前阶段**：后端核心功能开发完成，系统可完整运行 ✅
 
-### 已完成
-- ✅ 技术选型和系统设计
-- ✅ RuoYi后端框架集成
-- ✅ Docker环境配置
-- ✅ MySQL数据库搭建
-- ✅ 后端服务部署脚本
-- ✅ **Controller接口规范统一**（2025-08-09）
+### 最新进展（2025-01-21）
+- ✅ **小鼠管理系统核心功能修复**
+  - 修复出生时间筛选问题（日期格式错误）
+  - 修复编辑和新增小鼠后页面跳转问题
+  - 优化表格刷新机制，保持筛选条件
+- ✅ **完整的自动化部署体系**
+  - 一键启动脚本 `quick-start.ps1`
+  - 开发部署脚本 `deploy.ps1`
+  - 环境检查脚本 `check-environment.ps1`
+  - Docker容器化部署完全就绪
+- ✅ **项目文档体系完善**
+  - 详细的部署指南和使用说明
+  - 完整的故障排除文档
+  - 开发者友好的快速开始指南
+
+### 已完成功能模块
+- ✅ **基础架构**
+  - RuoYi后端框架集成
+  - Docker环境配置
+  - MySQL数据库设计和初始化
+  - Redis缓存配置
+- ✅ **核心业务模块**
+  - 小鼠信息管理（增删改查、批量操作）
+  - 实验管理（实验设计、参数配置）
+  - 设备管理（设备注册、状态监控）
+  - 行为数据管理（数据存储、查询统计）
+- ✅ **接口规范统一**
   - 统一使用 `@PostMapping("/XXX")` 接口风格
   - 修复删除接口400错误问题
-  - 完成TMouseController、TBehaviorDataController、TDeviceController、TExperimentController统一改造
-- ✅ **一键编译部署脚本**（2025-08-09）
-  - 创建自动化部署脚本 `scripts/deploy.ps1`
-  - 集成编译、打包、Docker构建、服务启动全流程
-  - 支持一键完成从代码修改到服务部署
+  - 完成所有Controller统一改造
+- ✅ **自动化部署**
+  - 一键编译部署脚本
+  - Docker容器化部署
+  - 数据库自动初始化
+  - 服务健康检查
 
 ### 进行中
-- 🔄 前端Vue.js应用开发
-- 🔄 Python数据采集端开发
+- 🔄 **Excel导出功能优化**：在导出的Excel文件中包含小鼠照片图片
+- 🔄 **前端界面优化**：提升用户体验和界面美观度
+- 🔄 **系统性能优化**：数据库查询优化和缓存策略改进
 
-### 待开始
-- ⏳ 行为识别算法集成
-- ⏳ 移动端应用开发
-- ⏳ 系统集成测试
+### 下一阶段计划
+- ⏳ **Python数据采集端开发**：基于OpenCV和YOLO的视频分析模块
+- ⏳ **行为识别算法集成**：深度学习模型训练和部署
+- ⏳ **前端Vue.js应用开发**：现代化的Web管理界面
+- ⏳ **移动端应用开发**：uni-app跨平台移动应用
+- ⏳ **系统集成测试**：端到端功能测试和性能测试
 
 ## 快速开始
 
-### 环境要求
-- Docker Desktop
-- PowerShell（Windows）
+123### 环境要求
+- **Docker Desktop**：用于容器化部署
+- **PowerShell**：Windows环境下的脚本执行
+- **Git**：用于克隆项目代码
+- **Java 8+**：后端开发环境（可选，Docker部署时不需要）
 
-### 一键启动后端服务
+### 从GitHub克隆项目后的完整启动流程
+
+#### 1. 克隆项目
+```bash
+git clone https://github.com/your-username/mouse.git
+cd mouse
+```
+
+#### 2. 环境检查（推荐）
 ```powershell
-# 克隆项目后，在项目根目录执行
+# 检查Docker、PowerShell等环境是否就绪
+.\scripts\check-environment.ps1
+```
+
+#### 3. 一键启动后端服务（推荐方式）
+```powershell
+# 在项目根目录执行，自动完成所有初始化工作
 .\scripts\quick-start.ps1
 ```
 
-服务启动后访问：http://localhost:8092
+**该脚本会自动完成：**
+- 检查Docker环境
+- 构建后端Docker镜像
+- 启动MySQL、Redis、后端服务
+- 初始化数据库
+- 显示服务状态和访问地址
 
-### 脚本工具
+#### 4. 访问系统
+服务启动后访问：**http://localhost:8092**
+
+### Docker手动部署方式
+
+如果需要手动控制部署过程：
+
+```powershell
+# 1. 进入docker目录
+cd docker
+
+# 2. 启动所有服务
+docker-compose up -d
+
+# 3. 查看服务状态
+docker-compose ps
+
+# 4. 查看日志
+docker-compose logs -f mouse-backend
+```
+
+### 开发模式部署
+
+开发过程中需要频繁重新部署：
+
+```powershell
+# 一键编译部署脚本（开发专用）
+.\scripts\deploy.ps1
+```
+
+**该脚本功能：**
+- 自动编译打包Spring Boot项目
+- 重新构建Docker镜像
+- 重启后端服务
+- 保持数据库数据不丢失
+
+### 脚本工具详解
 
 项目提供了完整的自动化脚本，位于 `scripts/` 目录：
 
-- **`quick-start.ps1`** - 一键启动整个后端环境（推荐）
-- **`deploy.ps1`** - 一键编译部署脚本（开发专用）
-  - 自动编译打包项目
-  - 重新构建Docker镜像
-  - 启动后端服务
-  - 使用方法：`PowerShell -ExecutionPolicy Bypass -File "D:\mouse\scripts\deploy.ps1"`
-- **`check-environment.ps1`** - 环境检查和诊断
-- **`init-database.ps1`** - 数据库初始化
-- **`start-backend.ps1`** - 手动启动后端服务
+| 脚本名称 | 功能描述 | 使用场景 |
+|---------|---------|----------|
+| **`quick-start.ps1`** | 一键启动整个后端环境 | 首次部署、完整重启 |
+| **`deploy.ps1`** | 一键编译部署 | 开发调试、代码更新 |
+| **`check-environment.ps1`** | 环境检查和诊断 | 问题排查、环境验证 |
+| **`init-database.ps1`** | 数据库初始化 | 数据库重置、首次安装 |
+| **`start-backend.ps1`** | 手动启动后端服务 | 单独启动后端 |
+
+### 常见问题解决
+
+#### Docker相关问题
+```powershell
+# 检查Docker是否运行
+docker version
+
+# 清理Docker缓存（解决构建问题）
+docker system prune -f
+
+# 重新构建镜像
+cd docker
+docker-compose build --no-cache
+```
+
+#### 端口冲突问题
+```powershell
+# 检查端口占用
+netstat -ano | findstr :8092
+netstat -ano | findstr :3306
+netstat -ano | findstr :6379
+
+# 停止所有服务
+cd docker
+docker-compose down
+```
+
+#### 权限问题
+```powershell
+# 以管理员身份运行PowerShell
+# 或者设置执行策略
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 
 详细使用说明请参考：[scripts/README.md](./scripts/README.md)
 

@@ -2,404 +2,314 @@
 
 ## 项目概述
 
-本项目使用Docker容器化部署，包含以下组件：
-- MySQL数据库（端口3307）
-- 若依后端服务（端口8081）
-- 前端页面（通过后端服务提供）
+本项目使用Docker容器化部署，提供完整的自动化部署解决方案。系统包含以下组件：
+- **MySQL数据库**（端口3306）
+- **Redis缓存**（端口6379）
+- **若依后端服务**（端口8092）
+- **MinIO对象存储**（端口9000/9001）
 
 ## 环境要求
 
-- Docker Desktop
-- 至少4GB可用内存
-- 至少10GB可用磁盘空间
+- **Docker Desktop**：最新版本，确保正常运行
+- **PowerShell**：Windows环境下的脚本执行
+- **至少4GB可用内存**
+- **至少10GB可用磁盘空间**
+- **Git**：用于克隆项目代码
 
 ## 快速启动
 
-### 1. 启动MySQL数据库
+### 方式一：一键自动化部署（推荐）
 
-```bash
-# 创建Docker网络
-docker network create mouse-network
+**适用场景**：首次部署、完整重启
 
-# 启动MySQL容器
-docker run -d --name mouse-mysql \
-  --network mouse-network \
-  -p 3307:3306 \
-  -e MYSQL_ROOT_PASSWORD=mouse123456 \
-  -e MYSQL_DATABASE=mouse_behavior \
-  -v "D:/mouse/docker/mysql/conf:/etc/mysql/conf.d" \
-  -v "D:/mouse/docker/mysql/init:/docker-entrypoint-initdb.d" \
-  mysql:8.0
+```powershell
+# 1. 克隆项目
+git clone https://github.com/your-username/mouse.git
+cd mouse
+
+# 2. 一键启动所有服务
+.\scripts\quick-start.ps1
 ```
 
-### 2. 编译后端项目
+**该脚本会自动完成：**
+- 检查Docker环境
+- 构建后端Docker镜像
+- 启动MySQL、Redis、MinIO、后端服务
+- 初始化数据库
+- 显示服务状态和访问地址
 
-#### 方式一：使用本地Java和Maven（推荐）
+### 方式二：开发模式部署
 
-**前提条件：**
-- 已安装Java 17或更高版本
-- 项目自带Maven 3.9.4
+**适用场景**：开发调试、代码更新
 
-**构建步骤：**
-
-```bash
-# 进入后端目录
-cd D:\mouse\backend
-
-# 编译项目
-.\apache-maven-3.9.4\bin\mvn.cmd clean compile
-
-# 打包项目
-.\apache-maven-3.9.4\bin\mvn.cmd package -DskipTests
-
-# 切换到Docker目录
-cd D:\mouse\docker
-
- cd D:\mouse\docker; docker stop mouse-backend; docker rm mouse-backend; docker-compose build backend --no-cache; docker-compose up backend -d
-
-# 启动基础服务
-docker-compose up -d mysql redis minio
-
-# 停止并删除旧的后端容器（如果存在）
-docker stop mouse-backend 2>$null
-docker rm mouse-backend 2>$null
-
-# 构建并启动后端服务
-docker-compose build backend --no-cache
-docker-compose up backend -d
-
-# 检查容器状态
-docker logs mouse-backend --tail 20
+```powershell
+# 一键编译部署（保持数据不丢失）
+.\scripts\deploy.ps1
 ```
 
-**注意事项：**
-1. 确保Docker中的MySQL、Redis、MinIO服务已启动
-2. 数据库连接配置已修改为正确的端口（3307）
-3. 验证码功能已禁用（captchaEnabled: false）
+**该脚本功能：**
+- 自动编译打包Spring Boot项目
+- 重新构建Docker镜像
+- 重启后端服务
+- 保持数据库数据不丢失
 
-#### 方式二：使用Maven Docker镜像
+### 方式三：手动Docker部署
 
-```bash
-# 使用Maven Docker镜像编译项目
-docker run --rm \
-  -v "D:/mouse/backend:/workspace" \
-  -w /workspace \
-  maven:3.8-openjdk-17 \
-  mvn clean package -DskipTests
+**适用场景**：自定义配置、故障排除
+
+```powershell
+# 1. 环境检查
+.\scripts\check-environment.ps1
+
+# 2. 手动启动基础服务
+docker-compose -f docker\docker-compose.yml up -d mysql redis minio
+
+# 3. 编译并启动后端
+.\scripts\deploy.ps1
 ```
 
-### 3. 启动后端服务
+## 脚本工具详解
 
-```bash
-# 启动后端容器
-docker run -d --name mouse-backend \
-  --network mouse-network \
-  -p 8081:8080 \
-  -v "D:/mouse/backend/ruoyi-admin/target:/app" \
-  openjdk:17-jdk-slim \
-  java -jar /app/ruoyi-admin.jar
-```
+| 脚本名称 | 功能描述 | 适用场景 |
+|---------|---------|----------|
+| `quick-start.ps1` | 一键完整部署 | 首次部署、完整重启 |
+| `deploy.ps1` | 编译部署后端 | 代码更新、开发调试 |
+| `check-environment.ps1` | 环境检查 | 故障排除、环境验证 |
+| `stop-services.ps1` | 停止所有服务 | 系统维护、资源清理 |
 
 ## 重要注意事项
 
+### 服务端口配置
+
+| 服务 | 容器端口 | 主机端口 | 访问地址 |
+|------|---------|---------|----------|
+| MySQL | 3306 | 3306 | localhost:3306 |
+| Redis | 6379 | 6379 | localhost:6379 |
+| MinIO API | 9000 | 9000 | localhost:9000 |
+| MinIO Console | 9001 | 9001 | localhost:9001 |
+| 后端服务 | 8080 | 8092 | http://localhost:8092 |
+
 ### 数据库配置
 
-- MySQL运行在**3307端口**（避免与本地MySQL冲突）
-- 数据库名：`mouse_behavior`
-- 用户名：`root`
-- 密码：`mouse123456`
-- 容器内部通信使用：`mouse-mysql:3306`
+- **数据库名**：`ry-vue`
+- **用户名**：`root`
+- **密码**：`password`
+- **字符集**：`utf8mb4`
+- **时区**：`Asia/Shanghai`
 
 ### 网络配置
 
-- 所有容器必须连接到`mouse-network`网络
-- 容器间通信使用容器名作为主机名
-- 外部访问使用映射的端口
+- 所有容器连接到`mouse_network`网络
+- 容器间通信使用服务名作为主机名
+- 支持外部访问的端口已映射到主机
 
-### 字体问题解决
+### 系统访问
 
-验证码功能需要字体支持，如遇到字体错误：
+部署成功后，可通过以下地址访问系统：
 
-```bash
-# 在后端容器中安装字体
-docker exec -it mouse-backend apt-get update
-docker exec -it mouse-backend apt-get install -y fontconfig fonts-dejavu-core
-docker restart mouse-backend
-```
-
-### 端口映射
-
-- MySQL：`3307:3306`
-- 后端服务：`8081:8080`
-- 前端访问：`http://localhost:8081`
+- **主系统**：http://localhost:8092
+- **MinIO控制台**：http://localhost:9001
+- **默认登录**：admin / admin123
 
 ## 常用命令
 
-### 查看容器状态
+### 服务管理
 
-```bash
+```powershell
+# 查看所有服务状态
+.\scripts\check-environment.ps1
+
+# 停止所有服务
+.\scripts\stop-services.ps1
+
+# 重新部署后端
+.\scripts\deploy.ps1
+
+# 完整重启
+.\scripts\quick-start.ps1
+```
+
+### Docker原生命令
+
+```powershell
 # 查看运行中的容器
 docker ps
 
 # 查看容器日志
-docker logs mouse-backend
-docker logs mouse-mysql
+docker logs docker-mouse-backend-1
+docker logs docker-mysql-1
+docker logs docker-redis-1
+
+# 重启特定服务
+docker restart docker-mouse-backend-1
+docker restart docker-mysql-1
 ```
 
-### 重启服务
+### 故障排除
 
-```bash
-# 重启后端服务
-docker restart mouse-backend
+```powershell
+# 查看详细日志
+docker logs docker-mouse-backend-1 --tail 100
 
-# 重启MySQL
-docker restart mouse-mysql
-```
+# 进入容器调试
+docker exec -it docker-mouse-backend-1 /bin/bash
 
-### 停止和清理
-
-```bash
-# 停止所有容器
-docker stop mouse-backend mouse-mysql
-
-# 删除容器
-docker rm mouse-backend mouse-mysql
-
-# 删除网络
-docker network rm mouse-network
+# 检查网络连接
+docker network ls
+docker network inspect docker_mouse_network
 ```
 
 ## 完整部署流程（推荐）
 
-基于实际部署经验，以下是经过验证的完整部署流程：
+### 新用户首次部署
 
-### 1. 准备工作
+```powershell
+# 1. 克隆项目
+git clone https://github.com/your-username/mouse.git
+cd mouse
 
-```bash
-# 确保在项目根目录
-cd D:\mouse
+# 2. 环境检查
+.\scripts\check-environment.ps1
 
-# 检查Docker服务状态
-docker --version
-docker-compose --version
+# 3. 一键部署
+.\scripts\quick-start.ps1
+
+# 4. 访问系统
+# 浏览器打开：http://localhost:8092
+# 登录账号：admin / admin123
 ```
 
-### 2. 编译后端项目
+### 开发者日常部署
 
-```bash
-# 进入后端目录
-cd D:\mouse\backend
+```powershell
+# 代码更新后重新部署
+.\scripts\deploy.ps1
 
-# 使用项目自带的Maven进行清理和编译
-.\apache-maven-3.9.4\bin\mvn.cmd clean compile
-
-# 打包项目（跳过测试）
-.\apache-maven-3.9.4\bin\mvn.cmd package -DskipTests
+# 查看服务状态
+.\scripts\check-environment.ps1
 ```
 
-### 3. Docker容器部署
+### 验证部署成功
 
-```bash
-# 切换到Docker目录
-cd D:\mouse\docker
-
-# 启动基础服务（MySQL、Redis、MinIO）
-docker-compose up -d mysql redis minio
-
-# 停止并删除旧的后端容器（如果存在）
-docker stop mouse-backend
-docker rm mouse-backend
-
-# 构建并启动后端服务
-docker-compose build backend --no-cache
-docker-compose up backend -d
-
-# 检查容器状态
-docker logs mouse-backend
-```
-
-### 4. 验证部署
-
-```bash
-# 检查容器运行状态
+```powershell
+# 检查所有容器状态
 docker ps
 
-# 查看应用启动日志
-docker logs mouse-backend --tail 200
+# 查看后端启动日志
+docker logs docker-mouse-backend-1 --tail 50
 
-# 测试接口访问
-curl http://localhost:8080/captcha/captchaImage
+# 测试系统访问
+# 访问：http://localhost:8092
+# 应该能看到登录页面
 ```
 
-## 常见部署问题及解决方案
-
-### 1. 配置文件冲突问题
-
-**问题描述：** 应用启动时报错 `InvalidConfigDataPropertyException`
-
-**原因：** `application-prod.yml` 中包含 `spring.profiles.active` 或 `spring.profiles.include` 配置，与Docker环境变量冲突
-
-**解决方案：**
-```yaml
-# 在 application-prod.yml 中删除以下配置
-spring:
-  profiles:
-    active: druid  # 删除此行
-    include: druid # 删除此行
-```
-
-### 2. Docker镜像构建问题
-
-**问题描述：** Docker构建时网络连接失败
-
-**解决方案：**
-- 使用本地已有的Docker镜像
-- 修改Dockerfile使用本地编译的jar包
-- 避免在容器内重新编译
-
-### 3. jar包版本不一致问题
-
-**问题描述：** 容器中的jar包不是最新编译的版本
-
-**解决方案：**
-```bash
-# 确保每次部署都重新构建镜像
-docker-compose build backend --no-cache
-
-# 检查容器内jar包时间戳
-docker exec mouse-backend ls -la /app/app.jar
-```
-
-### 4. 匿名访问配置问题
-
-**问题描述：** `@Anonymous` 注解对 `@RestController` 不生效
-
-**解决方案：**
-```java
-// 修改 PermitAllUrlProperties.java
-Map<String, Object> controllerBeans = applicationContext.getBeansWithAnnotation(Controller.class);
-Map<String, Object> restControllerBeans = applicationContext.getBeansWithAnnotation(RestController.class);
-controllerBeans.putAll(restControllerBeans);
-```
-
-### 5. Dockerfile优化建议
-
-**推荐的Dockerfile配置：**
-```dockerfile
-# 使用本地编译的jar包
-FROM openjdk:17-jdk-slim
-
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# 直接复制本地编译好的jar包
-COPY backend/ruoyi-admin/target/ruoyi-admin.jar app.jar
-COPY backend/ruoyi-admin/src/main/resources/application-prod.yml /app/application-prod.yml
-
-EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-ENV JAVA_OPTS="-Xms512m -Xmx1024m -Dspring.profiles.active=prod"
-
-CMD sh -c "java $JAVA_OPTS -jar app.jar"
-```
-
-## 故障排除
+## 常见问题及解决方案
 
 ### 1. 端口被占用
 
-```bash
-# 检查端口占用
-netstat -ano | findstr :8081
-netstat -ano | findstr :3307
+**问题现象：** 启动失败，提示端口已被占用
 
-# 修改端口映射或停止占用进程
+**解决方案：**
+```powershell
+# 检查端口占用
+netstat -ano | findstr :8092
+netstat -ano | findstr :3306
+
+# 停止占用进程或修改端口配置
+# 或者使用脚本停止所有服务
+.\scripts\stop-services.ps1
 ```
 
-### 2. 容器无法启动
+### 2. Docker服务未启动
 
-```bash
-# 查看详细错误信息
-docker logs <container_name>
+**问题现象：** 提示"Cannot connect to the Docker daemon"
+
+**解决方案：**
+```powershell
+# 启动Docker Desktop
+# 或检查Docker服务状态
+.\scripts\check-environment.ps1
+```
+
+### 3. 容器启动失败
+
+**问题现象：** 容器无法正常启动
+
+**解决方案：**
+```powershell
+# 查看详细错误日志
+docker logs docker-mouse-backend-1 --tail 100
+
+# 重新构建镜像
+.\scripts\deploy.ps1
+
+# 完整重启所有服务
+.\scripts\quick-start.ps1
+```
+
+### 4. 数据库连接失败
+
+**问题现象：** 后端无法连接数据库
+
+**解决方案：**
+```powershell
+# 检查MySQL容器状态
+docker logs docker-mysql-1
+
+# 重启MySQL服务
+docker restart docker-mysql-1
 
 # 检查网络连接
-docker network ls
-docker network inspect mouse-network
+docker network inspect docker_mouse_network
 ```
-
-### 3. 数据库连接失败
-
-- 确认MySQL容器正在运行
-- 检查网络配置
-- 验证数据库配置文件中的连接信息
-
-### 4. 验证码不显示
-
-- 安装字体包（见上文字体问题解决）
-- 重启后端容器
 
 ## 开发建议
 
-### 1. 数据持久化
+### 数据持久化
 
-建议为MySQL添加数据卷：
+项目已配置数据卷持久化：
+- MySQL数据：`mysql_data`卷
+- MinIO数据：`minio_data`卷
+- Redis数据：`redis_data`卷
 
-```bash
-docker run -d --name mouse-mysql \
-  --network mouse-network \
-  -p 3307:3306 \
-  -e MYSQL_ROOT_PASSWORD=mouse123456 \
-  -e MYSQL_DATABASE=mouse_behavior \
-  -v mysql_data:/var/lib/mysql \
-  -v "D:/mouse/docker/mysql/conf:/etc/mysql/conf.d" \
-  -v "D:/mouse/docker/mysql/init:/docker-entrypoint-initdb.d" \
-  mysql:8.0
+### 开发模式
+
+```powershell
+# 开发时使用deploy脚本，保持数据不丢失
+.\scripts\deploy.ps1
+
+# 查看实时日志
+docker logs docker-mouse-backend-1 -f
 ```
 
-### 2. 开发模式
+### 资源清理
 
-开发时可以使用热重载：
+```powershell
+# 停止所有服务
+.\scripts\stop-services.ps1
 
-```bash
-# 挂载源码目录进行开发
-docker run -d --name mouse-backend-dev \
-  --network mouse-network \
-  -p 8081:8080 \
-  -v "D:/mouse/backend:/workspace" \
-  -w /workspace \
-  maven:3.8-openjdk-17 \
-  mvn spring-boot:run
-```
-
-### 3. 资源清理
-
-定期清理Docker资源：
-
-```bash
-# 清理未使用的镜像、容器、网络
+# 清理未使用的Docker资源
 docker system prune -f
-
-# 清理未使用的卷
-docker volume prune -f
 ```
 
-## 安全建议
+## 生产环境建议
 
-1. **生产环境**：修改默认密码
-2. **网络隔离**：使用专用网络
-3. **资源限制**：为容器设置内存和CPU限制
-4. **日志管理**：配置日志轮转
+1. **安全配置**：修改默认密码和密钥
+2. **资源限制**：为容器设置内存和CPU限制
+3. **监控日志**：配置日志收集和监控
+4. **备份策略**：定期备份数据库和文件
+5. **网络安全**：使用HTTPS和防火墙
 
-## 性能优化
+## 技术支持
 
-1. **内存分配**：为Java应用设置合适的堆内存
-2. **连接池**：优化数据库连接池配置
-3. **镜像优化**：使用多阶段构建减小镜像大小
+如遇到问题，请按以下顺序排查：
+
+1. 运行环境检查脚本：`.\scripts\check-environment.ps1`
+2. 查看容器日志：`docker logs docker-mouse-backend-1`
+3. 检查网络连接：`docker network inspect docker_mouse_network`
+4. 重新部署：`.\scripts\quick-start.ps1`
 
 ---
 
-**最后更新：** 2025年8月
-**维护者：** 项目开发团队
+**最后更新：** 2025年1月
+**维护者：** 小鼠行为分析系统开发团队
