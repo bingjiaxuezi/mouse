@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增小鼠')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-mouse-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">小鼠编号：</label>
+            <div class="col-sm-8">
+                <input name="mouseCode" class="form-control" type="text" maxlength="50" placeholder="留空则自动生成">
+                <span class="help-block m-b-none">可选填，如不填写系统将自动生成唯一编号</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label is-required">小鼠名称：</label>
+            <div class="col-sm-8">
+                <input name="mouseName" class="form-control" type="text" maxlength="100" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">物种：</label>
+            <div class="col-sm-8">
+                <input name="species" class="form-control" type="text" maxlength="50">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">性别：</label>
+            <div class="col-sm-8">
+                <select name="gender" class="form-control">
+                    <option value="">请选择性别</option>
+                    <option value="M">雄性</option>
+                    <option value="F">雌性</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出生日期：</label>
+            <div class="col-sm-8">
+                <div class="input-group date">
+                    <input name="birthDate" class="form-control" placeholder="yyyy-mm-dd" type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">体重(g)：</label>
+            <div class="col-sm-8">
+                <input name="weight" class="form-control" type="number" step="0.01" min="0">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验ID：</label>
+            <div class="col-sm-8">
+                <input name="experimentId" class="form-control" type="number" min="0">
+            </div>
+        </div>
+        <!-- 照片上传 -->
+        <div class="form-group">
+            <label class="col-sm-3 control-label">照片：</label>
+            <div class="col-sm-8">
+                <div class="file-loading">
+                    <input id="mousePhoto" name="file" type="file" accept="image/*">
+                </div>
+                <input type="hidden" id="photoUrlValue" name="photoUrl" value="">
+                <span class="help-block m-b-none">支持 jpg、jpeg、png、gif、bmp、webp 格式，上传后会自动填充隐藏字段用于保存。</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8">
+                <div class="radio-box">
+                    <input type="radio" id="status1" name="status" value="1" checked>
+                    <label for="status1">正常</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="status0" name="status" value="0">
+                    <label for="status0">停用</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8">
+                <textarea name="remark" class="form-control" rows="3" maxlength="500"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="row">
+    <div class="col-sm-offset-5 col-sm-10">
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存
+        </button>&nbsp;
+        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭
+        </button>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script type="text/javascript">
+		var prefix = ctx + "system/mouse";
+		$(function(){
+            // 初始化上传控件
+            var initial = $("#photoUrlValue").val();
+            var options = {
+                uploadUrl: ctx + 'common/upload',
+                allowedFileExtensions: ['jpg','jpeg','png','gif','bmp','webp'],
+                showUpload: true,
+                showRemove: true,
+                initialPreviewAsData: true,
+                browseClass: 'btn btn-primary',
+                dropZoneEnabled: false,
+                maxFileCount: 1,
+                autoReplace: true
+            };
+            if (initial) {
+                options.initialPreview = [initial];
+                options.overwriteInitial = true;
+            }
+            $("#mousePhoto").fileinput(options)
+                .on('fileuploaded', function (event, data) {
+                    var rsp = data.response || {};
+                    if (rsp.url) {
+                        $("#photoUrlValue").val(rsp.url);
+                    } else if (rsp.fileName) {
+                        $("#photoUrlValue").val(rsp.fileName);
+                    }
+                })
+                .on('filesuccessremove filecleared', function () {
+                    $("#photoUrlValue").val('');
+                });
+        });
+		$("#form-mouse-add").validate({
+			focusCleanup: true
+		});
+		
+function submitHandler() {
+    if ($.validate.form()) {
+        $.modal.loading("正在处理中，请稍候...");
+        $.post(prefix + "/add", $('#form-mouse-add').serialize(), function(result) {
+            $.modal.closeLoading();
+            if (result.code == web_status.SUCCESS) {
+                top.layer.alert(result.msg, {
+                    icon: 1,
+                    title: "系统提示",
+                    btn: ['关闭'],
+                    btnclass: ['btn btn-primary'],
+                    yes: function(index) {
+                        // 先关闭弹窗
+                        top.layer.close(index);
+                        // 再调用closeItem关闭iframe
+                        closeItem();
+                    }
+                });
+            } else {
+                $.modal.alertError(result.msg);
+            }
+        });
+    }
+}
+
+
+	    
+	    $('input[name="birthDate"]').datetimepicker({
+	        format: "yyyy-mm-dd",
+	        minView: "month",
+	        language:  'zh-CN',
+	        autoclose: true,
+	        todayHighlight: true
+	    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TMouseMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TMouse" id="TMouseResult">
+        <id     property="id"           column="id"            />
+        <result property="mouseCode"    column="mouse_code"    />
+        <result property="mouseName"    column="mouse_name"    />
+        <result property="species"      column="species"       />
+        <result property="gender"       column="gender"        />
+        <result property="birthDate"    column="birth_date"    />
+        <result property="weight"       column="weight"        />
+        <result property="experimentId" column="experiment_id" />
+        <result property="photoUrl"     column="photo_url"     />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.system.domain.vo.TMouseVO" id="TMouseVOResult">
+        <id     property="id"           column="id"            />
+        <result property="mouseCode"    column="mouse_code"    />
+        <result property="mouseName"    column="mouse_name"    />
+        <result property="species"      column="species"       />
+        <result property="gender"       column="gender"        />
+        <result property="birthDate"    column="birth_date"    />
+        <result property="weight"       column="weight"        />
+        <result property="experimentId" column="experiment_id" />
+        <result property="experimentName" column="experiment_name" />
+        <result property="photoUrl"     column="photo_url"     />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectTMouseVo">
+        select id, mouse_code, mouse_name, species, gender, birth_date, weight, experiment_id, photo_url, status, create_by, create_time, update_by, update_time, remark from t_mouse
+    </sql>
+
+    <select id="selectTMouseList" parameterType="com.ruoyi.system.domain.TMouse" resultMap="TMouseVOResult">
+        select m.id, m.mouse_code, m.mouse_name, m.species, m.gender, m.birth_date, m.weight, m.experiment_id, m.photo_url, m.status, m.create_by, m.create_time, m.update_by, m.update_time, m.remark,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_mouse m
+        left join t_experiment e on m.experiment_id = e.id
+        left join sys_user u1 on m.create_by = u1.user_name
+        left join sys_user u2 on m.update_by = u2.user_name
+        where 1=1
+        <if test="mouseCode != null and mouseCode != ''"> and m.mouse_code like concat('%', #{mouseCode}, '%')</if>
+        <if test="mouseName != null and mouseName != ''"> and m.mouse_name like concat('%', #{mouseName}, '%')</if>
+        <if test="species != null and species != ''"> and m.species = #{species}</if>
+        <if test="gender != null and gender != ''"> and m.gender = #{gender}</if>
+        <if test="status != null"> and m.status = #{status}</if>
+        <if test="params.beginTime != null and params.beginTime != ''"> and <![CDATA[ date_format(m.birth_date,'%Y%m%d') >= date_format(#{params.beginTime},'%Y%m%d') ]]></if>
+        <if test="params.endTime != null and params.endTime != ''"> and <![CDATA[ date_format(m.birth_date,'%Y%m%d') <= date_format(#{params.endTime},'%Y%m%d') ]]></if>
+        order by m.create_time desc
+    </select>
+
+    <select id="selectTMouseById" parameterType="Long" resultMap="TMouseVOResult">
+        select m.id, m.mouse_code, m.mouse_name, m.species, m.gender, m.birth_date, m.weight, m.experiment_id, m.photo_url, m.status, m.create_by, m.create_time, m.update_by, m.update_time, m.remark,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_mouse m
+        left join t_experiment e on m.experiment_id = e.id
+        left join sys_user u1 on m.create_by = u1.user_name
+        left join sys_user u2 on m.update_by = u2.user_name
+        where m.id = #{id}
+    </select>
+
+    <insert id="insertTMouse" parameterType="com.ruoyi.system.domain.vo.TMouseVO" useGeneratedKeys="true" keyProperty="id">
+        insert into t_mouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">mouse_code,</if>
+            <if test="mouseName != null and mouseName != ''">mouse_name,</if>
+            <if test="species != null and species != ''">species,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="birthDate != null">birth_date,</if>
+            <if test="weight != null">weight,</if>
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="photoUrl != null and photoUrl != ''">photo_url,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">#{mouseCode},</if>
+            <if test="mouseName != null and mouseName != ''">#{mouseName},</if>
+            <if test="species != null and species != ''">#{species},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="birthDate != null">#{birthDate},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="photoUrl != null and photoUrl != ''">#{photoUrl},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTMouse" parameterType="com.ruoyi.system.domain.vo.TMouseVO">
+        update t_mouse
+        <trim prefix="set" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">mouse_code = #{mouseCode},</if>
+            <if test="mouseName != null and mouseName != ''">mouse_name = #{mouseName},</if>
+            <if test="species != null and species != ''">species = #{species},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="photoUrl != null">photo_url = #{photoUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMouseById" parameterType="Long">
+        delete from t_mouse where id = #{id}
+    </delete>
+
+    <delete id="deleteTMouseByIds" parameterType="String">
+        delete from t_mouse where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkMouseCodeUnique" parameterType="String" resultMap="TMouseResult">
+        select id, mouse_code from t_mouse where mouse_code = #{mouseCode} limit 1
+    </select>
+
+    <select id="selectTMouseByMouseCode" parameterType="String" resultMap="TMouseVOResult">
+        select m.id, m.mouse_code, m.mouse_name, m.species, m.gender, m.birth_date, m.weight, m.experiment_id, m.photo_url, m.status, m.create_by, m.create_time, m.update_by, m.update_time, m.remark,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_mouse m
+        left join t_experiment e on m.experiment_id = e.id
+        left join sys_user u1 on m.create_by = u1.user_name
+        left join sys_user u2 on m.update_by = u2.user_name
+        where m.mouse_code = #{mouseCode}
+    </select>
+
+</mapper>

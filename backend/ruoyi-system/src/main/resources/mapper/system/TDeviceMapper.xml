@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TDeviceMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TDevice" id="TDeviceResult">
+        <id     property="id"           column="id"            />
+        <result property="deviceCode"   column="device_code"   />
+        <result property="deviceName"   column="device_name"   />
+        <result property="deviceType"   column="device_type"   />
+        <result property="location"     column="location"      />
+        <result property="status"       column="status"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="remark"       column="remark"        />
+    </resultMap>
+
+    <sql id="selectTDeviceVo">
+        select id, device_code, device_name, device_type, location, status, create_by, create_time, update_by, update_time, remark from t_device
+    </sql>
+
+    <select id="selectTDeviceList" parameterType="com.ruoyi.system.domain.TDevice" resultType="com.ruoyi.system.domain.vo.TDeviceVO">
+        select d.id, d.device_code, d.device_name, d.device_type, d.location, d.status, d.create_by, d.create_time, d.update_by, d.update_time, d.remark,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_device d
+        left join sys_user u1 on d.create_by = u1.user_name
+        left join sys_user u2 on d.update_by = u2.user_name
+        where 1=1
+        <if test="deviceCode != null and deviceCode != ''">
+            AND d.device_code like concat('%', #{deviceCode}, '%')
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND d.device_name like concat('%', #{deviceName}, '%')
+        </if>
+        <if test="deviceType != null and deviceType != ''">
+            AND d.device_type = #{deviceType}
+        </if>
+        <if test="location != null and location != ''">
+            AND d.location like concat('%', #{location}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND d.status = #{status}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(d.create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(d.create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        order by d.create_time desc
+    </select>
+
+    <select id="selectTDeviceById" parameterType="Long" resultType="com.ruoyi.system.domain.vo.TDeviceVO">
+        select d.id, d.device_code, d.device_name, d.device_type, d.location, d.status, d.create_by, d.create_time, d.update_by, d.update_time, d.remark,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_device d
+        left join sys_user u1 on d.create_by = u1.user_name
+        left join sys_user u2 on d.update_by = u2.user_name
+        where d.id = #{id}
+    </select>
+
+    <insert id="insertTDevice" parameterType="com.ruoyi.system.domain.TDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into t_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code,</if>
+            <if test="deviceName != null and deviceName != ''">device_name,</if>
+            <if test="deviceType != null and deviceType != ''">device_type,</if>
+            <if test="location != null and location != ''">location,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">#{deviceCode},</if>
+            <if test="deviceName != null and deviceName != ''">#{deviceName},</if>
+            <if test="deviceType != null and deviceType != ''">#{deviceType},</if>
+            <if test="location != null and location != ''">#{location},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTDevice" parameterType="com.ruoyi.system.domain.TDevice">
+        update t_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code = #{deviceCode},</if>
+            <if test="deviceName != null and deviceName != ''">device_name = #{deviceName},</if>
+            <if test="deviceType != null and deviceType != ''">device_type = #{deviceType},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTDeviceById" parameterType="Long">
+        delete from t_device where id = #{id}
+    </delete>
+
+    <delete id="deleteTDeviceByIds" parameterType="String">
+        delete from t_device where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkDeviceCodeUnique" parameterType="String" resultMap="TDeviceResult">
+        select id, device_code from t_device where device_code = #{deviceCode} limit 1
+    </select>
+
+</mapper>

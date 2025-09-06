@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('修改小鼠')" />
+	<th:block th:include="include :: datetimepicker-css" />
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-mouse-edit" th:object="${tMouse}">
+			<input name="id" th:field="*{id}" type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label is-required">小鼠编号：</label>
+				<div class="col-sm-8">
+					<input name="mouseCode" th:field="*{mouseCode}" class="form-control" type="text" maxlength="50" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label is-required">小鼠名称：</label>
+				<div class="col-sm-8">
+					<input name="mouseName" th:field="*{mouseName}" class="form-control" type="text" maxlength="100" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物种：</label>
+				<div class="col-sm-8">
+					<input name="species" th:field="*{species}" class="form-control" type="text" maxlength="50">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">性别：</label>
+				<div class="col-sm-8">
+					<select name="gender" class="form-control">
+						<option value="">请选择性别</option>
+						<option value="M" th:selected="*{gender} == 'M'">雄性</option>
+						<option value="F" th:selected="*{gender} == 'F'">雌性</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">出生日期：</label>
+				<div class="col-sm-8">
+					<div class="input-group date">
+						<input name="birthDate" th:value="*{birthDate != null ? #dates.format(birthDate, 'yyyy-MM-dd') : ''}" class="form-control" placeholder="yyyy-mm-dd" type="text">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">体重(g)：</label>
+				<div class="col-sm-8">
+					<input name="weight" th:field="*{weight}" class="form-control" type="number" step="0.01" min="0">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">实验ID：</label>
+				<div class="col-sm-8">
+					<input name="experimentId" th:field="*{experimentId}" class="form-control" type="number" min="0">
+				</div>
+			</div>
+            <!-- 照片上传 -->
+            <div class="form-group">
+                <label class="col-sm-3 control-label">照片：</label>
+                <div class="col-sm-8">
+                    <div class="file-loading">
+                        <input id="mousePhoto" name="file" type="file" accept="image/*">
+                    </div>
+                    <input type="hidden" id="photoUrlValue" name="photoUrl" th:value="*{photoUrl}" />
+                    <span class="help-block m-b-none">支持 jpg、jpeg、png、gif、bmp、webp 格式，上传后会自动填充隐藏字段用于保存。</span>
+                </div>
+            </div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<div class="radio-box">
+						<input type="radio" id="status1" name="status" value="1" th:checked="*{status} == 1">
+						<label for="status1">正常</label>
+						<input type="radio" id="status0" name="status" value="0" th:checked="*{status} == 0">
+						<label for="status0">异常</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea name="remark" th:field="*{remark}" class="form-control" rows="3" maxlength="500"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-sm-offset-5 col-sm-10">
+			<button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存 喵</button>&nbsp;
+			<button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+		</div>
+	</div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: bootstrap-fileinput-js" />
+	<script type="text/javascript">
+		var prefix = ctx + "system/mouse";
+		
+
+        $(function(){
+            
+            var initial = $("#photoUrlValue").val();
+            var originalPhotoUrl = initial; // 保存原始图片URL
+            var hasUploadedNewPhoto = false; // 标记是否上传了新图片
+            
+            var options = {
+                uploadUrl: ctx + 'common/upload',
+                allowedFileExtensions: ['jpg','jpeg','png','gif','bmp','webp'],
+                showUpload: true,
+                showRemove: true,
+                initialPreviewAsData: false,
+                browseClass: 'btn btn-primary',
+                dropZoneEnabled: false,
+                maxFileCount: 1,
+                autoReplace: true
+            };
+            if (initial) {
+                options.initialPreview = [initial];
+                options.initialPreviewConfig = [{
+                    caption: '当前图片',
+                    width: '120px',
+                    url: ctx + 'common/delete',
+                    key: initial
+                }];
+                options.initialPreviewAsData = true;
+                options.overwriteInitial = false;
+            }
+            $("#mousePhoto").fileinput(options)
+                .on('fileuploaded', function (event, data) {
+                    var rsp = data.response || {};
+                    hasUploadedNewPhoto = true; // 标记已上传新图片
+                    if (rsp.url) {
+                        $("#photoUrlValue").val(rsp.url);
+                    } else if (rsp.fileName) {
+                        $("#photoUrlValue").val(rsp.fileName);
+                    }
+                })
+                .on('filesuccessremove filecleared', function () {
+                    // 如果没有上传新图片，保留原图片；否则清空
+                    if (!hasUploadedNewPhoto && originalPhotoUrl) {
+                        $("#photoUrlValue").val(originalPhotoUrl);
+                    } else {
+                        $("#photoUrlValue").val('');
+                        hasUploadedNewPhoto = false;
+                    }
+                });
+        });
+		$("#form-mouse-edit").validate({
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix, $('#form-mouse-edit').serialize(), function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        // 编辑成功后跳转到小鼠列表页面
+                        setTimeout(function() {
+							console.log('喵喵')
+							console.log(result.msg);
+                            closeItem();
+                        }, 1000);
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                });
+            }
+        }
+	    
+	    $('input[name="birthDate"]').datetimepicker({
+	        format: "yyyy-mm-dd",
+	        minView: "month",
+	        language:  'zh-CN',
+	        autoclose: true,
+	        todayHighlight: true
+	    });
+
+	</script>
+</body>
+</html>

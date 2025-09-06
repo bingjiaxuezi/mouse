@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TBehaviorDataMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TBehaviorData" id="TBehaviorDataResult">
+        <id     property="id"            column="id"             />
+        <result property="deviceCode"    column="device_code"  />
+        <result property="mouseCode"     column="mouse_code"   />
+        <result property="experimentId"  column="experiment_id"  />
+        <result property="behaviorType"  column="behavior_type"  />
+        <result property="behaviorValue" column="behavior_value" />
+        <result property="confidence"    column="confidence"     />
+        <result property="timestamp"     column="timestamp"      />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"        column="remark"         />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.system.domain.vo.TBehaviorDataVO" id="TBehaviorDataVOResult">
+        <id     property="id"            column="id"             />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="mouseCode"     column="mouse_code"     />
+        <result property="mouseName"     column="mouse_name"     />
+        <result property="experimentId"  column="experiment_id"  />
+        <result property="experimentName" column="experiment_name" />
+        <result property="behaviorType"  column="behavior_type"  />
+        <result property="behaviorValue" column="behavior_value" />
+        <result property="confidence"    column="confidence"     />
+        <result property="timestamp"     column="timestamp"      />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"      column="update_by"      />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTBehaviorDataVo">
+        select id, device_code, mouse_code, experiment_id, behavior_type, behavior_value, confidence, timestamp, create_by, create_time, update_by, update_time, remark from t_behavior_data
+    </sql>
+
+    <select id="selectTBehaviorDataList" parameterType="com.ruoyi.system.domain.TBehaviorData" resultMap="TBehaviorDataVOResult">
+        select bd.id, bd.device_code, bd.mouse_code, bd.experiment_id, bd.behavior_type, bd.behavior_value, bd.confidence, bd.timestamp, bd.create_by, bd.create_time, bd.update_by, bd.update_time, bd.remark,
+               d.device_name,
+               m.mouse_name,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_behavior_data bd
+        left join t_device d on bd.device_code = d.device_code
+        left join t_mouse m on bd.mouse_code = m.mouse_code
+        left join t_experiment e on bd.experiment_id = e.id
+        left join sys_user u1 on bd.create_by = u1.user_name
+        left join sys_user u2 on bd.update_by = u2.user_name
+        where 1=1
+        <if test="deviceCode != null and deviceCode != ''">
+            AND bd.device_code = #{deviceCode}
+        </if>
+        <if test="mouseCode != null and mouseCode != ''">
+            AND bd.mouse_code = #{mouseCode}
+        </if>
+        <if test="experimentId != null">
+            AND bd.experiment_id = #{experimentId}
+        </if>
+        <if test="behaviorType != null and behaviorType != ''">
+            AND bd.behavior_type = #{behaviorType}
+        </if>
+        <if test="params.beginTimestamp != null">
+            AND bd.timestamp &gt;= #{params.beginTimestamp}
+        </if>
+        <if test="params.endTimestamp != null">
+            AND bd.timestamp &lt;= #{params.endTimestamp}
+        </if>
+        order by bd.timestamp desc
+    </select>
+
+    <select id="selectTBehaviorDataById" parameterType="Long" resultMap="TBehaviorDataVOResult">
+        select bd.id, bd.device_code, bd.mouse_code, bd.experiment_id, bd.behavior_type, bd.behavior_value, bd.confidence, bd.timestamp, bd.create_by, bd.create_time, bd.update_by, bd.update_time, bd.remark,
+               d.device_name,
+               m.mouse_name,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_behavior_data bd
+        left join t_device d on bd.device_code = d.device_code
+        left join t_mouse m on bd.mouse_code = m.mouse_code
+        left join t_experiment e on bd.experiment_id = e.id
+        left join sys_user u1 on bd.create_by = u1.user_name
+        left join sys_user u2 on bd.update_by = u2.user_name
+        where bd.id = #{id}
+    </select>
+
+    <insert id="insertTBehaviorData" parameterType="com.ruoyi.system.domain.TBehaviorData" useGeneratedKeys="true" keyProperty="id">
+        insert into t_behavior_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code,</if>
+            <if test="mouseCode != null and mouseCode != ''">mouse_code,</if>
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="behaviorType != null and behaviorType != ''">behavior_type,</if>
+            <if test="behaviorValue != null and behaviorValue != ''">behavior_value,</if>
+            <if test="confidence != null">confidence,</if>
+            <if test="timestamp != null">timestamp,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">#{deviceCode},</if>
+            <if test="mouseCode != null and mouseCode != ''">#{mouseCode},</if>
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="behaviorType != null and behaviorType != ''">#{behaviorType},</if>
+            <if test="behaviorValue != null and behaviorValue != ''">#{behaviorValue},</if>
+            <if test="confidence != null">#{confidence},</if>
+            <if test="timestamp != null">#{timestamp},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTBehaviorData" parameterType="com.ruoyi.system.domain.TBehaviorData">
+        update t_behavior_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code = #{deviceCode},</if>
+            <if test="mouseCode != null and mouseCode != ''">mouse_code = #{mouseCode},</if>
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="behaviorType != null and behaviorType != ''">behavior_type = #{behaviorType},</if>
+            <if test="behaviorValue != null and behaviorValue != ''">behavior_value = #{behaviorValue},</if>
+            <if test="confidence != null">confidence = #{confidence},</if>
+            <if test="timestamp != null">timestamp = #{timestamp},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTBehaviorDataById" parameterType="Long">
+        delete from t_behavior_data where id = #{id}
+    </delete>
+
+    <delete id="deleteTBehaviorDataByIds" parameterType="String">
+        delete from t_behavior_data where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectRecentBehaviorsByMouseCode" resultMap="TBehaviorDataVOResult">
+        select bd.id, bd.device_code, bd.mouse_code, bd.experiment_id, bd.behavior_type, bd.behavior_value, bd.confidence, bd.timestamp, bd.create_by, bd.create_time, bd.update_by, bd.update_time, bd.remark,
+               d.device_name,
+               m.mouse_name,
+               e.experiment_name,
+               u1.user_name as createByName, u2.user_name as updateByName
+        from t_behavior_data bd
+        left join t_device d on bd.device_code = d.device_code
+        left join t_mouse m on bd.mouse_code = m.mouse_code
+        left join t_experiment e on bd.experiment_id = e.id
+        left join sys_user u1 on bd.create_by = u1.user_name
+        left join sys_user u2 on bd.update_by = u2.user_name
+        where bd.mouse_code = #{mouseCode}
+        order by bd.timestamp desc
+    </select>
+
+</mapper>

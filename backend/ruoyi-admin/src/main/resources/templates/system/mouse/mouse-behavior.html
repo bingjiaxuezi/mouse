@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('小鼠行为详情')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>小鼠行为详情 - <span id="mouseCodeTitle"></span></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <!-- 统计概览 -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-sm-3">
+                                <div class="widget style1 navy-bg">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <i class="fa fa-bar-chart fa-3x"></i>
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            <span>总记录数</span>
+                                            <h2 class="font-bold" id="totalRecords">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="widget style1 lazur-bg">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <i class="fa fa-tags fa-3x"></i>
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            <span>行为类型数</span>
+                                            <h2 class="font-bold" id="behaviorTypes">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="widget style1 yellow-bg">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <i class="fa fa-clock-o fa-3x"></i>
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            <span>最近记录</span>
+                                            <h2 class="font-bold" id="lastRecord">-</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="widget style1 red-bg">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <i class="fa fa-line-chart fa-3x"></i>
+                                        </div>
+                                        <div class="col-8 text-right">
+                                            <span>平均置信度</span>
+                                            <h2 class="font-bold" id="avgConfidence">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 搜索条件 -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-sm-12 search-collapse">
+                                <form id="formId">
+                                    <div class="select-list">
+                                        <ul>
+                                            <li>
+                                                行为类型：<select name="behaviorType" id="behaviorTypeSelect">
+                                                    <option value="">所有类型</option>
+                                                </select>
+                                            </li>
+                                            <li class="select-time">
+                                                <label>记录时间：</label>
+                                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTimestamp]" data-type="datetime"/>
+                                                <span>-</span>
+                                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTimestamp]" data-type="datetime"/>
+                                            </li>
+                                            <li>
+                                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                                <a class="btn btn-warning btn-rounded btn-sm" onclick="resetForm()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 数据表格 -->
+                        <div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+         var prefix = ctx + "system/behavior";
+         var mouseCode = [[${mouseCode}]];
+         
+         // 行为类型映射缓存
+         var behaviorTypeMap = {};
+         
+         // 从后端获取行为类型映射
+         function loadBehaviorTypes() {
+             $.ajax({
+                 url: ctx + 'system/behavior/types',
+                 type: 'GET',
+                 success: function(result) {
+                     if (result.code === 0) {
+                         behaviorTypeMap = result.data;
+                     }
+                 },
+                 error: function() {
+                     console.error('获取行为类型失败');
+                 }
+             });
+         }
+         
+         // 获取行为类型中文名称
+         function getBehaviorTypeChinese(englishType) {
+             return behaviorTypeMap[englishType] || englishType;
+         }
+         
+         // 解析行为值
+         function parseBehaviorValue(behaviorType, behaviorValue) {
+             if (!behaviorValue || behaviorValue === '-') {
+                 return '-';
+             }
+             
+             // 如果后端已经格式化了行为值，直接返回
+             if (typeof behaviorValue === 'string' && (behaviorValue.includes('分钟') || behaviorValue.includes('次') || behaviorValue.includes('米'))) {
+                 return behaviorValue;
+             }
+             
+             // 如果包含冒号，提取值部分
+             if (behaviorValue.includes(':')) {
+                 var parts = behaviorValue.split(':');
+                 if (parts.length >= 2) {
+                     return parts[1];
+                 }
+             }
+             
+             // 根据行为类型解析行为值
+             switch(behaviorType) {
+                 case 'movement':
+                 case 'exploration':
+                 case 'exploring':
+                     return behaviorValue + ' 米';
+                 case 'sleeping':
+                 case 'resting':
+                     return behaviorValue + ' 分钟';
+                 case 'feeding':
+                     return behaviorValue + ' 次';
+                 default:
+                     return behaviorValue;
+             }
+         }
+        
+        // 加载行为类型下拉选项
+        function loadBehaviorTypeOptions() {
+            $.ajax({
+                url: ctx + 'system/behavior/types/' + mouseCode,
+                type: 'GET',
+                success: function(result) {
+                    if (result.code === 0) {
+                        var select = $('#behaviorTypeSelect');
+                        select.empty();
+                        select.append('<option value="">所有类型</option>');
+                        
+                        $.each(result.data, function(key, value) {
+                            select.append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    }
+                },
+                error: function() {
+                    console.error('获取行为类型选项失败');
+                }
+            });
+        }
+        
+        // 重置表单
+        function resetForm() {
+            $('#formId')[0].reset();
+            $('#startTime').val('');
+            $('#endTime').val('');
+            $('#behaviorTypeSelect').val('');
+            $.table.search();
+        }
+        
+        $(function() {
+            // 加载行为类型映射和下拉选项
+            loadBehaviorTypes();
+            loadBehaviorTypeOptions();
+            
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "行为记录",
+                queryParams: function(params) {
+                    var search = $.table.queryParams(params);
+                    search.mouseCode = mouseCode;
+                    search.behaviorType = $('#behaviorTypeSelect').val();
+                    search['params[beginTimestamp]'] = $('#startTime').val();
+                    search['params[endTimestamp]'] = $('#endTime').val();
+                    return search;
+                },
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    title: '记录ID',
+                    visible: false
+                },
+                {
+                    field: 'deviceCode',
+                    title: '设备编码'
+                },
+                {
+                    field: 'mouseCode',
+                    title: '小鼠编码'
+                },
+                {
+                    field: 'experimentId',
+                    title: '实验ID'
+                },
+                {
+                    field: 'behaviorType',
+                    title: '行为类型',
+                    formatter: function(value, row, index) {
+                        // 优先使用后端返回的中文名称
+                        return row.behaviorTypeName || getBehaviorTypeChinese(value);
+                    }
+                },
+                {
+                    field: 'behaviorValue',
+                    title: '行为值',
+                    formatter: function(value, row, index) {
+                        // 优先使用后端格式化的行为值
+                        return row.formattedBehaviorValue || parseBehaviorValue(row.behaviorType, value);
+                    }
+                },
+                {
+                    field: 'confidence',
+                    title: '置信度',
+                    formatter: function(value, row, index) {
+                        return (value * 100).toFixed(1) + '%';
+                    }
+                },
+                {
+                    field: 'timestamp',
+                    title: '记录时间'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')" shiro:hasPermission="system:behavior:edit"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')" shiro:hasPermission="system:behavior:remove"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+            
+            // 设置小鼠编码标题
+            $("#mouseCodeTitle").text(mouseCode);
+            
+            // 加载统计数据
+            loadStatistics();
+        });
+
+        var behaviorTypeDatas = [[${@dict.getType('behavior_type')}]];
+
+        function loadStatistics() {
+            $.ajax({
+                url: prefix + "/statistics/" + mouseCode,
+                type: 'GET',
+                success: function(result) {
+                    if (result.code === 0 && result.data) {
+                        $("#totalRecords").text(result.data.totalRecords || 0);
+                        $("#behaviorTypes").text(result.data.behaviorTypeCount || 0);
+                        $("#lastRecord").text(result.data.lastRecordTime || '-');
+                        
+                        // 计算平均置信度
+                        loadAverageConfidence();
+                    }
+                },
+                error: function() {
+                    $.modal.msgError("加载统计数据失败");
+                }
+            });
+        }
+        
+        function loadAverageConfidence() {
+            $.ajax({
+                url: prefix + "/recent",
+                type: 'GET',
+                data: { mouseCode: mouseCode, limit: 1000 }, // 获取更多数据计算平均值
+                success: function(result) {
+                    if (result.code === 0 && result.data && result.data.length > 0) {
+                        var totalConfidence = 0;
+                        $.each(result.data, function(index, item) {
+                            totalConfidence += (item.confidence || 0);
+                        });
+                        var avgConfidence = (totalConfidence / result.data.length * 100).toFixed(1) + '%';
+                        $("#avgConfidence").text(avgConfidence);
+                    } else {
+                        $("#avgConfidence").text('0%');
+                    }
+                }
+            });
+        }
+
+        $("#startTime").datetimepicker({
+            format: "yyyy-mm-dd hh:ii:ss",
+            minView: "month",
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0
+        });
+        $("#endTime").datetimepicker({
+            format: "yyyy-mm-dd hh:ii:ss",
+            minView: "month",
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0
+        });
+    </script>
+</body>
+</html>

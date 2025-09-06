@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('行为记录管理')" />
+	<th:block th:include="include :: layout-latest-css" />
+	<style>
+		.statistics-card {
+			background: #fff;
+			border-radius: 8px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+		.stat-item {
+			text-align: center;
+			padding: 15px;
+		}
+		.stat-number {
+			font-size: 24px;
+			font-weight: bold;
+			color: #337ab7;
+		}
+		.stat-label {
+			font-size: 14px;
+			color: #666;
+			margin-top: 5px;
+		}
+		.behavior-type-tag {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 12px;
+			font-size: 12px;
+			margin: 2px;
+		}
+		.behavior-eating { background-color: #d4edda; color: #155724; }
+		.behavior-drinking { background-color: #cce7ff; color: #004085; }
+		.behavior-moving { background-color: #fff3cd; color: #856404; }
+		.behavior-resting { background-color: #f8d7da; color: #721c24; }
+		.behavior-exploring { background-color: #e2e3e5; color: #383d41; }
+	</style>
+</head>
+<body class="gray-bg">
+	<div class="container-div">
+		<!-- 统计汇总区域 -->
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="statistics-card">
+					<h4 style="margin-bottom: 20px;"><i class="fa fa-bar-chart"></i> 行为统计概览</h4>
+					<div class="row" id="statisticsOverview">
+						<div class="col-sm-2">
+							<div class="stat-item">
+								<div class="stat-number" id="totalBehaviors">-</div>
+								<div class="stat-label">总行为记录</div>
+							</div>
+						</div>
+						<div class="col-sm-2">
+							<div class="stat-item">
+								<div class="stat-number" id="activeMice">-</div>
+								<div class="stat-label">活跃小鼠数</div>
+							</div>
+						</div>
+						<div class="col-sm-2">
+							<div class="stat-item">
+								<div class="stat-number" id="todayBehaviors">-</div>
+								<div class="stat-label">今日记录</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="stat-item">
+								<div class="stat-label">行为类型分布</div>
+								<div id="behaviorTypeDistribution" style="margin-top: 10px;">
+									<!-- 动态加载行为类型标签 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 行为类型分布图表区域 -->
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="statistics-card">
+					<h4 style="margin-bottom: 20px;"><i class="fa fa-pie-chart"></i> 行为类型分布图表</h4>
+					
+					<!-- 图表控制面板 -->
+					<div class="row" style="margin-bottom: 15px;">
+						<div class="col-sm-3">
+							<label>小鼠编号:</label>
+							<select id="chartMouseCode" class="form-control">
+								<option value="">所有小鼠</option>
+							</select>
+						</div>
+						<div class="col-sm-2">
+							<label>时间范围:</label>
+							<select id="chartTimeRange" class="form-control" onchange="toggleCustomTime()">
+								<option value="24">近24小时</option>
+								<option value="72">近3天</option>
+								<option value="168">近7天</option>
+								<option value="custom">自定义时间</option>
+							</select>
+						</div>
+						<div class="col-sm-3" id="customTimeRange" style="display: none;">
+							<label>开始时间:</label>
+							<input type="text" id="chartStartTime" class="form-control" placeholder="开始时间" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+						</div>
+						<div class="col-sm-3" id="customTimeRange2" style="display: none;">
+							<label>结束时间:</label>
+							<input type="text" id="chartEndTime" class="form-control" placeholder="结束时间" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+						</div>
+						<div class="col-sm-1">
+							<label>&nbsp;</label>
+							<button type="button" class="btn btn-primary form-control" onclick="loadTypeDistributionChart()"><i class="fa fa-refresh"></i> 刷新</button>
+						</div>
+					</div>
+					
+					<!-- 图表容器 -->
+					<div class="row">
+						<div class="col-sm-12">
+							<div id="behaviorTypeChart" style="height: 400px; width: 100%;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 查询条件区域 -->
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="behavior-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								小鼠编号：<input type="text" name="mouseCode" placeholder="请输入小鼠编号"/>
+							</li>
+							<li>
+								设备编号：<input type="text" name="deviceCode" placeholder="请输入设备编号"/>
+							</li>
+							<li>
+								行为类型：<select name="behaviorTypeId" id="behaviorTypeSelect">
+									<option value="">所有类型</option>
+								</select>
+							</li>
+							<li>
+								实验ID：<input type="text" name="experimentId" placeholder="请输入实验ID"/>
+							</li>
+							<li class="select-time">
+								<label>记录时间： </label>
+								<input type="text" id="startTime" placeholder="开始时间" name="params[beginTimestamp]" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+								<span>-</span>
+								<input type="text" id="endTime" placeholder="结束时间" name="params[endTimestamp]" data-type="datetime" data-format="yyyy-MM-dd HH:mm:ss"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="resetForm()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:behavior:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+		        <a class="btn btn-info" onclick="refreshStatistics()">
+		            <i class="fa fa-refresh"></i> 刷新统计
+		        </a>
+	        </div>
+	        
+	        <!-- 行为记录列表 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table"></table>
+			</div>
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: layout-latest-js" />
+	<script th:src="@{/ajax/libs/echarts/echarts.min.js}"></script>
+	<script th:src="@{/ruoyi/js/behavior.js}"></script>
+	<script th:inline="javascript">
+		var exportFlag = [[${@permission.hasPermi('system:behavior:export')}]];
+		var prefix = ctx + "system/behavior";
+		var behaviorTypes = []; // 存储行为类型数据
+
+		$(function() {
+		    loadBehaviorTypes();
+		    queryBehaviorList();
+		    loadStatistics();
+		    loadChartMouseOptions();
+		    loadTypeDistributionChart(); // 默认加载图表
+		});
+
+		// 加载行为类型下拉选项
+		function loadBehaviorTypes() {
+		    $.get(ctx + "system/behavior/types", function(result) {
+		        if (result.code == 0) {
+		            behaviorTypes = result.data;
+		            var options = '<option value="">所有类型</option>';
+		            $.each(result.data, function(code, name) {
+		                options += '<option value="' + code + '">' + name + '</option>';
+		            });
+		            $('#behaviorTypeSelect').html(options);
+		        }
+		    });
+		}
+
+		// 查询行为记录列表
+		function queryBehaviorList() {
+		    var options = {
+            url: prefix + "/list",
+            exportUrl: prefix + "/export",
+            sortName: "timestamp",
+            sortOrder: "desc",
+		        modalName: "行为记录",
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+		            field: 'id',
+		            title: '记录ID',
+		            visible: false
+		        },
+		        {
+		            field: 'mouseCode',
+		            title: '小鼠编号',
+		            sortable: true,
+		            formatter: function(value, row, index) {
+		                return '<a href="javascript:void(0)" onclick="viewMouseBehavior(\'' + value + '\')" class="text-primary">' + value + '</a>';
+		            }
+		        },
+		        {
+		            field: 'deviceCode',
+		            title: '设备编号'
+		        },
+		        {
+		            field: 'experimentId',
+		            title: '实验ID'
+		        },
+		        {
+		            field: 'behaviorTypeName',
+		            title: '行为类型',
+		            formatter: function(value, row, index) {
+		                var className = getBehaviorTypeClass(row.behaviorTypeCategory);
+		                return '<span class="behavior-type-tag ' + className + '">' + (value || row.behaviorType) + '</span>';
+		            }
+		        },
+		        {
+		            field: 'formattedBehaviorValue',
+		            title: '行为值',
+		            formatter: function(value, row, index) {
+		                var displayValue = value || row.behaviorValue || '-';
+		                if (displayValue && displayValue.length > 50) {
+		                    return '<span title="' + displayValue + '">' + displayValue.substring(0, 50) + '...</span>';
+		                }
+		                return displayValue;
+		            }
+		        },
+		        {
+		            field: 'recordTime',
+		            title: '记录时间',
+		            sortable: true
+		        },
+		        {
+		            field: 'duration',
+		            title: '持续时间(秒)',
+		            formatter: function(value, row, index) {
+		                return value ? value + 's' : '-';
+		            }
+		        },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		                actions.push('<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="viewBehaviorDetail(\'' + row.id + '\')" title="详情"><i class="fa fa-eye"></i>详情</a> ');
+		                actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="viewMouseBehavior(\'' + row.mouseCode + '\')" title="查看小鼠行为"><i class="fa fa-line-chart"></i>分析</a>');
+		                return actions.join('');
+		            }
+		        }]
+		    };
+		    $.table.init(options);
+		}
+
+		// 加载统计数据
+		function loadStatistics() {
+		    $.get(prefix + "/statistics", function(result) {
+		        if (result.code == 200) {
+		            var data = result.data;
+		            $('#totalBehaviors').text(data.totalBehaviors || 0);
+		            $('#activeMice').text(data.activeMice || 0);
+		            $('#todayBehaviors').text(data.todayBehaviors || 0);
+		            
+		            // 渲染行为类型分布
+		            if (data.behaviorTypeDistribution) {
+		                var distributionHtml = '';
+		                $.each(data.behaviorTypeDistribution, function(type, count) {
+		                    var className = getBehaviorTypeClass(type);
+		                    distributionHtml += '<span class="behavior-type-tag ' + className + '">' + type + ': ' + count + '</span>';
+		                });
+		                $('#behaviorTypeDistribution').html(distributionHtml);
+		            }
+		        }
+		    });
+		}
+
+		// 获取行为类型样式类
+		function getBehaviorTypeClass(category) {
+		    switch(category) {
+		        case '进食': return 'behavior-eating';
+		        case '饮水': return 'behavior-drinking';
+		        case '运动': return 'behavior-moving';
+		        case '休息': return 'behavior-resting';
+		        case '探索': return 'behavior-exploring';
+		        default: return 'behavior-exploring';
+		    }
+		}
+
+		// 查看小鼠行为详情
+		function viewMouseBehavior(mouseCode) {
+		    var url = prefix + "/mouse/" + mouseCode;
+		    $.modal.openTab("小鼠行为分析 - " + mouseCode, url);
+		}
+
+		// 查看行为记录详情
+		function viewBehaviorDetail(behaviorId) {
+		    $.get(prefix + "/" + behaviorId, function(result) {
+		        if (result.code == 200) {
+		            var data = result.data;
+		            var content = '<div class="row">' +
+		                '<div class="col-sm-6">' +
+		                '<p><strong>小鼠编号:</strong> ' + (data.mouseCode || '-') + '</p>' +
+		                '<p><strong>设备编号:</strong> ' + (data.deviceCode || '-') + '</p>' +
+		                '<p><strong>实验ID:</strong> ' + (data.experimentId || '-') + '</p>' +
+		                '<p><strong>行为类型:</strong> ' + (data.behaviorTypeName || data.behaviorType || '-') + '</p>' +
+		                '</div>' +
+		                '<div class="col-sm-6">' +
+		                '<p><strong>记录时间:</strong> ' + (data.recordTime || '-') + '</p>' +
+		                '<p><strong>持续时间:</strong> ' + (data.duration ? data.duration + '秒' : '-') + '</p>' +
+		                '<p><strong>创建时间:</strong> ' + (data.createTime || '-') + '</p>' +
+		                '</div>' +
+		                '</div>' +
+		                '<div class="row">' +
+		                '<div class="col-sm-12">' +
+		                '<p><strong>行为值:</strong></p>' +
+		                '<pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto;">' + (data.formattedBehaviorValue || data.behaviorValue || '无数据') + '</pre>' +
+		                '</div>' +
+		                '</div>';
+		            
+		            $.modal.open("行为记录详情", content, "800", "500");
+		        } else {
+		            $.modal.alertError(result.msg);
+		        }
+		    });
+		}
+
+		// 刷新统计数据
+		function refreshStatistics() {
+		    loadStatistics();
+		    $.modal.msgSuccess("统计数据已刷新");
+		}
+
+		// 重置表单
+		function resetForm() {
+		    resetDate();
+		    $("#behavior-form")[0].reset();
+		    // 清空时间输入框的值
+		    $('#startTime').val('');
+		    $('#endTime').val('');
+		    $.table.search();
+		}
+
+		// 切换自定义时间范围显示
+		function toggleCustomTime() {
+		    var timeRange = $('#chartTimeRange').val();
+		    if (timeRange === 'custom') {
+		        $('#customTimeRange').show();
+		        $('#customTimeRange2').show();
+		    } else {
+		        $('#customTimeRange').hide();
+		        $('#customTimeRange2').hide();
+		    }
+		}
+
+		// 加载小鼠选项到图表控制面板
+		function loadChartMouseOptions() {
+		    $.get(ctx + "system/mouse/list", function(result) {
+		        if (result.code == 0 && result.rows) {
+		            var options = '<option value="">所有小鼠</option>';
+		            $.each(result.rows, function(index, mouse) {
+		                options += '<option value="' + mouse.mouseCode + '">' + mouse.mouseCode + '</option>';
+		            });
+		            $('#chartMouseCode').html(options);
+		        }
+		    });
+		}
+
+		// 加载行为类型分布图表
+		function loadTypeDistributionChart() {
+		    var mouseCode = $('#chartMouseCode').val();
+		    var timeRange = $('#chartTimeRange').val();
+		    var options = {
+		        mouseCode: mouseCode
+		    };
+		    
+		    if (timeRange === 'custom') {
+		        var startTime = $('#chartStartTime').val();
+		        var endTime = $('#chartEndTime').val();
+		        if (!startTime || !endTime) {
+		            $.modal.msgError('请选择开始时间和结束时间');
+		            return;
+		        }
+		        options.startTime = startTime;
+		        options.endTime = endTime;
+		    } else {
+		        options.hours = parseInt(timeRange);
+		    }
+		    
+		    BehaviorChart.loadTypeDistribution('behaviorTypeChart', options);
+		}
+
+
+	</script>
+</body>
+</html>

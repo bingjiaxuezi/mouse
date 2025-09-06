@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('小鼠列表')" />
+	<th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="mouse-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								小鼠编号：<input type="text" name="mouseCode"/>
+							</li>
+							<li>
+								小鼠名称：<input type="text" name="mouseName"/>
+							</li>
+							<li>
+								物种：<input type="text" name="species"/>
+							</li>
+							<li>
+								性别：<select name="gender">
+									<option value="">所有</option>
+									<option value="M">雄性</option>
+									<option value="F">雌性</option>
+								</select>
+							</li>
+							<li>
+								状态：<select name="status">
+									<option value="">所有</option>
+									<option value="1">正常</option>
+									<option value="0">停用</option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>小鼠出生日期： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始日期" name="params[beginTime]" data-type="date"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束日期" name="params[endTime]" data-type="date"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="resetPre()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	        	<a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="system:mouse:add">
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	             <a class="btn btn-primary single disabled" onclick="$.operate.editTab()" shiro:hasPermission="system:mouse:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+	            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:mouse:remove">
+	                <i class="fa fa-remove"></i> 删除
+	            </a>
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:mouse:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+	        
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table"></table>
+			</div>
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: layout-latest-js" />
+	<script th:inline="javascript">
+		var editFlag = [[${@permission.hasPermi('system:mouse:edit')} ? '' : 'hidden']];
+		var removeFlag = [[${@permission.hasPermi('system:mouse:remove')} ? '' : 'hidden']];
+		var prefix = ctx + "system/mouse";
+
+		$(function() {
+		    queryMouseList();
+		});
+
+		function queryMouseList() {
+		    var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/{id}",
+            removeUrl: prefix + "/delete",
+            exportUrl: prefix + "/export",
+            sortName: "createTime",
+            sortOrder: "desc",
+            modalName: "小鼠",
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+		            field: 'id',
+		            title: '小鼠ID',
+		            visible: false
+		        },
+		        {
+		            field: 'mouseCode',
+		            title: '小鼠编号',
+		            sortable: true
+		        },
+		        {
+            field: 'mouseName',
+            title: '小鼠名称'
+        },
+        {
+            field: 'photoUrl',
+            title: '照片',
+            align: 'center',
+            formatter: function(value, row, index) {
+                if (value && value.trim() !== '') {
+                    return '<img src="' + value + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showImagePreview(\'' + value + '\')" title="点击查看大图" />';
+                } else {
+                    return '<span class="text-muted">无照片</span>';
+                }
+            }
+        },
+        {
+            field: 'species',
+            title: '物种'
+        },
+		        {
+		            field: 'gender',
+		            title: '性别',
+		            formatter: function(value, row, index) {
+		                if (value == 'M') {
+		                    return '<span class="label label-primary">雄性</span>';
+		                } else if (value == 'F') {
+		                    return '<span class="label label-danger">雌性</span>';
+		                }
+		                return value;
+		            }
+		        },
+		        {
+		            field: 'birthDate',
+		            title: '出生日期',
+		            sortable: true
+		        },
+		        {
+		            field: 'weight',
+		            title: '体重(g)'
+		        },
+		        {
+		            field: 'experimentId',
+		            title: '实验ID'
+		        },
+		        {
+		        	visible: editFlag == 'hidden' ? false : true,
+		        	title: '状态',
+		        	align: 'center',
+		        	formatter: function (value, row, index) {
+		        		return statusTools(row);
+		        	}
+		        },
+		        {
+		            field: 'createTime',
+		            title: '创建时间',
+		            sortable: true
+		        },
+		        {
+		            title: '操作',
+            align: 'center',
+            formatter: function(value, row, index) {
+            	var actions = [];
+                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.editTab(\'' + row.id + '\')" title="编辑"><i class="fa fa-edit"></i>编辑</a> ');
+                actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')" title="删除"><i class="fa fa-remove"></i>删除</a>');
+                return actions.join('');
+            }
+		        }]
+		    };
+		    $.table.init(options);
+		}
+		
+		/* 自定义重置-表单重置/搜索 */
+		function resetPre() {
+			resetDate();
+			$("#mouse-form")[0].reset();
+			$.table.search();
+		}
+		
+		/* 小鼠状态显示 */
+		function statusTools(row) {
+		    if (row.status == 1) {
+				return '<i class="fa fa-toggle-on text-info fa-2x" onclick="disable(\'' + row.id + '\')" title="点击停用"></i> ';
+			} else {
+				return '<i class="fa fa-toggle-off text-info fa-2x" onclick="enable(\'' + row.id + '\')" title="点击启用"></i> ';
+			}
+		}
+		
+		/* 小鼠管理-停用 */
+		function disable(mouseId) {
+			$.modal.confirm("确认要停用该小鼠吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "id": mouseId, "status": 0 });
+		    });
+		}
+
+		/* 小鼠管理启用 */
+		function enable(mouseId) {
+			$.modal.confirm("确认要启用该小鼠吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "id": mouseId, "status": 1 });
+		    });
+		}
+
+		/* 图片预览功能 */
+		function showImagePreview(imageUrl) {
+			var modalHtml = '<div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog">' +
+				'<div class="modal-dialog modal-lg" role="document">' +
+				'<div class="modal-content">' +
+				'<div class="modal-header">' +
+				'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+				'<span aria-hidden="true">&times;</span>' +
+				'</button>' +
+				'<h4 class="modal-title">小鼠照片预览</h4>' +
+				'</div>' +
+				'<div class="modal-body text-center">' +
+				'<img src="' + imageUrl + '" style="max-width: 100%; max-height: 500px; object-fit: contain;" />' +
+				'</div>' +
+				'</div>' +
+				'</div>' +
+				'</div>';
+			
+			// 移除已存在的模态框
+			$('#imagePreviewModal').remove();
+			// 添加新的模态框并显示
+			$('body').append(modalHtml);
+			$('#imagePreviewModal').modal('show');
+		}
+	</script>
+</body>
+</html>

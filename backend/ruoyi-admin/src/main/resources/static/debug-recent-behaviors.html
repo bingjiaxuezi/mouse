@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>调试最近行为记录</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .timeline-item {
+            border-left: 2px solid #007bff;
+            padding-left: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #007bff;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .behavior-type-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+        .behavior-eating { background-color: #28a745; }
+        .behavior-drinking { background-color: #17a2b8; }
+        .behavior-moving { background-color: #ffc107; color: #212529; }
+        .behavior-resting { background-color: #6c757d; }
+        .behavior-exploring { background-color: #fd7e14; }
+        .behavior-jumping { background-color: #e83e8c; }
+        .behavior-default { background-color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>调试最近行为记录</h1>
+    <button onclick="testRecentBehaviors()">测试加载最近行为记录</button>
+    <div id="debug-info"></div>
+    <div id="behaviorTimeline"></div>
+
+    <script>
+        var ctx = '/';  // 根路径
+        var mouseCode = '5ddeec8653f1487d';
+        var prefix = ctx + 'system/behavior';
+
+        function testRecentBehaviors() {
+            console.log('开始测试最近行为记录...');
+            $('#debug-info').html('<p>正在加载...</p>');
+            
+            $.get(prefix + "/mouse/" + mouseCode + "/recent", {
+                pageNum: 1,
+                pageSize: 10
+            }, function(result) {
+                console.log('接口响应:', result);
+                $('#debug-info').html('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
+                
+                if (result.code == 0) {
+                    var data = result.data;
+                    var behaviors = data.rows || data.list || data;
+                    console.log('行为数据:', behaviors);
+                    
+                    if (Array.isArray(behaviors)) {
+                        console.log('开始渲染时间线，数据条数:', behaviors.length);
+                        renderTimeline(behaviors, true);
+                    } else {
+                        console.error('无效的行为数据格式:', data);
+                        $('#debug-info').append('<p style="color: red;">错误: 无效的行为数据格式</p>');
+                    }
+                } else {
+                    console.error('加载最近行为失败:', result.msg);
+                    $('#debug-info').append('<p style="color: red;">错误: ' + result.msg + '</p>');
+                }
+            }).fail(function(xhr, status, error) {
+                console.error('请求失败:', error, xhr.responseText);
+                $('#debug-info').append('<p style="color: red;">请求失败: ' + error + '</p>');
+            });
+        }
+
+        // 渲染时间线
+        function renderTimeline(behaviors, isFirst) {
+            console.log('renderTimeline 被调用，behaviors:', behaviors, 'isFirst:', isFirst);
+            var timelineHtml = '';
+            
+            $.each(behaviors, function(index, behavior) {
+                console.log('处理行为记录 ' + index + ':', behavior);
+                var className = getBehaviorTypeClass(behavior.behaviorTypeName);
+                timelineHtml += '<div class="timeline-item">' +
+                    '<div class="timeline-time">' + (behavior.timestamp || behavior.recordTime || '-') + '</div>' +
+                    '<div class="timeline-content">' +
+                    '<span class="behavior-type-tag ' + className + '">' + (behavior.behaviorTypeName || behavior.behaviorType || '-') + '</span>' +
+                    '<span style="margin-left: 10px;">设备: ' + (behavior.deviceCode || '-') + '</span>' +
+                    '<span style="margin-left: 10px;">置信度: ' + (behavior.confidence ? (behavior.confidence * 100).toFixed(1) + '%' : '-') + '</span>' +
+                    (behavior.behaviorValue ? '<div style="margin-top: 5px; font-size: 12px; color: #666;">值: ' + 
+                        (behavior.formattedBehaviorValue || behavior.behaviorValue) + '</div>' : '') +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            console.log('生成的HTML:', timelineHtml);
+            
+            if (isFirst) {
+                $('#behaviorTimeline').html(timelineHtml);
+                console.log('首次加载，替换内容');
+            } else {
+                $('#behaviorTimeline').append(timelineHtml);
+                console.log('追加内容');
+            }
+            
+            console.log('时间线容器内容:', $('#behaviorTimeline').html());
+        }
+
+        // 获取行为类型样式类
+        function getBehaviorTypeClass(category) {
+            switch(category) {
+                case '进食':
+                case 'feeding': return 'behavior-eating';
+                case '饮水':
+                case 'drinking': return 'behavior-drinking';
+                case '运动':
+                case '攀爬':
+                case 'climbing':
+                case 'movement': return 'behavior-moving';
+                case '休息':
+                case 'resting': return 'behavior-resting';
+                case '探索':
+                case '跳跃':
+                case 'jumping':
+                case 'exploring': return 'behavior-exploring';
+                default: return 'behavior-default';
+            }
+        }
+
+        // 页面加载完成后自动测试
+        $(function() {
+            console.log('页面加载完成，开始自动测试');
+            testRecentBehaviors();
+        });
+    </script>
+</body>
+</html>

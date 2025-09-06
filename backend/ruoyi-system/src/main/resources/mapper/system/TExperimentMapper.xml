@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TExperimentMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TExperiment" id="TExperimentResult">
+        <id     property="id"               column="id"                />
+        <result property="experimentName"   column="experiment_name"   />
+        <result property="experimentCode"   column="experiment_code"   />
+        <result property="description"      column="description"       />
+        <result property="researcherId"     column="researcher_id"     />
+        <result property="status"           column="status"            />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+        <result property="remark"           column="remark"            />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.system.domain.vo.TExperimentVO" id="TExperimentVOResult">
+        <id     property="id"               column="id"                />
+        <result property="experimentName"   column="experiment_name"   />
+        <result property="experimentCode"   column="experiment_code"   />
+        <result property="description"      column="description"       />
+        <result property="researcherId"     column="researcher_id"     />
+        <result property="researcherName"   column="researcherName"    />
+        <result property="status"           column="status"            />
+        <result property="statusName"       column="statusDesc"        />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+    </resultMap>
+
+    <sql id="selectTExperimentVo">
+        select id, experiment_name, experiment_code, description, researcher_id, status, create_by, create_time, update_by, update_time, remark from t_experiment
+    </sql>
+
+    <select id="selectTExperimentList" parameterType="com.ruoyi.system.domain.TExperiment" resultMap="TExperimentVOResult">
+        select e.id, e.experiment_name, e.experiment_code, e.description, e.researcher_id, e.status, e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
+               u.user_name as researcherName,
+               u1.user_name as createByName, u2.user_name as updateByName,
+               case e.status 
+                   when '0' then '进行中'
+                   when '1' then '已完成'
+                   when '2' then '已暂停'
+                   else '未知'
+               end as statusDesc
+        from t_experiment e
+        left join sys_user u on e.researcher_id = u.user_id
+        left join sys_user u1 on e.create_by = u1.user_name
+        left join sys_user u2 on e.update_by = u2.user_name
+        where 1=1
+        <if test="experimentName != null and experimentName != ''">
+            AND e.experiment_name like concat('%', #{experimentName}, '%')
+        </if>
+        <if test="experimentCode != null and experimentCode != ''">
+            AND e.experiment_code like concat('%', #{experimentCode}, '%')
+        </if>
+        <if test="researcherId != null">
+            AND e.researcher_id = #{researcherId}
+        </if>
+        <if test="status != null and status != ''">
+            AND e.status = #{status}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(e.create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(e.create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        order by e.create_time desc
+    </select>
+
+    <select id="selectTExperimentById" parameterType="Long" resultMap="TExperimentVOResult">
+        select e.id, e.experiment_name, e.experiment_code, e.description, e.researcher_id, e.status, e.create_by, e.create_time, e.update_by, e.update_time, e.remark,
+               u.user_name as researcherName,
+               u1.user_name as createByName, u2.user_name as updateByName,
+               case e.status 
+                   when '0' then '进行中'
+                   when '1' then '已完成'
+                   when '2' then '已暂停'
+                   else '未知'
+               end as statusDesc
+        from t_experiment e
+        left join sys_user u on e.researcher_id = u.user_id
+        left join sys_user u1 on e.create_by = u1.user_name
+        left join sys_user u2 on e.update_by = u2.user_name
+        where e.id = #{id}
+    </select>
+
+    <insert id="insertTExperiment" parameterType="com.ruoyi.system.domain.TExperiment" useGeneratedKeys="true" keyProperty="id">
+        insert into t_experiment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="experimentName != null and experimentName != ''">experiment_name,</if>
+            <if test="experimentCode != null and experimentCode != ''">experiment_code,</if>
+            <if test="description != null and description != ''">description,</if>
+            <if test="researcherId != null">researcher_id,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="experimentName != null and experimentName != ''">#{experimentName},</if>
+            <if test="experimentCode != null and experimentCode != ''">#{experimentCode},</if>
+            <if test="description != null and description != ''">#{description},</if>
+            <if test="researcherId != null">#{researcherId},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateTExperiment" parameterType="com.ruoyi.system.domain.TExperiment">
+        update t_experiment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="experimentName != null and experimentName != ''">experiment_name = #{experimentName},</if>
+            <if test="experimentCode != null and experimentCode != ''">experiment_code = #{experimentCode},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="researcherId != null">researcher_id = #{researcherId},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTExperimentById" parameterType="Long">
+        delete from t_experiment where id = #{id}
+    </delete>
+
+    <delete id="deleteTExperimentByIds" parameterType="String">
+        delete from t_experiment where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkExperimentCodeUnique" parameterType="String" resultMap="TExperimentResult">
+        select id, experiment_code from t_experiment where experiment_code = #{experimentCode} limit 1
+    </select>
+
+</mapper>

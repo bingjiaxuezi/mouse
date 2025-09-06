@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小鼠行为测试页面</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>小鼠行为接口测试</h1>
+    
+    <div class="test-section">
+        <h3>1. 测试小鼠基本信息接口</h3>
+        <button onclick="testMouseInfo()">测试小鼠信息</button>
+        <div id="mouseInfoResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 测试行为统计汇总接口</h3>
+        <button onclick="testBehaviorSummary()">测试行为统计</button>
+        <div id="summaryResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 测试最近行为记录接口</h3>
+        <button onclick="testRecentBehaviors()">测试最近行为</button>
+        <div id="recentResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 测试行为趋势接口</h3>
+        <button onclick="testBehaviorTrend()">测试行为趋势</button>
+        <div id="trendResult" class="result"></div>
+    </div>
+    
+    <script>
+        const mouseCode = '5ddeec8653f1487d';
+        
+        function testMouseInfo() {
+            const resultDiv = $('#mouseInfoResult');
+            resultDiv.html('正在测试...');
+            
+            $.ajax({
+                url: `/system/mouse/${mouseCode}`,
+                type: 'GET',
+                success: function(response) {
+                    console.log('小鼠信息响应:', response);
+                    if (response.code === 0) {
+                        resultDiv.html(`<div class="success">✓ 成功获取小鼠信息</div><pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+                    } else {
+                        resultDiv.html(`<div class="error">✗ 接口返回错误: ${response.msg}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('小鼠信息请求失败:', error);
+                    resultDiv.html(`<div class="error">✗ 请求失败: ${error}</div>`);
+                }
+            });
+        }
+        
+        function testBehaviorSummary() {
+            const resultDiv = $('#summaryResult');
+            resultDiv.html('正在测试...');
+            
+            $.ajax({
+                url: `/system/behavior/mouse/${mouseCode}/summary`,
+                type: 'GET',
+                success: function(response) {
+                    console.log('行为统计响应:', response);
+                    if (response.code === 0) {
+                        resultDiv.html(`<div class="success">✓ 成功获取行为统计</div><pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+                    } else {
+                        resultDiv.html(`<div class="error">✗ 接口返回错误: ${response.msg}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('行为统计请求失败:', error);
+                    resultDiv.html(`<div class="error">✗ 请求失败: ${error}</div>`);
+                }
+            });
+        }
+        
+        function testRecentBehaviors() {
+            const resultDiv = $('#recentResult');
+            resultDiv.html('正在测试...');
+            
+            $.ajax({
+                url: `/system/behavior/mouse/${mouseCode}/recent`,
+                type: 'GET',
+                data: { pageNum: 1, pageSize: 10 },
+                success: function(response) {
+                    console.log('最近行为响应:', response);
+                    if (response.code === 0) {
+                        resultDiv.html(`<div class="success">✓ 成功获取最近行为记录</div><pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+                    } else {
+                        resultDiv.html(`<div class="error">✗ 接口返回错误: ${response.msg}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('最近行为请求失败:', error);
+                    resultDiv.html(`<div class="error">✗ 请求失败: ${error}</div>`);
+                }
+            });
+        }
+        
+        function testBehaviorTrend() {
+            const resultDiv = $('#trendResult');
+            resultDiv.html('正在测试...');
+            
+            $.ajax({
+                url: `/system/behavior/mouse/${mouseCode}/trend`,
+                type: 'GET',
+                success: function(response) {
+                    console.log('行为趋势响应:', response);
+                    if (response.code === 0) {
+                        resultDiv.html(`<div class="success">✓ 成功获取行为趋势</div><pre>${JSON.stringify(response.data, null, 2)}</pre>`);
+                    } else {
+                        resultDiv.html(`<div class="error">✗ 接口返回错误: ${response.msg}</div>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('行为趋势请求失败:', error);
+                    resultDiv.html(`<div class="error">✗ 请求失败: ${error}</div>`);
+                }
+            });
+        }
+        
+        // 页面加载完成后自动测试所有接口
+        $(document).ready(function() {
+            console.log('测试页面加载完成，开始自动测试接口...');
+            setTimeout(() => {
+                testMouseInfo();
+                setTimeout(() => testBehaviorSummary(), 1000);
+                setTimeout(() => testRecentBehaviors(), 2000);
+                setTimeout(() => testBehaviorTrend(), 3000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

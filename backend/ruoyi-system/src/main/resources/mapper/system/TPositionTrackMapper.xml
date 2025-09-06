@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TPositionTrackMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TPositionTrack" id="TPositionTrackResult">
+        <id     property="id"            column="id"             />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="mouseCode"     column="mouse_code"     />
+        <result property="experimentId"  column="experiment_id"  />
+        <result property="xCoordinate"   column="x_coordinate"   />
+        <result property="yCoordinate"   column="y_coordinate"   />
+        <result property="zCoordinate"   column="z_coordinate"   />
+        <result property="velocity"      column="velocity"       />
+        <result property="direction"     column="direction"      />
+        <result property="timestamp"     column="timestamp"      />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.system.domain.vo.TPositionTrackVO" id="TPositionTrackVOResult">
+        <id     property="id"            column="id"             />
+        <result property="deviceCode"    column="device_code"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="mouseCode"     column="mouse_code"     />
+        <result property="mouseName"     column="mouse_name"     />
+        <result property="experimentId"  column="experiment_id"  />
+        <result property="experimentName" column="experiment_name" />
+        <result property="xCoordinate"   column="x_coordinate"   />
+        <result property="yCoordinate"   column="y_coordinate"   />
+        <result property="zCoordinate"   column="z_coordinate"   />
+        <result property="velocity"      column="velocity"       />
+        <result property="direction"     column="direction"      />
+        <result property="timestamp"     column="timestamp"      />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectTPositionTrackVo">
+        select id, device_code, mouse_code, experiment_id, x_coordinate, y_coordinate, z_coordinate, velocity, direction, timestamp, create_by, create_time from t_position_track
+    </sql>
+
+    <select id="selectTPositionTrackList" parameterType="com.ruoyi.system.domain.TPositionTrack" resultMap="TPositionTrackVOResult">
+        select pt.id, pt.device_code, pt.mouse_code, pt.experiment_id, pt.x_coordinate, pt.y_coordinate, pt.z_coordinate, pt.velocity, pt.direction, pt.timestamp, pt.create_by, pt.create_time,
+               d.device_name,
+               m.mouse_name,
+               e.experiment_name
+        from t_position_track pt
+        left join t_device d on pt.device_code = d.device_code
+        left join t_mouse m on pt.mouse_code = m.mouse_code
+        left join t_experiment e on pt.experiment_id = e.id
+        where 1=1
+        <if test="deviceCode != null and deviceCode != ''">
+            AND pt.device_code = #{deviceCode}
+        </if>
+        <if test="mouseCode != null and mouseCode != ''">
+            AND pt.mouse_code = #{mouseCode}
+        </if>
+        <if test="experimentId != null">
+            AND pt.experiment_id = #{experimentId}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND pt.timestamp >= #{params.beginTime}
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            <![CDATA[ AND pt.timestamp <= #{params.endTime} ]]>
+        </if>
+
+        order by pt.timestamp desc
+    </select>
+
+    <select id="selectTPositionTrackById" parameterType="Long" resultMap="TPositionTrackVOResult">
+        select pt.id, pt.device_code, pt.mouse_code, pt.experiment_id, pt.x_coordinate, pt.y_coordinate, pt.z_coordinate, pt.velocity, pt.direction, pt.timestamp, pt.create_by, pt.create_time,
+               d.device_name,
+               m.mouse_name,
+               e.experiment_name
+        from t_position_track pt
+        left join t_device d on pt.device_code = d.device_code
+        left join t_mouse m on pt.mouse_code = m.mouse_code
+        left join t_experiment e on pt.experiment_id = e.id
+        where pt.id = #{id}
+    </select>
+
+    <insert id="insertTPositionTrack" parameterType="com.ruoyi.system.domain.TPositionTrack" useGeneratedKeys="true" keyProperty="id">
+        insert into t_position_track
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code,</if>
+            <if test="mouseCode != null and mouseCode != ''">mouse_code,</if>
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="xCoordinate != null">x_coordinate,</if>
+            <if test="yCoordinate != null">y_coordinate,</if>
+            <if test="zCoordinate != null">z_coordinate,</if>
+            <if test="velocity != null">velocity,</if>
+            <if test="direction != null">direction,</if>
+            <if test="timestamp != null">timestamp,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">#{deviceCode},</if>
+            <if test="mouseCode != null and mouseCode != ''">#{mouseCode},</if>
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="xCoordinate != null">#{xCoordinate},</if>
+            <if test="yCoordinate != null">#{yCoordinate},</if>
+            <if test="zCoordinate != null">#{zCoordinate},</if>
+            <if test="velocity != null">#{velocity},</if>
+            <if test="direction != null">#{direction},</if>
+            <if test="timestamp != null">#{timestamp},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTPositionTrack" parameterType="com.ruoyi.system.domain.TPositionTrack">
+        update t_position_track
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceCode != null and deviceCode != ''">device_code = #{deviceCode},</if>
+            <if test="mouseCode != null and mouseCode != ''">mouse_code = #{mouseCode},</if>
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="xCoordinate != null">x_coordinate = #{xCoordinate},</if>
+            <if test="yCoordinate != null">y_coordinate = #{yCoordinate},</if>
+            <if test="zCoordinate != null">z_coordinate = #{zCoordinate},</if>
+            <if test="velocity != null">velocity = #{velocity},</if>
+            <if test="direction != null">direction = #{direction},</if>
+            <if test="timestamp != null">timestamp = #{timestamp},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTPositionTrackById" parameterType="Long">
+        delete from t_position_track where id = #{id}
+    </delete>
+
+    <delete id="deleteTPositionTrackByIds" parameterType="String">
+        delete from t_position_track where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTPositionTrackByMouseCode" parameterType="String">
+        delete from t_position_track where mouse_code = #{mouseCode}
+    </delete>
+
+</mapper>

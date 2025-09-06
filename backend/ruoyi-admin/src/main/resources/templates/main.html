@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>小鼠行为监测系统 - 首页</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet"/>
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <style>
+        /* 优化首页字体显示效果 */
+        .ibox-content h4 {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+        .ibox-content p {
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .alert-info h4 {
+            font-weight: bold;
+            font-size: 20px;
+            color: #31708f;
+        }
+        .alert-info p {
+            font-weight: 500;
+            font-size: 15px;
+            color: #31708f;
+            line-height: 1.7;
+        }
+        .ibox-title h5 {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        /* 联系我们部分字体优化 */
+        .ibox-content h5 {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-top: 20px;
+        }
+        .ibox-content ul li {
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        /* 底部声明字体优化 */
+        .text-center p {
+            font-weight: 500;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5><i class="fa fa-home"></i> 欢迎使用小鼠行为监测系统</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="alert alert-info">
+                                    <h4><i class="fa fa-info-circle"></i> 系统简介</h4>
+                                    <p>小鼠行为监测系统是一套基于计算机视觉和人工智能技术的实验动物行为分析平台，专为生物医学研究、药物开发和行为学研究设计。系统能够实时监测和分析小鼠的各种行为模式，为科研工作者提供准确、客观的数据支持。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="ibox">
+                                    <div class="ibox-content text-center">
+                                        <i class="fa fa-video-camera fa-3x text-primary"></i>
+                                        <h4>实时监控</h4>
+                                        <p class="text-muted">24小时不间断视频监控，实时捕捉小鼠行为数据</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="ibox">
+                                    <div class="ibox-content text-center">
+                                        <i class="fa fa-line-chart fa-3x text-success"></i>
+                                        <h4>智能分析</h4>
+                                        <p class="text-muted">基于AI算法的行为识别与分析，提供精准的数据报告</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="ibox">
+                                    <div class="ibox-content text-center">
+                                        <i class="fa fa-database fa-3x text-warning"></i>
+                                        <h4>数据管理</h4>
+                                        <p class="text-muted">完善的数据存储与管理系统，支持多维度数据查询</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="ibox">
+                                    <div class="ibox-content text-center">
+                                        <i class="fa fa-users fa-3x text-info"></i>
+                                        <h4>协作研究</h4>
+                                        <p class="text-muted">支持多用户协作，便于团队共享研究成果</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="ibox">
+                                    <div class="ibox-title">
+                                        <h5><i class="fa fa-flask"></i> 应用场景</h5>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <h4>医学研究</h4>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-check text-success"></i> 神经科学研究 - 研究小鼠的学习记忆、认知功能等神经行为</li>
+                                            <li><i class="fa fa-check text-success"></i> 药理学研究 - 评估药物对小鼠行为的影响和副作用</li>
+                                            <li><i class="fa fa-check text-success"></i> 疾病模型研究 - 建立和验证各种疾病的小鼠模型</li>
+                                            <li><i class="fa fa-check text-success"></i> 行为毒理学 - 评估化学物质对动物行为的毒性影响</li>
+                                            <li><i class="fa fa-check text-success"></i> 基因功能研究 - 分析基因敲除或转基因小鼠的行为表型</li>
+                                        </ul>
+                                        
+                                        <h4>科研教育</h4>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-check text-success"></i> 生物学实验室 - 为学生提供动物行为学实验平台</li>
+                                            <li><i class="fa fa-check text-success"></i> 动物行为分析 - 教学演示各种动物行为分析方法</li>
+                                            <li><i class="fa fa-check text-success"></i> 实验数据管理 - 培养学生的科研数据管理能力</li>
+                                            <li><i class="fa fa-check text-success"></i> 多用户协作研究 - 支持师生共同参与研究项目</li>
+                                            <li><i class="fa fa-check text-success"></i> 研究报告生成 - 自动生成标准化的实验报告</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="ibox">
+                                    <div class="ibox-title">
+                                        <h5><i class="fa fa-cogs"></i> 技术优势</h5>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-check text-primary"></i> <strong>实时数据采集</strong> - 高精度传感器实时采集小鼠行为数据</li>
+                                            <li><i class="fa fa-check text-primary"></i> <strong>智能视频分析</strong> - 基于深度学习的视频分析算法</li>
+                                            <li><i class="fa fa-check text-primary"></i> <strong>高精度行为识别</strong> - 准确识别多种小鼠行为模式</li>
+                                            <li><i class="fa fa-check text-primary"></i> <strong>云端数据存储</strong> - 安全可靠的云端数据存储与备份</li>
+                                            <li><i class="fa fa-check text-primary"></i> <strong>跨平台访问支持</strong> - 支持Web、移动端多平台访问</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="ibox">
+                                    <div class="ibox-title">
+                                        <h5><i class="fa fa-address-card"></i> 联系我们</h5>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <h4>王嘉宁教授</h4>
+                                                <p><strong>职位：</strong>山东大学基础医学院副教授，医学博士</p>
+                                                <p><strong>邮箱：</strong><a href="mailto:mailtowjn@gmail.com">mailtowjn@gmail.com</a></p>
+                                                
+                                                <h5>教育背景</h5>
+                                                <p>2001年毕业于山东大学，获医学士学位；同年考入军事医学科学院，攻读分子免疫学研究生，2006年毕业，获得医学博士学位，博士学位论文被评为优秀博士论文。随后赴美进行博士后研究，先后在美国MD Anderson Cancer Center和美国洛杉矶加州大学（UCLA）开展基础医学研究；2010年作为引进人才回国工作。</p>
+                                                
+                                                <h5>研究方向</h5>
+                                                <p>重要从事应用类科研项目，研发新型抗肿瘤多肽、新型肿瘤示踪剂和小分子抗体类药物。参加国家863计划及多项国家级课题的研究，获得发明专利一项；曾获中国人民解放军科技进步三等奖。研究成果曾在法国巴黎召开的第十五届抗癌治疗大会上荣获"SOMPS Poster Award"奖。</p>
+                                                
+                                                <h5>主持项目</h5>
+                                                <ul>
+                                                    <li>国家自然科学基金项目《免疫负调控分子TIPE2对于肝细胞肝癌迁移、侵袭的作用及其机制的研究》</li>
+                                                    <li>山东省自然科学基金项目《用于恶性肿瘤靶向治疗的新型CD59/ErbB2双特异性拮抗多肽的研究》</li>
+                                                    <li>中国医学教育慕课联盟扶持建设项目《医学免疫学》</li>
+                                                </ul>
+                                                
+                                                <h5>学术成就</h5>
+                                                <p>主持国家自然科学基金及山东省自然科学基金项目各一项，在国内外学术期刊上发表多篇学术论文，其中SCI收录7篇。致力于教学改革和科普教育，开展了建设《医学免疫学》大学本科慕课课程的尝试和翻转课堂的实践。其中《医学免疫学》慕课课程获得人民卫生出版社立项资助，是本专业全国唯一获得人民卫生出版社推广的课程。</p>
+                                                
+                                                <h5>发明专利</h5>
+                                                <ul>
+                                                    <li>王嘉宁，冯健男，郭宁.能抑制HER2高表达肿瘤细胞增殖的稳定的小分子多肽，申请号：20060007523.4.</li>
+                                                    <li>胡品良,冯健男，郭宁,王嘉宁. HER2/neu与Herstatin相互作用的片段及其基因的应用.申请号：200510069032.8</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-sm-4 text-center">
+                                                <h5>联系二维码</h5>
+                                                <img th:src="@{/img/lczj.jpg}" alt="联系二维码" class="img-responsive" style="max-width: 200px; margin: 0 auto;">
+                                                <p class="text-muted"><small>扫码联系我们</small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <p class="text-muted"><small><i class="fa fa-heart text-danger"></i> 本项目基于RuoYi开发框架构建，向RuoYi开发团队表示最崇高的敬意！</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+</body>
+</html>

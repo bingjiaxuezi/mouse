@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小鼠行为分析</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        .main-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 400px;
+        }
+        .timeline-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .mouse-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+        .info-item {
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #333;
+            width: 100px;
+            display: inline-block;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .behavior-timeline {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .timeline-item {
+            border-left: 3px solid #337ab7;
+            padding-left: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #337ab7;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .behavior-type-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .behavior-eating { background-color: #d4edda; color: #155724; }
+        .behavior-drinking { background-color: #cce7ff; color: #004085; }
+        .behavior-moving { background-color: #fff3cd; color: #856404; }
+        .behavior-resting { background-color: #f8d7da; color: #721c24; }
+        .behavior-exploring { background-color: #e2e3e5; color: #383d41; }
+        .behavior-default { background-color: #007bff; color: white; }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #d9534f;
+        }
+        .btn-group {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .btn {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1><i class="fa fa-mouse-pointer"></i> 小鼠行为分析 <small id="mouseCodeTitle">加载中...</small></h1>
+        </div>
+
+        <!-- 小鼠基本信息 -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="info-card">
+                    <h4><i class="fa fa-info-circle"></i> 小鼠基本信息</h4>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="info-item">
+                                <span class="info-label">小鼠编号:</span>
+                                <span id="mouseCode">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">小鼠名称:</span>
+                                <span id="mouseName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">品种:</span>
+                                <span id="species">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">性别:</span>
+                                <span id="gender">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">出生日期:</span>
+                                <span id="birthDate">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">体重:</span>
+                                <span id="weight">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">实验ID:</span>
+                                <span id="experimentId">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">状态:</span>
+                                <span id="status">-</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <img id="mousePhoto" class="mouse-photo" style="display: none;" alt="小鼠照片">
+                            <div id="noPhoto" class="text-muted">
+                                <i class="fa fa-image" style="font-size: 48px;"></i>
+                                <p>暂无照片</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h4><i class="fa fa-bar-chart"></i> 行为统计汇总</h4>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRecords">0</div>
+                        <div class="stat-label">总记录数</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="stat-number" id="todayRecords">0</div>
+                        <div class="stat-label">今日记录</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="stat-number" id="avgDaily">0</div>
+                        <div class="stat-label">日均记录</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <h4><i class="fa fa-line-chart"></i> 行为趋势分析</h4>
+                    <div id="behaviorTrendChart" style="height: 320px;"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <h4><i class="fa fa-pie-chart"></i> 行为类型分布</h4>
+                    <div id="behaviorTypeChart" style="height: 320px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近行为记录时间线 -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="timeline-card">
+                    <h4><i class="fa fa-clock-o"></i> 最近行为记录</h4>
+                    <div class="behavior-timeline" id="behaviorTimeline">
+                        <div class="loading">正在加载行为记录...</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="loadMoreRecords()">加载更多记录</button>
+                        <button class="btn btn-info" onclick="viewAllBehaviors()">查看全部行为</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入依赖库 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+
+    <script>
+        // 全局变量
+        const urlParams = new URLSearchParams(window.location.search);
+        const mouseCode = urlParams.get('mouseCode') || '5ddeec8653f1487d';
+        const baseUrl = 'http://localhost:8080';
+        let currentPage = 1;
+        const pageSize = 10;
+        let isLoading = false;
+
+        // 通用请求函数
+        function makeRequest(url, options = {}) {
+            const defaultOptions = {
+                method: 'GET',
+                headers: {
+                    'Accept': '*/*',
+                    'Accept-Encoding': 'gzip, deflate, br, zstd',
+                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+                    'Referer': `${baseUrl}/system/behavior/mouse/${mouseCode}`,
+                    'Sec-Fetch-Dest': 'empty',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Site': 'same-origin',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'sec-ch-ua': '"Not(A:Brand";v="99", "Microsoft Edge";v="133", "Chromium";v="133"',
+                    'sec-ch-ua-mobile': '?0',
+                    'sec-ch-ua-platform': '"Windows"'
+                },
+                credentials: 'include'
+            };
+
+            return fetch(url, { ...defaultOptions, ...options })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error('Request failed:', error);
+                    throw error;
+                });
+        }
+
+        // 加载小鼠基本信息
+        function loadMouseInfo() {
+            console.log('Loading mouse info for:', mouseCode);
+            
+            makeRequest(`${baseUrl}/system/mouse/api/${mouseCode}`)
+                .then(result => {
+                    console.log('Mouse info response:', result);
+                    if (result.code === 0) {
+                        const mouse = result.data;
+                        document.getElementById('mouseCode').textContent = mouse.mouseCode || '-';
+                        document.getElementById('mouseName').textContent = mouse.mouseName || '-';
+                        document.getElementById('species').textContent = mouse.species || '-';
+                        document.getElementById('gender').textContent = mouse.gender === 'M' ? '雄性' : (mouse.gender === 'F' ? '雌性' : '-');
+                        document.getElementById('birthDate').textContent = mouse.birthDate || '-';
+                        document.getElementById('weight').textContent = mouse.weight ? mouse.weight + 'g' : '-';
+                        document.getElementById('experimentId').textContent = mouse.experimentId || '-';
+                        document.getElementById('status').innerHTML = mouse.status === 1 ? 
+                            '<span class="label label-success">正常</span>' : 
+                            '<span class="label label-danger">停用</span>';
+                        document.getElementById('mouseCodeTitle').textContent = `(${mouse.mouseCode || mouseCode})`;
+                        
+                        // 加载小鼠照片
+                        if (mouse.photoUrl && mouse.photoUrl.trim() !== '') {
+                            document.getElementById('mousePhoto').src = mouse.photoUrl;
+                            document.getElementById('mousePhoto').style.display = 'block';
+                            document.getElementById('noPhoto').style.display = 'none';
+                        }
+                    } else {
+                        console.error('Failed to load mouse info:', result.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Mouse info request failed:', error);
+                });
+        }
+
+        // 加载行为统计汇总
+        function loadBehaviorSummary() {
+            console.log('Loading behavior summary for:', mouseCode);
+            
+            // 加载统计汇总数据
+            makeRequest(`${baseUrl}/system/behavior/mouse/${mouseCode}/summary`)
+                .then(result => {
+                    console.log('Behavior summary response:', result);
+                    if (result.code === 0) {
+                        const summary = result.data;
+                        document.getElementById('totalRecords').textContent = summary.totalRecords || 0;
+                        document.getElementById('todayRecords').textContent = summary.todayRecords || 0;
+                        document.getElementById('avgDaily').textContent = summary.avgDaily || 0;
+                    } else {
+                        console.error('Failed to load behavior summary:', result.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Behavior summary request failed:', error);
+                });
+            
+            // 加载行为类型分布数据
+            loadBehaviorTypeDistribution();
+        }
+        
+        // 加载行为类型分布数据
+        function loadBehaviorTypeDistribution() {
+            console.log('Loading behavior type distribution for:', mouseCode);
+            
+            // 获取更多数据用于统计分布，设置较大的pageSize
+            makeRequest(`${baseUrl}/system/behavior/mouse/${mouseCode}/recent?pageNum=1&pageSize=100`)
+                .then(result => {
+                    console.log('Behavior type distribution response:', result);
+                    if (result.code === 0 && result.rows && result.rows.length > 0) {
+                        // 统计行为类型分布
+                        const typeCount = {};
+                        result.rows.forEach(behavior => {
+                            const typeName = behavior.behaviorTypeName || behavior.behaviorType || '未知';
+                            typeCount[typeName] = (typeCount[typeName] || 0) + 1;
+                        });
+                        
+                        // 转换为ECharts需要的数据格式
+                        const chartData = Object.keys(typeCount).map(key => ({
+                            name: key,
+                            value: typeCount[key]
+                        }));
+                        
+                        console.log('Behavior type chart data:', chartData);
+                        renderTypeChart({ data: chartData });
+                    } else {
+                        console.log('No behavior data for type distribution');
+                        document.getElementById('behaviorTypeChart').innerHTML = 
+                            '<div class="no-data">暂无行为类型数据</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Behavior type distribution request failed:', error);
+                    document.getElementById('behaviorTypeChart').innerHTML = 
+                        '<div class="error">加载行为类型分布失败: ' + error.message + '</div>';
+                });
+        }
+
+        // 加载行为趋势数据
+        function loadBehaviorTrend() {
+            console.log('Loading behavior trend for:', mouseCode);
+            
+            makeRequest(`${baseUrl}/system/behavior/mouse/${mouseCode}/trend`)
+                .then(result => {
+                    console.log('Behavior trend response:', result);
+                    if (result.code === 0) {
+                        renderTrendChart(result.data);
+                    } else {
+                        console.error('Failed to load behavior trend:', result.msg);
+                        document.getElementById('behaviorTrendChart').innerHTML = 
+                            '<div class="error">加载趋势数据失败: ' + result.msg + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Behavior trend request failed:', error);
+                    document.getElementById('behaviorTrendChart').innerHTML = 
+                        '<div class="error">请求失败: ' + error.message + '</div>';
+                });
+        }
+
+        // 加载最近行为记录
+        function loadRecentBehaviors(page = 1) {
+            if (isLoading) return;
+            
+            isLoading = true;
+            console.log('Loading recent behaviors for:', mouseCode, 'page:', page);
+            
+            const url = `${baseUrl}/system/behavior/mouse/${mouseCode}/recent?pageNum=${page}&pageSize=${pageSize}`;
+            
+            makeRequest(url)
+                .then(result => {
+                    console.log('Recent behaviors response:', result);
+                    if (result.code === 0) {
+                        const data = result.data;
+                        const behaviors = data.rows || data.list || data;
+                        console.log('Behaviors data:', behaviors);
+                        
+                        if (Array.isArray(behaviors) && behaviors.length > 0) {
+                            console.log('Rendering timeline with', behaviors.length, 'behaviors');
+                            renderTimeline(behaviors, page === 1);
+                            currentPage = page;
+                        } else {
+                            if (page === 1) {
+                                document.getElementById('behaviorTimeline').innerHTML = 
+                                    '<div class="text-center" style="padding: 20px; color: #666;">暂无行为记录</div>';
+                            }
+                        }
+                    } else {
+                        console.error('Failed to load recent behaviors:', result.msg);
+                        document.getElementById('behaviorTimeline').innerHTML = 
+                            '<div class="error">加载失败: ' + result.msg + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Recent behaviors request failed:', error);
+                    document.getElementById('behaviorTimeline').innerHTML = 
+                        '<div class="error">请求失败: ' + error.message + '</div>';
+                })
+                .finally(() => {
+                    isLoading = false;
+                });
+        }
+
+        // 渲染时间线
+        function renderTimeline(behaviors, isFirst) {
+            console.log('renderTimeline called with:', behaviors.length, 'behaviors, isFirst:', isFirst);
+            let timelineHtml = '';
+            
+            behaviors.forEach((behavior, index) => {
+                console.log('Processing behavior', index, ':', behavior);
+                const className = getBehaviorTypeClass(behavior.behaviorTypeName);
+                timelineHtml += `
+                    <div class="timeline-item">
+                        <div class="timeline-time">${behavior.timestamp || behavior.recordTime || '-'}</div>
+                        <div class="timeline-content">
+                            <span class="behavior-type-tag ${className}">${behavior.behaviorTypeName || behavior.behaviorType || '-'}</span>
+                            <span style="margin-left: 10px;">设备: ${behavior.deviceCode || '-'}</span>
+                            <span style="margin-left: 10px;">置信度: ${behavior.confidence ? (behavior.confidence * 100).toFixed(1) + '%' : '-'}</span>
+                            ${behavior.behaviorValue ? `<div style="margin-top: 5px; font-size: 12px; color: #666;">值: ${behavior.formattedBehaviorValue || behavior.behaviorValue}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            console.log('Generated HTML length:', timelineHtml.length);
+            
+            const timelineContainer = document.getElementById('behaviorTimeline');
+            if (isFirst) {
+                timelineContainer.innerHTML = timelineHtml;
+                console.log('Timeline content replaced');
+            } else {
+                timelineContainer.innerHTML += timelineHtml;
+                console.log('Timeline content appended');
+            }
+            
+            console.log('Final timeline HTML length:', timelineContainer.innerHTML.length);
+        }
+
+        // 获取行为类型样式类
+        function getBehaviorTypeClass(category) {
+            switch(category) {
+                case '进食':
+                case 'feeding': return 'behavior-eating';
+                case '饮水':
+                case 'drinking': return 'behavior-drinking';
+                case '运动':
+                case '攀爬':
+                case 'climbing':
+                case 'movement': return 'behavior-moving';
+                case '休息':
+                case 'resting': return 'behavior-resting';
+                case '探索':
+                case '跳跃':
+                case 'jumping':
+                case 'exploring': return 'behavior-exploring';
+                default: return 'behavior-default';
+            }
+        }
+
+        // 渲染趋势图表
+        function renderTrendChart(data) {
+            const chart = echarts.init(document.getElementById('behaviorTrendChart'));
+            
+            const option = {
+                title: {
+                    text: '行为趋势',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: data.legend || [],
+                    bottom: 10
+                },
+                xAxis: {
+                    type: 'category',
+                    data: data.xAxis || []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: data.series || []
+            };
+            
+            chart.setOption(option);
+        }
+
+        // 渲染类型分布图表
+        function renderTypeChart(data) {
+            const chart = echarts.init(document.getElementById('behaviorTypeChart'));
+            
+            const option = {
+                title: {
+                    text: '行为类型分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [{
+                    name: '行为类型',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['60%', '50%'],
+                    data: data.data || [],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+            
+            chart.setOption(option);
+        }
+
+        // 加载更多记录
+        function loadMoreRecords() {
+            loadRecentBehaviors(currentPage + 1);
+        }
+
+        // 查看全部行为
+        function viewAllBehaviors() {
+            window.open(`${baseUrl}/system/behavior`, '_blank');
+        }
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化数据');
+            
+            // 设置页面标题
+            document.getElementById('mouseCodeTitle').textContent = `(${mouseCode})`;
+            
+            // 加载所有数据
+            loadMouseInfo();
+            loadBehaviorSummary();
+            loadBehaviorTrend();
+            loadRecentBehaviors();
+        });
+    </script>
+</body>
+</html>

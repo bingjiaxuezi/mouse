@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TPhysiologicalStateMapper">
+    
+    <resultMap type="com.ruoyi.system.domain.TPhysiologicalState" id="TPhysiologicalStateResult">
+        <result property="id"    column="id"    />
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="heartRate"    column="heart_rate"    />
+        <result property="bodyTemperature"    column="body_temperature"    />
+        <result property="bloodPressure"    column="blood_pressure"    />
+        <result property="respiratoryRate"    column="respiratory_rate"    />
+        <result property="activityLevel"    column="activity_level"    />
+        <result property="stressLevel"    column="stress_level"    />
+        <result property="recordTime"    column="record_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.system.domain.vo.TPhysiologicalStateVO" id="TPhysiologicalStateVOResult">
+        <result property="id"    column="id"    />
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="mouseName"    column="mouse_name"    />
+        <result property="mouseCode"    column="mouse_code"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="experimentName"    column="experiment_name"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="heartRate"    column="heart_rate"    />
+        <result property="bodyTemperature"    column="body_temperature"    />
+        <result property="bloodPressure"    column="blood_pressure"    />
+        <result property="respiratoryRate"    column="respiratory_rate"    />
+        <result property="activityLevel"    column="activity_level"    />
+        <result property="stressLevel"    column="stress_level"    />
+        <result property="recordTime"    column="record_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTPhysiologicalStateVo">
+        select p.id, p.mouse_id, p.experiment_id, p.device_id, p.heart_rate, p.body_temperature, 
+               p.blood_pressure, p.respiratory_rate, p.activity_level, p.stress_level, p.record_time, 
+               p.create_by, p.create_time, p.update_by, p.update_time, p.remark,
+               m.mouse_name, m.mouse_code,
+               e.experiment_name,
+               d.device_name
+        from t_physiological_state p
+        left join t_mouse m on p.mouse_id = m.id
+        left join t_experiment e on p.experiment_id = e.id
+        left join t_device d on p.device_id = d.id
+    </sql>
+
+    <select id="selectTPhysiologicalStateList" parameterType="com.ruoyi.system.domain.TPhysiologicalState" resultMap="TPhysiologicalStateVOResult">
+        <include refid="selectTPhysiologicalStateVo"/>
+        <where>  
+            <if test="mouseId != null "> and p.mouse_id = #{mouseId}</if>
+            <if test="experimentId != null "> and p.experiment_id = #{experimentId}</if>
+            <if test="deviceId != null "> and p.device_id = #{deviceId}</if>
+            <if test="heartRate != null "> and p.heart_rate = #{heartRate}</if>
+            <if test="bodyTemperature != null "> and p.body_temperature = #{bodyTemperature}</if>
+            <if test="bloodPressure != null and bloodPressure != ''"> and p.blood_pressure = #{bloodPressure}</if>
+            <if test="respiratoryRate != null "> and p.respiratory_rate = #{respiratoryRate}</if>
+            <if test="activityLevel != null and activityLevel != ''"> and p.activity_level = #{activityLevel}</if>
+            <if test="stressLevel != null and stressLevel != ''"> and p.stress_level = #{stressLevel}</if>
+            <if test="recordTime != null "> and p.record_time = #{recordTime}</if>
+        </where>
+        order by p.record_time desc
+    </select>
+    
+    <select id="selectTPhysiologicalStateById" parameterType="Long" resultMap="TPhysiologicalStateVOResult">
+        <include refid="selectTPhysiologicalStateVo"/>
+        where p.id = #{id}
+    </select>
+        
+    <insert id="insertTPhysiologicalState" parameterType="com.ruoyi.system.domain.TPhysiologicalState" useGeneratedKeys="true" keyProperty="id">
+        insert into t_physiological_state
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mouseId != null">mouse_id,</if>
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="heartRate != null">heart_rate,</if>
+            <if test="bodyTemperature != null">body_temperature,</if>
+            <if test="bloodPressure != null">blood_pressure,</if>
+            <if test="respiratoryRate != null">respiratory_rate,</if>
+            <if test="activityLevel != null">activity_level,</if>
+            <if test="stressLevel != null">stress_level,</if>
+            <if test="recordTime != null">record_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mouseId != null">#{mouseId},</if>
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="heartRate != null">#{heartRate},</if>
+            <if test="bodyTemperature != null">#{bodyTemperature},</if>
+            <if test="bloodPressure != null">#{bloodPressure},</if>
+            <if test="respiratoryRate != null">#{respiratoryRate},</if>
+            <if test="activityLevel != null">#{activityLevel},</if>
+            <if test="stressLevel != null">#{stressLevel},</if>
+            <if test="recordTime != null">#{recordTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTPhysiologicalState" parameterType="com.ruoyi.system.domain.TPhysiologicalState">
+        update t_physiological_state
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mouseId != null">mouse_id = #{mouseId},</if>
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="heartRate != null">heart_rate = #{heartRate},</if>
+            <if test="bodyTemperature != null">body_temperature = #{bodyTemperature},</if>
+            <if test="bloodPressure != null">blood_pressure = #{bloodPressure},</if>
+            <if test="respiratoryRate != null">respiratory_rate = #{respiratoryRate},</if>
+            <if test="activityLevel != null">activity_level = #{activityLevel},</if>
+            <if test="stressLevel != null">stress_level = #{stressLevel},</if>
+            <if test="recordTime != null">record_time = #{recordTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTPhysiologicalStateById" parameterType="Long">
+        delete from t_physiological_state where id = #{id}
+    </delete>
+
+    <delete id="deleteTPhysiologicalStateByIds" parameterType="String">
+        delete from t_physiological_state where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteTPhysiologicalStateByMouseCode" parameterType="String">
+        delete from t_physiological_state where mouse_code = #{mouseCode}
+    </delete>
+</mapper>

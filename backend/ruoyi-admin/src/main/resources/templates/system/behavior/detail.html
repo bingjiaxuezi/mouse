@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('行为记录详情')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>行为记录详情</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">记录ID：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="recordId">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">小鼠信息：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="mouseInfo">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">行为类型：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="behaviorType">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">记录时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="recordTime">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">持续时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="duration">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">行为强度：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="intensity">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">位置信息：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="location">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">环境温度：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="temperature">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">环境湿度：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="humidity">-</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">创建时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="createTime">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">备注信息：</label>
+                                    <div class="col-sm-10">
+                                        <p class="form-control-static" id="remark">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 相关行为记录 -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>同类型行为记录</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <table id="relatedBehaviorTable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>记录时间</th>
+                                    <th>持续时间(秒)</th>
+                                    <th>强度</th>
+                                    <th>位置</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="relatedBehaviorTableBody">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-offset-5 col-sm-10">
+            <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+        </div>
+    </div>
+    
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/behavior";
+        var behaviorId = [[${param.id}]];
+        
+        $(function() {
+            loadBehaviorDetail();
+        });
+        
+        function loadBehaviorDetail() {
+            if (!behaviorId) {
+                $.modal.alertError('行为记录ID不能为空');
+                return;
+            }
+            
+            $.ajax({
+                url: prefix + '/detail/' + behaviorId,
+                type: 'GET',
+                success: function(result) {
+                    if (result.code === 200 && result.data) {
+                        var data = result.data;
+                        $('#recordId').text(data.id || '-');
+                        $('#mouseInfo').text((data.mouseCode || '') + ' - ' + (data.mouseName || ''));
+                        $('#behaviorType').text(data.behaviorType || '-');
+                        $('#recordTime').text(data.recordTime || '-');
+                        $('#duration').text((data.duration || '-') + (data.duration ? ' 秒' : ''));
+                        $('#intensity').text(data.intensity || '-');
+                        $('#location').text(data.location || '-');
+                        $('#temperature').text((data.temperature || '-') + (data.temperature ? ' °C' : ''));
+                        $('#humidity').text((data.humidity || '-') + (data.humidity ? ' %' : ''));
+                        $('#createTime').text(data.createTime || '-');
+                        $('#remark').text(data.remark || '-');
+                        
+                        // 加载相关行为记录
+                        loadRelatedBehaviors(data.mouseId, data.behaviorType, data.id);
+                    } else {
+                        $.modal.alertError(result.msg || '加载行为记录详情失败');
+                    }
+                },
+                error: function() {
+                    $.modal.alertError('加载行为记录详情失败');
+                }
+            });
+        }
+        
+        function loadRelatedBehaviors(mouseId, behaviorType, currentId) {
+            $.ajax({
+                url: prefix + '/related',
+                type: 'GET',
+                data: {
+                    mouseId: mouseId,
+                    behaviorType: behaviorType,
+                    excludeId: currentId,
+                    limit: 10
+                },
+                success: function(result) {
+                    var tbody = $('#relatedBehaviorTableBody');
+                    tbody.empty();
+                    
+                    if (result.code === 200 && result.data && result.data.length > 0) {
+                        $.each(result.data, function(index, item) {
+                            var row = '<tr>' +
+                                '<td>' + (item.recordTime || '-') + '</td>' +
+                                '<td>' + (item.duration || '-') + '</td>' +
+                                '<td>' + (item.intensity || '-') + '</td>' +
+                                '<td>' + (item.location || '-') + '</td>' +
+                                '<td>' +
+                                    '<a class="btn btn-xs btn-info" href="javascript:void(0)" onclick="viewDetail(' + item.id + ')">查看</a>' +
+                                '</td>' +
+                                '</tr>';
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="5" class="text-center text-muted">暂无相关记录</td></tr>');
+                    }
+                },
+                error: function() {
+                    $('#relatedBehaviorTableBody').html('<tr><td colspan="5" class="text-center text-muted">加载失败</td></tr>');
+                }
+            });
+        }
+        
+        function viewDetail(id) {
+            var url = prefix + '/detail?id=' + id;
+            $.modal.openTab('行为记录详情', url);
+        }
+    </script>
+</body>
+</html>
