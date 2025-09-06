@@ -1,4 +1,4 @@
-# 小鼠行为监测系统 RESTful 通信规范
+# 实验驱动小鼠管理系统 RESTful 通信规范
 
 ## 1. 通信架构概述
 
@@ -266,36 +266,126 @@ Response:
 }
 ```
 
-### 3.4 二维码管理接口
+### 3.4 实验管理接口（核心优先级）
 
-#### 3.4.1 生成二维码
+#### 3.4.1 创建实验项目
 ```http
-POST /api/qrcode/generate
+POST /api/experiment/create
 Authorization: Bearer {admin_token}
 Content-Type: application/json
 
 {
-  "cage_id": "cage_001",
-  "qr_type": "cage_binding",
-  "algorithm": "QR_CODE",
-  "error_correction": "M",
-  "size": 200,
-  "expire_days": 365,
-  "description": "笼子001的二维码"
+  "experiment_name": "小鼠行为学实验A组",
+  "experiment_type": "behavior_analysis",
+  "template_id": "template_001",
+  "start_date": "2024-12-01",
+  "end_date": "2024-12-31",
+  "description": "研究小鼠在不同环境下的行为模式",
+  "researcher_id": "researcher_001",
+  "institution": "生物医学研究所"
 }
 
 Response:
 {
   "code": 200,
-  "message": "二维码生成成功",
+  "message": "实验创建成功",
   "data": {
-    "qr_id": "qr_20241201_001",
-    "cage_id": "cage_001",
-    "qr_content": "CAGE:cage_001:20241201:001",
-    "qr_code_base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-    "qr_code_url": "/api/qrcode/image/qr_20241201_001",
-    "expire_time": "2025-12-01T00:00:00Z",
+    "experiment_id": "exp_20241201_001",
+    "experiment_name": "小鼠行为学实验A组",
+    "status": "created",
     "created_time": "2024-12-01T14:30:22Z"
+  }
+}
+```
+
+#### 3.4.2 启动实验
+```http
+POST /api/experiment/{experiment_id}/start
+Authorization: Bearer {admin_token}
+
+{
+  "start_time": "2024-12-01T09:00:00Z",
+  "config_overrides": {
+    "detection_sensitivity": 0.8,
+    "recording_duration": 3600
+  }
+}
+```
+
+#### 3.4.3 绑定设备到实验
+```http
+POST /api/experiment/{experiment_id}/bind-device
+Authorization: Bearer {admin_token}
+
+{
+  "device_id": "dev_20241201_001",
+  "binding_type": "primary_capture",
+  "location": "实验室A-区域1"
+}
+```
+
+### 3.5 实验二维码管理接口
+
+#### 3.5.1 生成实验二维码
+```http
+POST /api/experiment/qrcode/generate
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "experiment_id": "exp_20241201_001",
+  "cage_id": "cage_001",
+  "qr_type": "experiment_cage_binding",
+  "algorithm": "QR_CODE",
+  "error_correction": "M",
+  "size": 200,
+  "expire_days": 365,
+  "description": "实验exp_20241201_001的笼子001二维码"
+}
+
+Response:
+{
+  "code": 200,
+  "message": "实验二维码生成成功",
+  "data": {
+    "qr_id": "qr_exp_20241201_001",
+    "experiment_id": "exp_20241201_001",
+    "cage_id": "cage_001",
+    "qr_content": "EXP:exp_20241201_001:CAGE:cage_001:20241201:001",
+    "qr_code_base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+    "qr_code_url": "/api/experiment/qrcode/image/qr_exp_20241201_001",
+    "expire_time": "2025-12-01T00:00:00Z",
+    "created_time": "2024-12-01T14:30:22Z",
+    "binding_status": "ready"
+  }
+}
+```
+
+#### 3.5.2 扫描实验二维码
+```http
+POST /api/experiment/qrcode/scan
+Authorization: Bearer {device_token}
+X-Device-ID: {device_id}
+
+{
+  "qr_content": "EXP:exp_20241201_001:CAGE:cage_001:20241201:001",
+  "scan_time": "2024-12-01T14:35:22Z",
+  "device_location": "实验室A-区域1"
+}
+
+Response:
+{
+  "code": 200,
+  "message": "实验二维码扫描成功",
+  "data": {
+    "experiment_id": "exp_20241201_001",
+    "cage_id": "cage_001",
+    "binding_confirmed": true,
+    "experiment_config": {
+      "detection_sensitivity": 0.8,
+      "recording_duration": 3600,
+      "behavior_types": ["sleeping", "grooming", "scratching", "twitching"]
+    }
   }
 }
 ```
