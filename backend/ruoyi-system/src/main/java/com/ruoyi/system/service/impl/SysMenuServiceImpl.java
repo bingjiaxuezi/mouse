@@ -196,7 +196,11 @@ public class SysMenuServiceImpl implements ISysMenuService
         {
             for (SysMenu menu : permissions)
             {
-                section.put(menu.getUrl(), MessageFormat.format(PREMISSION_STRING, menu.getPerms()));
+                // 只有当权限字符串不为空时才添加到Shiro配置中
+                if (StringUtils.isNotEmpty(menu.getPerms()))
+                {
+                    section.put(menu.getUrl(), MessageFormat.format(PREMISSION_STRING, menu.getPerms()));
+                }
             }
         }
         return section;

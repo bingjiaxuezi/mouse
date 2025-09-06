@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MailRecipientsMapper">
+    
+    <resultMap type="MailRecipients" id="MailRecipientsResult">
+        <result property="id"    column="id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="recipientId"    column="recipient_id"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="isActive"    column="is_active"    />
+    </resultMap>
+
+    <sql id="selectMailRecipientsVo">
+        select id, template_id, recipient_id, created_at, is_active from mail_recipients
+    </sql>
+
+    <select id="selectMailRecipientsList" parameterType="MailRecipients" resultMap="MailRecipientsResult">
+        <include refid="selectMailRecipientsVo"/>
+        <where>  
+            <if test="templateId != null "> and template_id = #{templateId}</if>
+            <if test="recipientId != null "> and recipient_id = #{recipientId}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="isActive != null "> and is_active = #{isActive}</if>
+        </where>
+    </select>
+    
+    <select id="selectMailRecipientsById" parameterType="Long" resultMap="MailRecipientsResult">
+        <include refid="selectMailRecipientsVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMailRecipients" parameterType="MailRecipients" useGeneratedKeys="true" keyProperty="id">
+        insert into mail_recipients
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="recipientId != null">recipient_id,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="isActive != null">is_active,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="recipientId != null">#{recipientId},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="isActive != null">#{isActive},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMailRecipients" parameterType="MailRecipients">
+        update mail_recipients
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="recipientId != null">recipient_id = #{recipientId},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMailRecipientsById" parameterType="Long">
+        delete from mail_recipients where id = #{id}
+    </delete>
+
+    <delete id="deleteMailRecipientsByIds" parameterType="String">
+        delete from mail_recipients where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MailTemplatesMapper">
+    
+    <resultMap type="MailTemplates" id="MailTemplatesResult">
+        <result property="templateId"    column="template_id"    />
+        <result property="templateCode"    column="template_code"    />
+        <result property="subject"    column="subject"    />
+        <result property="content"    column="content"    />
+        <result property="description"    column="description"    />
+        <result property="isActive"    column="is_active"    />
+    </resultMap>
+
+    <sql id="selectMailTemplatesVo">
+        select template_id, template_code, subject, content, description, is_active from mail_templates
+    </sql>
+
+    <select id="selectMailTemplatesList" parameterType="MailTemplates" resultMap="MailTemplatesResult">
+        <include refid="selectMailTemplatesVo"/>
+        <where>  
+            <if test="templateCode != null  and templateCode != ''"> and template_code = #{templateCode}</if>
+            <if test="subject != null  and subject != ''"> and subject like concat('%', #{subject}, '%')</if>
+            <if test="content != null  and content != ''"> and content like concat('%', #{content}, '%')</if>
+            <if test="isActive != null "> and is_active = #{isActive}</if>
+        </where>
+    </select>
+    
+    <select id="selectMailTemplatesByTemplateId" parameterType="Long" resultMap="MailTemplatesResult">
+        <include refid="selectMailTemplatesVo"/>
+        where template_id = #{templateId}
+    </select>
+
+    <insert id="insertMailTemplates" parameterType="MailTemplates" useGeneratedKeys="true" keyProperty="templateId">
+        insert into mail_templates
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">template_code,</if>
+            <if test="subject != null and subject != ''">subject,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="description != null">description,</if>
+            <if test="isActive != null">is_active,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">#{templateCode},</if>
+            <if test="subject != null and subject != ''">#{subject},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="description != null">#{description},</if>
+            <if test="isActive != null">#{isActive},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMailTemplates" parameterType="MailTemplates">
+        update mail_templates
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">template_code = #{templateCode},</if>
+            <if test="subject != null and subject != ''">subject = #{subject},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+        </trim>
+        where template_id = #{templateId}
+    </update>
+
+    <delete id="deleteMailTemplatesByTemplateId" parameterType="Long">
+        delete from mail_templates where template_id = #{templateId}
+    </delete>
+
+    <delete id="deleteMailTemplatesByTemplateIds" parameterType="String">
+        delete from mail_templates where template_id in 
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </delete>
+
+</mapper>

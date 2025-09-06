@@ -191,3 +191,47 @@ minio:
   secretKey: ${MINIO_SECRET_KEY:minioadmin}
   # 默认存储桶名称
   bucketName: ${MINIO_BUCKET_NAME:mouse-system}
+
+
+# 邮件配置
+mail:
+  # 邮件服务器配置
+  host: smtp.163.com
+  port: 465
+  # 发件人邮箱账号和密码
+  username: lichenzijia@163.com
+  password: KENCWTJWPECYQNWI
+  # SSL/TLS配置
+  ssl-enable: true
+  # 启用STARTTLS（可选，通常与SSL二选一）
+  starttls-enable: false
+  # 发件人信息
+  from-name: 系统邮件
+  from-address: lichenzijia@163.com
+  # 连接配置
+  connection:
+    # 连接超时时间(毫秒)
+    timeout: 30000
+    # 读取超时时间(毫秒)
+    read-timeout: 60000
+    # 写入超时时间(毫秒)
+    write-timeout: 60000
+  # 重试配置
+  retry:
+    # 最大重试次数
+    max-attempts: 3
+    # 初始等待时间(毫秒)
+    initial-delay: 1000
+    # 指数倍数
+    multiplier: 2
+    # 最大等待时间(毫秒)
+    max-delay: 10000
+  # 邮件发送配置
+  send:
+    # 是否启用调试模式
+    debug: false
+    # 默认编码
+    default-encoding: UTF-8
+    # 邮件内容类型
+    content-type: text/html;charset=UTF-8
+

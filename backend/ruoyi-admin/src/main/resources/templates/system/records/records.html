@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('邮件发送记录列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>关联的模板ID：</label>
+                                <input type="text" name="templateId"/>
+                            </li>
+                            <li>
+                                <label>接收者名称：</label>
+                                <input type="text" name="senderName"/>
+                            </li>
+                            <li>
+                                <label>接收者邮箱：</label>
+                                <input type="text" name="senderEmail"/>
+                            </li>
+                            <li>
+                                <label>邮件状态：</label>
+                                <select name="status" th:with="type=${@dict.getType('mail_send_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>发送时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择发送时间" name="sendTime"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:records:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:records:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:records:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:records:remove')}]];
+        var statusDatas = [[${@dict.getType('mail_send_status')}]];
+        var prefix = ctx + "system/records";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "邮件发送记录",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'mailId',
+                    title: '邮件ID',
+                    visible: false
+                },
+                {
+                    field: 'templateId',
+                    title: '关联的模板ID'
+                },
+                {
+                    field: 'senderId',
+                    title: '接收者用户ID'
+                },
+                {
+                    field: 'senderName',
+                    title: '接收者名称'
+                },
+                {
+                    field: 'senderEmail',
+                    title: '接收者邮箱'
+                },
+                {
+                    field: 'subject',
+                    title: '实际发送的邮件主题'
+                },
+                {
+                    field: 'content',
+                    title: '实际发送的邮件内容'
+                },
+                {
+                    field: 'status',
+                    title: '邮件状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(statusDatas, value);
+                    }
+                },
+                {
+                    field: 'sendTime',
+                    title: '发送时间'
+                },
+                {
+                    field: 'resultInfo',
+                    title: '发送结果详情JSON格式存储错误信息等'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.mailId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.mailId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>
