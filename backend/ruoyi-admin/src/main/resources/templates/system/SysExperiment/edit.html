@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改实验详情展示')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-SysExperiment-edit" th:object="${sysExperiment}">
+            <input name="experimentId" th:field="*{experimentId}" type="hidden">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">实验编号：</label>
+                    <div class="col-sm-8">
+                        <input name="experimentCode" th:field="*{experimentCode}" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">实验名称：</label>
+                    <div class="col-sm-8">
+                        <input name="experimentName" th:field="*{experimentName}" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">实验类型：</label>
+                    <div class="col-sm-8">
+                        <select name="experimentType" class="form-control" th:with="type=${@dict.getType('sys_experiment_type')}" required>
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{experimentType}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验模板名称：</label>
+                    <div class="col-sm-8">
+                        <input name="experimentTemplate" th:field="*{experimentTemplate}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验目标：</label>
+                    <div class="col-sm-8">
+                        <textarea name="experimentObjective" class="form-control">[[*{experimentObjective}]]</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验描述：</label>
+                    <div class="col-sm-8">
+                        <textarea name="experimentDesc" class="form-control">[[*{experimentDesc}]]</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验状态：</label>
+                    <div class="col-sm-8">
+                        <div class="radio-box" th:each="dict : ${@dict.getType('sys_experiment_status')}">
+                            <input type="radio" th:id="${'experimentStatus_' + dict.dictCode}" name="experimentStatus" th:value="${dict.dictValue}" th:field="*{experimentStatus}">
+                            <label th:for="${'experimentStatus_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">计划开始时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <input name="plannedBeginTime" th:value="${#dates.format(sysExperiment.plannedBeginTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">计划结束时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <input name="plannedFinishTime" th:value="${#dates.format(sysExperiment.plannedFinishTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实际开始时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <input name="actualBeginTime" th:value="${#dates.format(sysExperiment.actualBeginTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实际结束时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <input name="actualFinishTime" th:value="${#dates.format(sysExperiment.actualFinishTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">主要研究员：</label>
+                    <div class="col-sm-8">
+                        <input name="principalResearcher" th:field="*{principalResearcher}" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">协作研究员列表：</label>
+                    <div class="col-sm-8">
+                        <textarea name="coResearchers" class="form-control">[[*{coResearchers}]]</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验团队名称：</label>
+                    <div class="col-sm-8">
+                        <input name="experimentTeam" th:field="*{experimentTeam}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">实验配置参数：</label>
+                    <div class="col-sm-8">
+                        <textarea name="experimentConfig" class="form-control">[[*{experimentConfig}]]</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">二维码图片URL：</label>
+                    <div class="col-sm-8">
+                        <textarea name="qrCodeImageUrl" class="form-control">[[*{qrCodeImageUrl}]]</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">关联笼子总数：</label>
+                    <div class="col-sm-8">
+                        <input name="totalCages" th:field="*{totalCages}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">关联小鼠总数：</label>
+                    <div class="col-sm-8">
+                        <input name="totalMice" th:field="*{totalMice}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">创建者：</label>
+                    <div class="col-sm-8">
+                        <input name="buildBy" th:field="*{buildBy}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">备注：</label>
+                    <div class="col-sm-8">
+                        <textarea name="remark" class="form-control">[[*{remark}]]</textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/SysExperiment";
+        $("#form-SysExperiment-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-SysExperiment-edit').serialize());
+            }
+        }
+
+        $("input[name='plannedBeginTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='plannedFinishTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='actualBeginTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+
+        $("input[name='actualFinishTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+    </script>
+</body>
+</html>

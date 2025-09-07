@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysExperimentTemplateMapper">
+    
+    <resultMap type="SysExperimentTemplate" id="SysExperimentTemplateResult">
+        <result property="templateId"    column="template_id"    />
+        <result property="templateCode"    column="template_code"    />
+        <result property="templateName"    column="template_name"    />
+        <result property="templateType"    column="template_type"    />
+        <result property="templateDesc"    column="template_desc"    />
+        <result property="defaultDuration"    column="default_duration"    />
+        <result property="defaultConfig"    column="default_config"    />
+        <result property="requiredEquipment"    column="required_equipment"    />
+        <result property="templateStatus"    column="template_status"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysExperimentTemplateVo">
+        select template_id, template_code, template_name, template_type, template_desc, default_duration, default_config, required_equipment, template_status, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_experiment_template
+    </sql>
+
+    <select id="selectSysExperimentTemplateList" parameterType="SysExperimentTemplate" resultMap="SysExperimentTemplateResult">
+        <include refid="selectSysExperimentTemplateVo"/>
+        <where>  
+            <if test="templateCode != null  and templateCode != ''"> and template_code = #{templateCode}</if>
+            <if test="templateName != null  and templateName != ''"> and template_name like concat('%', #{templateName}, '%')</if>
+            <if test="templateType != null  and templateType != ''"> and template_type = #{templateType}</if>
+            <if test="templateDesc != null  and templateDesc != ''"> and template_desc = #{templateDesc}</if>
+            <if test="defaultDuration != null "> and default_duration = #{defaultDuration}</if>
+            <if test="defaultConfig != null  and defaultConfig != ''"> and default_config = #{defaultConfig}</if>
+            <if test="requiredEquipment != null  and requiredEquipment != ''"> and required_equipment = #{requiredEquipment}</if>
+            <if test="templateStatus != null  and templateStatus != ''"> and template_status = #{templateStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysExperimentTemplateByTemplateId" parameterType="Long" resultMap="SysExperimentTemplateResult">
+        <include refid="selectSysExperimentTemplateVo"/>
+        where template_id = #{templateId}
+    </select>
+
+    <insert id="insertSysExperimentTemplate" parameterType="SysExperimentTemplate" useGeneratedKeys="true" keyProperty="templateId">
+        insert into sys_experiment_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">template_code,</if>
+            <if test="templateName != null and templateName != ''">template_name,</if>
+            <if test="templateType != null and templateType != ''">template_type,</if>
+            <if test="templateDesc != null">template_desc,</if>
+            <if test="defaultDuration != null">default_duration,</if>
+            <if test="defaultConfig != null">default_config,</if>
+            <if test="requiredEquipment != null">required_equipment,</if>
+            <if test="templateStatus != null">template_status,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">#{templateCode},</if>
+            <if test="templateName != null and templateName != ''">#{templateName},</if>
+            <if test="templateType != null and templateType != ''">#{templateType},</if>
+            <if test="templateDesc != null">#{templateDesc},</if>
+            <if test="defaultDuration != null">#{defaultDuration},</if>
+            <if test="defaultConfig != null">#{defaultConfig},</if>
+            <if test="requiredEquipment != null">#{requiredEquipment},</if>
+            <if test="templateStatus != null">#{templateStatus},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysExperimentTemplate" parameterType="SysExperimentTemplate">
+        update sys_experiment_template
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateCode != null and templateCode != ''">template_code = #{templateCode},</if>
+            <if test="templateName != null and templateName != ''">template_name = #{templateName},</if>
+            <if test="templateType != null and templateType != ''">template_type = #{templateType},</if>
+            <if test="templateDesc != null">template_desc = #{templateDesc},</if>
+            <if test="defaultDuration != null">default_duration = #{defaultDuration},</if>
+            <if test="defaultConfig != null">default_config = #{defaultConfig},</if>
+            <if test="requiredEquipment != null">required_equipment = #{requiredEquipment},</if>
+            <if test="templateStatus != null">template_status = #{templateStatus},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where template_id = #{templateId}
+    </update>
+
+    <delete id="deleteSysExperimentTemplateByTemplateId" parameterType="Long">
+        delete from sys_experiment_template where template_id = #{templateId}
+    </delete>
+
+    <delete id="deleteSysExperimentTemplateByTemplateIds" parameterType="String">
+        delete from sys_experiment_template where template_id in 
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </delete>
+
+</mapper>

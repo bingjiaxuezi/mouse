@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCageMapper">
+    
+    <resultMap type="SysCage" id="SysCageResult">
+        <result property="cageId"    column="cage_id"    />
+        <result property="cageCode"    column="cage_code"    />
+        <result property="cageName"    column="cage_name"    />
+        <result property="cageType"    column="cage_type"    />
+        <result property="laboratoryRoom"    column="laboratory_room"    />
+        <result property="rackNumber"    column="rack_number"    />
+        <result property="positionRow"    column="position_row"    />
+        <result property="positionColumn"    column="position_column"    />
+        <result property="maxCapacity"    column="max_capacity"    />
+        <result property="currentCount"    column="current_count"    />
+        <result property="cageStatus"    column="cage_status"    />
+        <result property="temperatureRange"    column="temperature_range"    />
+        <result property="humidityRange"    column="humidity_range"    />
+        <result property="qrCodeContent"    column="qr_code_content"    />
+        <result property="qrCodeImageUrl"    column="qr_code_image_url"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysCageVo">
+        select cage_id, cage_code, cage_name, cage_type, laboratory_room, rack_number, position_row, position_column, max_capacity, current_count, cage_status, temperature_range, humidity_range, qr_code_content, qr_code_image_url, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_cage
+    </sql>
+
+    <select id="selectSysCageList" parameterType="SysCage" resultMap="SysCageResult">
+        <include refid="selectSysCageVo"/>
+        <where>  
+            <if test="cageCode != null  and cageCode != ''"> and cage_code = #{cageCode}</if>
+            <if test="cageName != null  and cageName != ''"> and cage_name like concat('%', #{cageName}, '%')</if>
+            <if test="cageType != null  and cageType != ''"> and cage_type = #{cageType}</if>
+            <if test="laboratoryRoom != null  and laboratoryRoom != ''"> and laboratory_room = #{laboratoryRoom}</if>
+            <if test="rackNumber != null  and rackNumber != ''"> and rack_number = #{rackNumber}</if>
+            <if test="positionRow != null "> and position_row = #{positionRow}</if>
+            <if test="positionColumn != null "> and position_column = #{positionColumn}</if>
+            <if test="maxCapacity != null "> and max_capacity = #{maxCapacity}</if>
+            <if test="currentCount != null "> and current_count = #{currentCount}</if>
+            <if test="cageStatus != null  and cageStatus != ''"> and cage_status = #{cageStatus}</if>
+            <if test="temperatureRange != null  and temperatureRange != ''"> and temperature_range = #{temperatureRange}</if>
+            <if test="humidityRange != null  and humidityRange != ''"> and humidity_range = #{humidityRange}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCageByCageId" parameterType="Long" resultMap="SysCageResult">
+        <include refid="selectSysCageVo"/>
+        where cage_id = #{cageId}
+    </select>
+
+    <insert id="insertSysCage" parameterType="SysCage" useGeneratedKeys="true" keyProperty="cageId">
+        insert into sys_cage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cageCode != null and cageCode != ''">cage_code,</if>
+            <if test="cageName != null and cageName != ''">cage_name,</if>
+            <if test="cageType != null">cage_type,</if>
+            <if test="laboratoryRoom != null and laboratoryRoom != ''">laboratory_room,</if>
+            <if test="rackNumber != null">rack_number,</if>
+            <if test="positionRow != null">position_row,</if>
+            <if test="positionColumn != null">position_column,</if>
+            <if test="maxCapacity != null">max_capacity,</if>
+            <if test="currentCount != null">current_count,</if>
+            <if test="cageStatus != null">cage_status,</if>
+            <if test="temperatureRange != null">temperature_range,</if>
+            <if test="humidityRange != null">humidity_range,</if>
+            <if test="qrCodeContent != null">qr_code_content,</if>
+            <if test="qrCodeImageUrl != null">qr_code_image_url,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cageCode != null and cageCode != ''">#{cageCode},</if>
+            <if test="cageName != null and cageName != ''">#{cageName},</if>
+            <if test="cageType != null">#{cageType},</if>
+            <if test="laboratoryRoom != null and laboratoryRoom != ''">#{laboratoryRoom},</if>
+            <if test="rackNumber != null">#{rackNumber},</if>
+            <if test="positionRow != null">#{positionRow},</if>
+            <if test="positionColumn != null">#{positionColumn},</if>
+            <if test="maxCapacity != null">#{maxCapacity},</if>
+            <if test="currentCount != null">#{currentCount},</if>
+            <if test="cageStatus != null">#{cageStatus},</if>
+            <if test="temperatureRange != null">#{temperatureRange},</if>
+            <if test="humidityRange != null">#{humidityRange},</if>
+            <if test="qrCodeContent != null">#{qrCodeContent},</if>
+            <if test="qrCodeImageUrl != null">#{qrCodeImageUrl},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCage" parameterType="SysCage">
+        update sys_cage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cageCode != null and cageCode != ''">cage_code = #{cageCode},</if>
+            <if test="cageName != null and cageName != ''">cage_name = #{cageName},</if>
+            <if test="cageType != null">cage_type = #{cageType},</if>
+            <if test="laboratoryRoom != null and laboratoryRoom != ''">laboratory_room = #{laboratoryRoom},</if>
+            <if test="rackNumber != null">rack_number = #{rackNumber},</if>
+            <if test="positionRow != null">position_row = #{positionRow},</if>
+            <if test="positionColumn != null">position_column = #{positionColumn},</if>
+            <if test="maxCapacity != null">max_capacity = #{maxCapacity},</if>
+            <if test="currentCount != null">current_count = #{currentCount},</if>
+            <if test="cageStatus != null">cage_status = #{cageStatus},</if>
+            <if test="temperatureRange != null">temperature_range = #{temperatureRange},</if>
+            <if test="humidityRange != null">humidity_range = #{humidityRange},</if>
+            <if test="qrCodeContent != null">qr_code_content = #{qrCodeContent},</if>
+            <if test="qrCodeImageUrl != null">qr_code_image_url = #{qrCodeImageUrl},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where cage_id = #{cageId}
+    </update>
+
+    <delete id="deleteSysCageByCageId" parameterType="Long">
+        delete from sys_cage where cage_id = #{cageId}
+    </delete>
+
+    <delete id="deleteSysCageByCageIds" parameterType="String">
+        delete from sys_cage where cage_id in 
+        <foreach item="cageId" collection="array" open="(" separator="," close=")">
+            #{cageId}
+        </foreach>
+    </delete>
+
+</mapper>

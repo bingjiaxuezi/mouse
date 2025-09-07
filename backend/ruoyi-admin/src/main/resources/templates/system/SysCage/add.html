@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增笼子管理')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-SysCage-add">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">笼子编号：</label>
+                    <div class="col-sm-8">
+                        <input name="cageCode" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">笼子名称：</label>
+                    <div class="col-sm-8">
+                        <input name="cageName" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">笼子类型：</label>
+                    <div class="col-sm-8">
+                        <select name="cageType" class="form-control" th:with="type=${@dict.getType('sys_cage_type')}">
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">实验室房间：</label>
+                    <div class="col-sm-8">
+                        <input name="laboratoryRoom" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">货架编号：</label>
+                    <div class="col-sm-8">
+                        <input name="rackNumber" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">行位置：</label>
+                    <div class="col-sm-8">
+                        <input name="positionRow" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">列位置：</label>
+                    <div class="col-sm-8">
+                        <input name="positionColumn" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">最大容量(只)：</label>
+                    <div class="col-sm-8">
+                        <input name="maxCapacity" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">当前小鼠数量：</label>
+                    <div class="col-sm-8">
+                        <input name="currentCount" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">温度范围(°C)：</label>
+                    <div class="col-sm-8">
+                        <input name="temperatureRange" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">湿度范围(%)：</label>
+                    <div class="col-sm-8">
+                        <input name="humidityRange" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">使用标志：</label>
+                    <div class="col-sm-8">
+                        <select name="delFlag" class="form-control" th:with="type=${@dict.getType('sys_status')}">
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/SysCage"
+        $("#form-SysCage-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-SysCage-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

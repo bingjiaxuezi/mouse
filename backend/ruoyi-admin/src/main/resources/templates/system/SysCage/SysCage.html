@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('笼子管理列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>笼子编号：</label>
+                                <input type="text" name="cageCode"/>
+                            </li>
+                            <li>
+                                <label>笼子名称：</label>
+                                <input type="text" name="cageName"/>
+                            </li>
+                            <li>
+                                <label>笼子类型：</label>
+                                <select name="cageType" th:with="type=${@dict.getType('sys_cage_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>实验室房间：</label>
+                                <input type="text" name="laboratoryRoom"/>
+                            </li>
+                            <li>
+                                <label>货架编号：</label>
+                                <input type="text" name="rackNumber"/>
+                            </li>
+                            <li>
+                                <label>行位置：</label>
+                                <input type="text" name="positionRow"/>
+                            </li>
+                            <li>
+                                <label>列位置：</label>
+                                <input type="text" name="positionColumn"/>
+                            </li>
+                            <li>
+                                <label>最大容量(只)：</label>
+                                <input type="text" name="maxCapacity"/>
+                            </li>
+                            <li>
+                                <label>当前小鼠数量：</label>
+                                <input type="text" name="currentCount"/>
+                            </li>
+                            <li>
+                                <label>温度范围(°C)：</label>
+                                <input type="text" name="temperatureRange"/>
+                            </li>
+                            <li>
+                                <label>湿度范围(%)：</label>
+                                <input type="text" name="humidityRange"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:SysCage:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:SysCage:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:SysCage:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:SysCage:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysCage:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysCage:remove')}]];
+        var cageTypeDatas = [[${@dict.getType('sys_cage_type')}]];
+        var temperatureRangeDatas = [[${@dict.getType('sys_cage_status')}]];
+        var delFlagDatas = [[${@dict.getType('sys_status')}]];
+        var prefix = ctx + "system/SysCage";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "笼子管理",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'cageId',
+                    title: '笼子ID',
+                    visible: false
+                },
+                {
+                    field: 'cageCode',
+                    title: '笼子编号'
+                },
+                {
+                    field: 'cageName',
+                    title: '笼子名称'
+                },
+                {
+                    field: 'cageType',
+                    title: '笼子类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(cageTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'laboratoryRoom',
+                    title: '实验室房间'
+                },
+                {
+                    field: 'rackNumber',
+                    title: '货架编号'
+                },
+                {
+                    field: 'positionRow',
+                    title: '行位置'
+                },
+                {
+                    field: 'positionColumn',
+                    title: '列位置'
+                },
+                {
+                    field: 'maxCapacity',
+                    title: '最大容量(只)'
+                },
+                {
+                    field: 'currentCount',
+                    title: '当前小鼠数量'
+                },
+                {
+                    field: 'cageStatus',
+                    title: '笼子状态'
+                },
+                {
+                    field: 'temperatureRange',
+                    title: '温度范围(°C)',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(temperatureRangeDatas, value);
+                    }
+                },
+                {
+                    field: 'humidityRange',
+                    title: '湿度范围(%)'
+                },
+                {
+                    field: 'qrCodeImageUrl',
+                    title: '二维码图片URL'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.cageId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.cageId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

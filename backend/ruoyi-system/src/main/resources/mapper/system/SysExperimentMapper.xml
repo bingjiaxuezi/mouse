@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysExperimentMapper">
+    
+    <resultMap type="SysExperiment" id="SysExperimentResult">
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="experimentCode"    column="experiment_code"    />
+        <result property="experimentName"    column="experiment_name"    />
+        <result property="experimentType"    column="experiment_type"    />
+        <result property="experimentTemplate"    column="experiment_template"    />
+        <result property="experimentObjective"    column="experiment_objective"    />
+        <result property="experimentDesc"    column="experiment_desc"    />
+        <result property="experimentStatus"    column="experiment_status"    />
+        <result property="plannedBeginTime"    column="planned_begin_time"    />
+        <result property="plannedFinishTime"    column="planned_finish_time"    />
+        <result property="actualBeginTime"    column="actual_begin_time"    />
+        <result property="actualFinishTime"    column="actual_finish_time"    />
+        <result property="experimentDuration"    column="experiment_duration"    />
+        <result property="principalResearcher"    column="principal_researcher"    />
+        <result property="coResearchers"    column="co_researchers"    />
+        <result property="experimentTeam"    column="experiment_team"    />
+        <result property="experimentConfig"    column="experiment_config"    />
+        <result property="qrCodeContent"    column="qr_code_content"    />
+        <result property="qrCodeImageUrl"    column="qr_code_image_url"    />
+        <result property="totalCages"    column="total_cages"    />
+        <result property="totalMice"    column="total_mice"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="modifyTime"    column="modify_time"    />
+    </resultMap>
+
+    <sql id="selectSysExperimentVo">
+        select experiment_id, experiment_code, experiment_name, experiment_type, experiment_template, experiment_objective, experiment_desc, experiment_status, planned_begin_time, planned_finish_time, actual_begin_time, actual_finish_time, experiment_duration, principal_researcher, co_researchers, experiment_team, experiment_config, qr_code_content, qr_code_image_url, total_cages, total_mice, build_by, build_time, modify_by, del_flag, remark, modify_time from sys_experiment
+    </sql>
+
+    <select id="selectSysExperimentList" parameterType="SysExperiment" resultMap="SysExperimentResult">
+        <include refid="selectSysExperimentVo"/>
+        <where>  
+            <if test="experimentCode != null  and experimentCode != ''"> and experiment_code = #{experimentCode}</if>
+            <if test="experimentName != null  and experimentName != ''"> and experiment_name like concat('%', #{experimentName}, '%')</if>
+            <if test="experimentType != null  and experimentType != ''"> and experiment_type = #{experimentType}</if>
+            <if test="experimentTemplate != null  and experimentTemplate != ''"> and experiment_template = #{experimentTemplate}</if>
+            <if test="experimentObjective != null  and experimentObjective != ''"> and experiment_objective = #{experimentObjective}</if>
+            <if test="experimentDesc != null  and experimentDesc != ''"> and experiment_desc = #{experimentDesc}</if>
+            <if test="experimentStatus != null  and experimentStatus != ''"> and experiment_status = #{experimentStatus}</if>
+            <if test="plannedBeginTime != null "> and planned_begin_time = #{plannedBeginTime}</if>
+            <if test="plannedFinishTime != null "> and planned_finish_time = #{plannedFinishTime}</if>
+            <if test="actualBeginTime != null "> and actual_begin_time = #{actualBeginTime}</if>
+            <if test="actualFinishTime != null "> and actual_finish_time = #{actualFinishTime}</if>
+            <if test="principalResearcher != null "> and principal_researcher = #{principalResearcher}</if>
+            <if test="coResearchers != null  and coResearchers != ''"> and co_researchers = #{coResearchers}</if>
+            <if test="experimentTeam != null  and experimentTeam != ''"> and experiment_team = #{experimentTeam}</if>
+            <if test="experimentConfig != null  and experimentConfig != ''"> and experiment_config = #{experimentConfig}</if>
+            <if test="qrCodeContent != null  and qrCodeContent != ''"> and qr_code_content = #{qrCodeContent}</if>
+            <if test="qrCodeImageUrl != null  and qrCodeImageUrl != ''"> and qr_code_image_url = #{qrCodeImageUrl}</if>
+            <if test="totalCages != null "> and total_cages = #{totalCages}</if>
+            <if test="totalMice != null "> and total_mice = #{totalMice}</if>
+            <if test="buildBy != null  and buildBy != ''"> and build_by = #{buildBy}</if>
+            <if test="buildTime != null "> and build_time = #{buildTime}</if>
+            <if test="modifyBy != null  and modifyBy != ''"> and modify_by = #{modifyBy}</if>
+            <if test="modifyTime != null "> and modify_time = #{modifyTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysExperimentByExperimentId" parameterType="Long" resultMap="SysExperimentResult">
+        <include refid="selectSysExperimentVo"/>
+        where experiment_id = #{experimentId}
+    </select>
+
+    <insert id="insertSysExperiment" parameterType="SysExperiment" useGeneratedKeys="true" keyProperty="experimentId">
+        insert into sys_experiment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="experimentCode != null and experimentCode != ''">experiment_code,</if>
+            <if test="experimentName != null and experimentName != ''">experiment_name,</if>
+            <if test="experimentType != null and experimentType != ''">experiment_type,</if>
+            <if test="experimentTemplate != null">experiment_template,</if>
+            <if test="experimentObjective != null">experiment_objective,</if>
+            <if test="experimentDesc != null">experiment_desc,</if>
+            <if test="experimentStatus != null">experiment_status,</if>
+            <if test="plannedBeginTime != null">planned_begin_time,</if>
+            <if test="plannedFinishTime != null">planned_finish_time,</if>
+            <if test="actualBeginTime != null">actual_begin_time,</if>
+            <if test="actualFinishTime != null">actual_finish_time,</if>
+            <if test="experimentDuration != null">experiment_duration,</if>
+            <if test="principalResearcher != null">principal_researcher,</if>
+            <if test="coResearchers != null">co_researchers,</if>
+            <if test="experimentTeam != null">experiment_team,</if>
+            <if test="experimentConfig != null">experiment_config,</if>
+            <if test="qrCodeContent != null">qr_code_content,</if>
+            <if test="qrCodeImageUrl != null">qr_code_image_url,</if>
+            <if test="totalCages != null">total_cages,</if>
+            <if test="totalMice != null">total_mice,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="modifyTime != null">modify_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="experimentCode != null and experimentCode != ''">#{experimentCode},</if>
+            <if test="experimentName != null and experimentName != ''">#{experimentName},</if>
+            <if test="experimentType != null and experimentType != ''">#{experimentType},</if>
+            <if test="experimentTemplate != null">#{experimentTemplate},</if>
+            <if test="experimentObjective != null">#{experimentObjective},</if>
+            <if test="experimentDesc != null">#{experimentDesc},</if>
+            <if test="experimentStatus != null">#{experimentStatus},</if>
+            <if test="plannedBeginTime != null">#{plannedBeginTime},</if>
+            <if test="plannedFinishTime != null">#{plannedFinishTime},</if>
+            <if test="actualBeginTime != null">#{actualBeginTime},</if>
+            <if test="actualFinishTime != null">#{actualFinishTime},</if>
+            <if test="experimentDuration != null">#{experimentDuration},</if>
+            <if test="principalResearcher != null">#{principalResearcher},</if>
+            <if test="coResearchers != null">#{coResearchers},</if>
+            <if test="experimentTeam != null">#{experimentTeam},</if>
+            <if test="experimentConfig != null">#{experimentConfig},</if>
+            <if test="qrCodeContent != null">#{qrCodeContent},</if>
+            <if test="qrCodeImageUrl != null">#{qrCodeImageUrl},</if>
+            <if test="totalCages != null">#{totalCages},</if>
+            <if test="totalMice != null">#{totalMice},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysExperiment" parameterType="SysExperiment">
+        update sys_experiment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="experimentCode != null and experimentCode != ''">experiment_code = #{experimentCode},</if>
+            <if test="experimentName != null and experimentName != ''">experiment_name = #{experimentName},</if>
+            <if test="experimentType != null and experimentType != ''">experiment_type = #{experimentType},</if>
+            <if test="experimentTemplate != null">experiment_template = #{experimentTemplate},</if>
+            <if test="experimentObjective != null">experiment_objective = #{experimentObjective},</if>
+            <if test="experimentDesc != null">experiment_desc = #{experimentDesc},</if>
+            <if test="experimentStatus != null">experiment_status = #{experimentStatus},</if>
+            <if test="plannedBeginTime != null">planned_begin_time = #{plannedBeginTime},</if>
+            <if test="plannedFinishTime != null">planned_finish_time = #{plannedFinishTime},</if>
+            <if test="actualBeginTime != null">actual_begin_time = #{actualBeginTime},</if>
+            <if test="actualFinishTime != null">actual_finish_time = #{actualFinishTime},</if>
+            <if test="experimentDuration != null">experiment_duration = #{experimentDuration},</if>
+            <if test="principalResearcher != null">principal_researcher = #{principalResearcher},</if>
+            <if test="coResearchers != null">co_researchers = #{coResearchers},</if>
+            <if test="experimentTeam != null">experiment_team = #{experimentTeam},</if>
+            <if test="experimentConfig != null">experiment_config = #{experimentConfig},</if>
+            <if test="qrCodeContent != null">qr_code_content = #{qrCodeContent},</if>
+            <if test="qrCodeImageUrl != null">qr_code_image_url = #{qrCodeImageUrl},</if>
+            <if test="totalCages != null">total_cages = #{totalCages},</if>
+            <if test="totalMice != null">total_mice = #{totalMice},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+        </trim>
+        where experiment_id = #{experimentId}
+    </update>
+
+    <delete id="deleteSysExperimentByExperimentId" parameterType="Long">
+        delete from sys_experiment where experiment_id = #{experimentId}
+    </delete>
+
+    <delete id="deleteSysExperimentByExperimentIds" parameterType="String">
+        delete from sys_experiment where experiment_id in 
+        <foreach item="experimentId" collection="array" open="(" separator="," close=")">
+            #{experimentId}
+        </foreach>
+    </delete>
+
+</mapper>

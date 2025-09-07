@@ -64,4 +64,11 @@ Write-Host $containerStatus
 Write-Host "Deployment process completed!" -ForegroundColor Green
 Write-Host "You can check logs with: docker logs mouse-backend" -ForegroundColor Yellow
 
-Write-Host "Step 5: docker logs mouse-backend --tail 20" -ForegroundColor Yellow
+Write-Host "Step 5: Monitoring container logs..." -ForegroundColor Yellow
+Write-Host "===========================================" -ForegroundColor Gray
+Write-Host "Options:" -ForegroundColor Cyan
+Write-Host "1. Press Ctrl+C to stop monitoring" -ForegroundColor Yellow
+Write-Host "2. Command will run indefinitely until interrupted" -ForegroundColor Yellow
+Write-Host "===========================================" -ForegroundColor Gray
+
+docker logs mouse-backend --follow --tail 20

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('实验详情展示列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>实验编号：</label>
+                                <input type="text" name="experimentCode"/>
+                            </li>
+                            <li>
+                                <label>实验名称：</label>
+                                <input type="text" name="experimentName"/>
+                            </li>
+                            <li>
+                                <label>实验类型：</label>
+                                <select name="experimentType" th:with="type=${@dict.getType('sys_experiment_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>实验模板名称：</label>
+                                <input type="text" name="experimentTemplate"/>
+                            </li>
+                            <li>
+                                <label>实验状态：</label>
+                                <select name="experimentStatus" th:with="type=${@dict.getType('sys_experiment_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>计划开始时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择计划开始时间" name="plannedBeginTime"/>
+                            </li>
+                            <li>
+                                <label>计划结束时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择计划结束时间" name="plannedFinishTime"/>
+                            </li>
+                            <li>
+                                <label>实际开始时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择实际开始时间" name="actualBeginTime"/>
+                            </li>
+                            <li>
+                                <label>实际结束时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择实际结束时间" name="actualFinishTime"/>
+                            </li>
+                            <li>
+                                <label>主要研究员：</label>
+                                <input type="text" name="principalResearcher"/>
+                            </li>
+                            <li>
+                                <label>实验团队名称：</label>
+                                <input type="text" name="experimentTeam"/>
+                            </li>
+                            <li>
+                                <label>关联笼子总数：</label>
+                                <input type="text" name="totalCages"/>
+                            </li>
+                            <li>
+                                <label>关联小鼠总数：</label>
+                                <input type="text" name="totalMice"/>
+                            </li>
+                            <li>
+                                <label>创建者：</label>
+                                <input type="text" name="buildBy"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:SysExperiment:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:SysExperiment:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:SysExperiment:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:SysExperiment:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysExperiment:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysExperiment:remove')}]];
+        var experimentTypeDatas = [[${@dict.getType('sys_experiment_type')}]];
+        var experimentStatusDatas = [[${@dict.getType('sys_experiment_status')}]];
+        var prefix = ctx + "system/SysExperiment";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "实验详情展示",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'experimentId',
+                    title: '实验ID',
+                    visible: false
+                },
+                {
+                    field: 'experimentCode',
+                    title: '实验编号'
+                },
+                {
+                    field: 'experimentName',
+                    title: '实验名称'
+                },
+                {
+                    field: 'experimentType',
+                    title: '实验类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(experimentTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'experimentTemplate',
+                    title: '实验模板名称'
+                },
+                {
+                    field: 'experimentObjective',
+                    title: '实验目标'
+                },
+                {
+                    field: 'experimentDesc',
+                    title: '实验描述'
+                },
+                {
+                    field: 'experimentStatus',
+                    title: '实验状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(experimentStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'plannedBeginTime',
+                    title: '计划开始时间'
+                },
+                {
+                    field: 'plannedFinishTime',
+                    title: '计划结束时间'
+                },
+                {
+                    field: 'actualBeginTime',
+                    title: '实际开始时间'
+                },
+                {
+                    field: 'actualFinishTime',
+                    title: '实际结束时间'
+                },
+                {
+                    field: 'experimentDuration',
+                    title: '实验周期'
+                },
+                {
+                    field: 'principalResearcher',
+                    title: '主要研究员'
+                },
+                {
+                    field: 'coResearchers',
+                    title: '协作研究员列表'
+                },
+                {
+                    field: 'experimentTeam',
+                    title: '实验团队名称'
+                },
+                {
+                    field: 'experimentConfig',
+                    title: '实验配置参数'
+                },
+                {
+                    field: 'qrCodeContent',
+                    title: '实验二维码内容'
+                },
+                {
+                    field: 'qrCodeImageUrl',
+                    title: '二维码图片URL'
+                },
+                {
+                    field: 'totalCages',
+                    title: '关联笼子总数'
+                },
+                {
+                    field: 'totalMice',
+                    title: '关联小鼠总数'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.experimentId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.experimentId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>
