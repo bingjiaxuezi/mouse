@@ -2,6 +2,137 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('实验详情展示列表')" />
+    <style>
+        /* 搜索区域样式优化 */
+        .select-list {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .select-list ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .select-list li {
+            display: flex;
+            align-items: center;
+            min-width: 280px;
+            margin-bottom: 10px;
+        }
+        
+        .select-list label {
+            min-width: 100px;
+            font-weight: 500;
+            color: #495057;
+            margin-right: 8px;
+        }
+        
+        .select-list input, .select-list select {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .select-list input:focus, .select-list select:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        /* 操作按钮样式优化 */
+        .btn-group .btn {
+            margin-right: 5px;
+            border-radius: 4px;
+            font-size: 13px;
+            padding: 5px 12px;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        /* 表格样式优化 */
+        .bootstrap-table .fixed-table-container {
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .bootstrap-table .table th {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .bootstrap-table .table td {
+            vertical-align: middle;
+        }
+        
+        /* 研究员名称显示样式 */
+        .researcher-name {
+            color: #007bff;
+            font-weight: 500;
+        }
+        
+        /* 状态标签样式 */
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-planning {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-running {
+            background-color: #e8f5e8;
+            color: #388e3c;
+        }
+        
+        .status-completed {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .status-paused {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+    </style>
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -54,7 +185,9 @@
                             </li>
                             <li>
                                 <label>主要研究员：</label>
-                                <input type="text" name="principalResearcher"/>
+                                <select name="principalResearcher" th:with="type=${@dict.getType('sys_normal_disable')}">
+                                    <option value="">所有研究员</option>
+                                </select>
                             </li>
                             <li>
                                 <label>实验团队名称：</label>
@@ -185,14 +318,7 @@
                     field: 'experimentDuration',
                     title: '实验周期'
                 },
-                {
-                    field: 'principalResearcher',
-                    title: '主要研究员'
-                },
-                {
-                    field: 'coResearchers',
-                    title: '协作研究员列表'
-                },
+
                 {
                     field: 'experimentTeam',
                     title: '实验团队名称'
@@ -226,6 +352,7 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="saveAsTemplate(\'' + row.experimentId + '\');"><i class="fa fa-save"></i>保存为模板</a> ');
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="viewExperimentDetail(\'' + row.experimentId + '\');"><i class="fa fa-search"></i>详情</a> ');
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.experimentId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.experimentId + '\')"><i class="fa fa-remove"></i>删除</a>');
@@ -235,6 +362,135 @@
             };
             $.table.init(options);
         });
+        
+        // 保存为模板函数
+        function saveAsTemplate(experimentId) {
+            layer.prompt({
+                title: '请输入模板名称',
+                formType: 0, // 输入框类型，0为文本框
+                value: '', // 默认值
+                maxlength: 50 // 最大长度
+            }, function(templateName, index) {
+                if (!templateName || templateName.trim() === '') {
+                    $.modal.alertWarning("请输入模板名称");
+                    return;
+                }
+                
+                layer.close(index); // 关闭输入框
+                
+                var data = {
+                    experimentId: experimentId,
+                    templateName: templateName.trim()
+                };
+                
+                $.ajax({
+                    url: ctx + "system/SysExperimentTemplate/saveAsTemplate",
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function(result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.alertSuccess("保存模板成功");
+                        } else {
+                            $.modal.alertError(result.msg || "保存模板失败");
+                        }
+                    },
+                    error: function() {
+                        $.modal.alertError("保存模板失败，请稍后重试");
+                    }
+                });
+            });
+        }
+        
+        // 查看实验详情函数
+        function viewExperimentDetail(experimentId) {
+            var url = ctx + "system/SysExperimentDetail?experimentId=" + experimentId;
+            $.modal.openTab("实验详情", url);
+        }
+        
+        // 研究员数据缓存
+        var researcherCache = {};
+        var researcherDataLoaded = false;
+        
+        // 页面加载时获取研究员数据
+        $(document).ready(function() {
+            loadResearcherData();
+        });
+        
+        // 加载研究员数据
+        function loadResearcherData() {
+            $.ajax({
+                url: ctx + "system/user/list",
+                type: "POST",
+                data: {
+                    pageSize: 1000,
+                    pageNum: 1
+                },
+                success: function(result) {
+                    if (result.code == 0 && result.rows) {
+                        // 构建研究员ID到姓名的映射
+                        for (var i = 0; i < result.rows.length; i++) {
+                            var user = result.rows[i];
+                            researcherCache[user.userId] = user.userName;
+                        }
+                        researcherDataLoaded = true;
+                        
+                        // 填充搜索条件中的研究员下拉列表
+                        var $researcherSelect = $("select[name='principalResearcher']");
+                        $researcherSelect.empty();
+                        $researcherSelect.append('<option value="">所有研究员</option>');
+                        for (var i = 0; i < result.rows.length; i++) {
+                            var user = result.rows[i];
+                            $researcherSelect.append('<option value="' + user.userId + '">' + user.userName + '</option>');
+                        }
+                        
+                        // 如果表格已经加载，则更新显示
+                        updateResearcherNames();
+                    }
+                },
+                error: function() {
+                    console.log('加载研究员数据失败');
+                }
+            });
+        }
+        
+        // 更新研究员名称显示
+        function updateResearcherNames() {
+            if (!researcherDataLoaded) {
+                return;
+            }
+            
+            // 更新所有研究员名称显示
+            $('.researcher-name').each(function() {
+                var $this = $(this);
+                var researcherId = $this.data('researcher-id');
+                if (researcherId && researcherCache[researcherId]) {
+                    $this.text(researcherCache[researcherId]);
+                }
+            });
+        }
+        
+        // 重写表格的onLoadSuccess回调
+        var originalOptions = $.table._option;
+        if (originalOptions && originalOptions.onLoadSuccess) {
+            var originalOnLoadSuccess = originalOptions.onLoadSuccess;
+            originalOptions.onLoadSuccess = function(data) {
+                originalOnLoadSuccess.call(this, data);
+                // 延迟执行以确保DOM已更新
+                setTimeout(function() {
+                    updateResearcherNames();
+                }, 100);
+            };
+        } else {
+            // 如果没有原始的onLoadSuccess，则添加一个
+            $(document).on('DOMNodeInserted', function(e) {
+                if ($(e.target).hasClass('researcher-name')) {
+                    setTimeout(function() {
+                        updateResearcherNames();
+                    }, 50);
+                }
+            });
+        }
     </script>
 </body>
 </html>

@@ -35,7 +35,51 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSysExperimentVo">
-        select experiment_id, experiment_code, experiment_name, experiment_type, experiment_template, experiment_objective, experiment_desc, experiment_status, planned_begin_time, planned_finish_time, actual_begin_time, actual_finish_time, experiment_duration, principal_researcher, co_researchers, experiment_team, experiment_config, qr_code_content, qr_code_image_url, total_cages, total_mice, build_by, build_time, modify_by, del_flag, remark, modify_time from sys_experiment
+        select 
+            e.experiment_id, 
+            e.experiment_code, 
+            e.experiment_name, 
+            e.experiment_type, 
+            e.experiment_template, 
+            e.experiment_objective, 
+            e.experiment_desc, 
+            e.experiment_status, 
+            e.planned_begin_time, 
+            e.planned_finish_time, 
+            e.actual_begin_time, 
+            e.actual_finish_time, 
+            e.experiment_duration, 
+            e.principal_researcher, 
+            e.co_researchers, 
+            e.experiment_team, 
+            e.experiment_config, 
+            e.qr_code_content, 
+            e.qr_code_image_url, 
+            COALESCE(
+                NULLIF((
+                    SELECT COUNT(DISTINCT ec.cage_id) 
+                    FROM sys_experiment_cage ec 
+                    WHERE ec.experiment_id = e.experiment_id 
+                    AND ec.bind_status = 'ACTIVE'
+                ), 0),
+                e.total_cages
+            ) as total_cages,
+            COALESCE(
+                NULLIF((
+                    SELECT COUNT(*) 
+                    FROM t_mouse m 
+                    WHERE m.experiment_id = e.experiment_id 
+                    AND m.status = '1'
+                ), 0),
+                e.total_mice
+            ) as total_mice,
+            e.build_by, 
+            e.build_time, 
+            e.modify_by, 
+            e.del_flag, 
+            e.remark, 
+            e.modify_time 
+        from sys_experiment e
     </sql>
 
     <select id="selectSysExperimentList" parameterType="SysExperiment" resultMap="SysExperimentResult">

@@ -14,10 +14,12 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysExperiment;
 import com.ruoyi.system.service.ISysExperimentService;
+import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
  * 实验详情展示Controller
@@ -33,6 +35,9 @@ public class SysExperimentController extends BaseController
 
     @Autowired
     private ISysExperimentService sysExperimentService;
+    
+    @Autowired
+    private ISysUserService sysUserService;
 
     @RequiresPermissions("system:SysExperiment:view")
     @GetMapping()
@@ -124,5 +129,24 @@ public class SysExperimentController extends BaseController
     public AjaxResult remove(String ids)
     {
         return toAjax(sysExperimentService.deleteSysExperimentByExperimentIds(ids));
+    }
+    
+    /**
+     * 根据研究员ID获取研究员名称
+     */
+    @PostMapping("/getResearcherName")
+    @ResponseBody
+    public AjaxResult getResearcherName(Long userId)
+    {
+        if (userId == null) {
+            return AjaxResult.error("用户ID不能为空");
+        }
+        
+        SysUser user = sysUserService.selectUserById(userId);
+        if (user != null) {
+            return AjaxResult.success(user.getUserName());
+        } else {
+            return AjaxResult.error("未找到对应的研究员");
+        }
     }
 }

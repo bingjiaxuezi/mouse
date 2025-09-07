@@ -1,12 +1,14 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysExperimentCageMapper;
 import com.ruoyi.system.domain.SysExperimentCage;
 import com.ruoyi.system.domain.vo.SysExperimentCageVO;
 import com.ruoyi.system.service.ISysExperimentCageService;
+import com.ruoyi.system.service.ISysCageService;
 import com.ruoyi.common.core.text.Convert;
 
 /**
@@ -20,6 +22,9 @@ public class SysExperimentCageServiceImpl implements ISysExperimentCageService
 {
     @Autowired
     private SysExperimentCageMapper sysExperimentCageMapper;
+    
+    @Autowired
+    private ISysCageService sysCageService;
 
     /**
      * 查询实验笼子关系
@@ -78,7 +83,28 @@ public class SysExperimentCageServiceImpl implements ISysExperimentCageService
     @Override
     public int deleteSysExperimentCageByRelationIds(String relationIds)
     {
-        return sysExperimentCageMapper.deleteSysExperimentCageByRelationIds(Convert.toStrArray(relationIds));
+        // 先获取要删除的关系记录中的笼子ID
+        String[] relationIdArray = Convert.toStrArray(relationIds);
+        List<Long> cageIds = new java.util.ArrayList<>();
+        
+        for (String relationIdStr : relationIdArray) {
+            Long relationId = Long.valueOf(relationIdStr);
+            SysExperimentCage relation = sysExperimentCageMapper.selectSysExperimentCageByRelationId(relationId);
+            if (relation != null && relation.getCageId() != null) {
+                cageIds.add(relation.getCageId());
+            }
+        }
+        
+        // 执行删除操作
+        int result = sysExperimentCageMapper.deleteSysExperimentCageByRelationIds(relationIdArray);
+        
+        // 如果删除成功，将相关笼子状态更新为可用
+        if (result > 0 && !cageIds.isEmpty()) {
+            String cageIdsStr = cageIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+            sysCageService.updateCageStatus(cageIdsStr, "AVAILABLE");
+        }
+        
+        return result;
     }
 
     /**
@@ -90,7 +116,22 @@ public class SysExperimentCageServiceImpl implements ISysExperimentCageService
     @Override
     public int deleteSysExperimentCageByRelationId(Long relationId)
     {
-        return sysExperimentCageMapper.deleteSysExperimentCageByRelationId(relationId);
+        // 先获取要删除的关系记录中的笼子ID
+        SysExperimentCage relation = sysExperimentCageMapper.selectSysExperimentCageByRelationId(relationId);
+        Long cageId = null;
+        if (relation != null) {
+            cageId = relation.getCageId();
+        }
+        
+        // 执行删除操作
+        int result = sysExperimentCageMapper.deleteSysExperimentCageByRelationId(relationId);
+        
+        // 如果删除成功，将相关笼子状态更新为可用
+        if (result > 0 && cageId != null) {
+            sysCageService.updateCageStatus(String.valueOf(cageId), "AVAILABLE");
+        }
+        
+        return result;
     }
 
     /**

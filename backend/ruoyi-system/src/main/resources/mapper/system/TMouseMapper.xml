@@ -59,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="species != null and species != ''"> and m.species = #{species}</if>
         <if test="gender != null and gender != ''"> and m.gender = #{gender}</if>
         <if test="status != null"> and m.status = #{status}</if>
+        <if test="experimentId != null"> and m.experiment_id = #{experimentId}</if>
         <if test="params.beginTime != null and params.beginTime != ''"> and <![CDATA[ date_format(m.birth_date,'%Y%m%d') >= date_format(#{params.beginTime},'%Y%m%d') ]]></if>
         <if test="params.endTime != null and params.endTime != ''"> and <![CDATA[ date_format(m.birth_date,'%Y%m%d') <= date_format(#{params.endTime},'%Y%m%d') ]]></if>
         order by m.create_time desc

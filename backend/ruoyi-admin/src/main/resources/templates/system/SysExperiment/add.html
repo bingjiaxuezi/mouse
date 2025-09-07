@@ -35,9 +35,12 @@
             </div>
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label">实验模板名称：</label>
+                    <label class="col-sm-4 control-label">实验模板：</label>
                     <div class="col-sm-8">
-                        <input name="experimentTemplate" class="form-control" type="text">
+                        <select name="experimentTemplate" id="templateSelect" class="form-control">
+                            <option value="">请选择模板</option>
+                        </select>
+                        <small class="help-block">选择模板后将自动填充相关信息</small>
                     </div>
                 </div>
             </div>
@@ -116,7 +119,14 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label is-required">主要研究员：</label>
                     <div class="col-sm-8">
-                        <input name="principalResearcher" class="form-control" type="text" required>
+                        <input type="hidden" name="principalResearcher" id="principalResearcherId">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="selectedPrincipalResearcher" placeholder="点击选择主要研究员" readonly required>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="selectPrincipalResearcher()"><i class="fa fa-user"></i> 选择研究员</button>
+                            </span>
+                        </div>
+                        <div id="principalResearcherDisplay" class="mt-2" style="min-height: 40px;"></div>
                     </div>
                 </div>
             </div>
@@ -124,7 +134,14 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">协作研究员列表：</label>
                     <div class="col-sm-8">
-                        <textarea name="coResearchers" class="form-control"></textarea>
+                        <input type="hidden" name="coResearchers" id="coResearcherIds">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="selectedCoResearchers" placeholder="点击选择协作研究员" readonly>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="selectCoResearchers()"><i class="fa fa-users"></i> 选择研究员</button>
+                            </span>
+                        </div>
+                        <div id="coResearchersDisplay" class="mt-2" style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e6e7; border-radius: 3px; padding: 10px; background-color: #f9f9f9; min-height: 60px;"></div>
                     </div>
                 </div>
             </div>
@@ -189,8 +206,118 @@
 
         function submitHandler() {
             if ($.validate.form()) {
+                // 确保研究员ID字段有值
+                if (selectedPrincipalResearcherId) {
+                    $('input[name="principalResearcher"]').val(selectedPrincipalResearcherId);
+                }
+                if (selectedCoResearcherIds.length > 0) {
+                    $('input[name="coResearchers"]').val(selectedCoResearcherIds.join(';'));
+                }
+                
                 $.operate.save(prefix + "/add", $('#form-SysExperiment-add').serialize());
             }
+        }
+        
+        // 页面加载时获取模板列表
+        $(document).ready(function() {
+            loadTemplateList();
+        });
+        
+        // 加载模板列表
+        function loadTemplateList() {
+            $.ajax({
+                url: ctx + "system/SysExperimentTemplate/getActiveTemplates",
+                type: "POST",
+                dataType: "json",
+                success: function(result) {
+                    if (result.code == web_status.SUCCESS && result.data) {
+                        var templateSelect = $("#templateSelect");
+                        templateSelect.empty();
+                        templateSelect.append('<option value="">请选择模板</option>');
+                        
+                        $.each(result.data, function(index, template) {
+                            // 对JSON字符串进行HTML转义处理
+                            var configData = template.defaultConfig || '';
+                            var escapedConfig = configData.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                            templateSelect.append('<option value="' + template.templateId + '" data-config="' + 
+                                escapedConfig + '">' + template.templateName + '</option>');
+                        });
+                    }
+                },
+                error: function() {
+                    console.log("加载模板列表失败");
+                }
+            });
+        }
+        
+        // 模板选择变化事件
+        $("#templateSelect").change(function() {
+            var selectedOption = $(this).find("option:selected");
+            var templateId = selectedOption.val();
+            
+            if (templateId && templateId !== '') {
+                var configData = selectedOption.data("config");
+                if (configData) {
+                    try {
+                        var config;
+                        
+                        // 检查configData的类型
+                        if (typeof configData === 'string') {
+                            // 如果是字符串，进行HTML转义处理
+                            var unescapedConfig = configData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+                            
+                            // 检查是否为有效的JSON字符串
+                            if (unescapedConfig.trim().startsWith('{') && unescapedConfig.trim().endsWith('}')) {
+                                config = JSON.parse(unescapedConfig);
+                            } else {
+                                $.modal.alertWarning("该模板的配置数据格式不正确，无法自动填充表单");
+                                return;
+                            }
+                        } else if (typeof configData === 'object') {
+                            // 如果已经是对象，直接使用
+                            config = configData;
+                        } else {
+                            $.modal.alertWarning("该模板的配置数据类型不正确，无法自动填充表单");
+                            return;
+                        }
+                        
+                        fillFormWithTemplate(config);
+                    } catch (e) {
+                        console.log("解析模板配置失败:", e);
+                        $.modal.alertWarning("解析模板配置失败，请检查模板数据格式");
+                    }
+                } else {
+                    $.modal.alertWarning("该模板没有配置数据");
+                }
+            }
+        });
+        
+        // 使用模板数据填充表单
+        function fillFormWithTemplate(config) {
+            // 不覆盖实验编号，其他字段进行填充
+            if (config.experimentType) {
+                $("select[name='experimentType']").val(config.experimentType);
+            }
+            if (config.experimentObjective) {
+                $("textarea[name='experimentObjective']").val(config.experimentObjective);
+            }
+            if (config.experimentDesc) {
+                $("textarea[name='experimentDesc']").val(config.experimentDesc);
+            }
+            if (config.principalResearcher) {
+                $("input[name='principalResearcher']").val(config.principalResearcher);
+            }
+            if (config.coResearchers) {
+                $("input[name='coResearchers']").val(config.coResearchers);
+            }
+            if (config.experimentTeam) {
+                $("input[name='experimentTeam']").val(config.experimentTeam);
+            }
+            if (config.experimentConfig) {
+                $("textarea[name='experimentConfig']").val(config.experimentConfig);
+            }
+            
+            $.modal.alertSuccess("模板数据已填充，请检查并修改相关信息");
         }
 
         $("input[name='plannedBeginTime']").datetimepicker({
@@ -216,6 +343,292 @@
             minView: "month",
             autoclose: true
         });
+        
+        // 研究员选择相关变量
+        var allResearchers = [];
+        var selectedPrincipalResearcherId = null;
+        var selectedCoResearcherIds = [];
+        
+        // 页面加载时获取所有研究员
+        loadAllResearchers();
+        
+        // 加载所有研究员
+        function loadAllResearchers() {
+            $.ajax({
+                url: ctx + "system/user/list",
+                type: "POST",
+                data: {
+                    pageSize: 100,
+                    pageNum: 1
+                },
+                success: function(result) {
+                    if (result.code == 0) {
+                        allResearchers = result.rows;
+                    }
+                }
+            });
+        }
+        
+        // 选择主要研究员
+        function selectPrincipalResearcher() {
+            if (allResearchers.length === 0) {
+                loadAllResearchers();
+                setTimeout(function() {
+                    showPrincipalResearcherSelectModal();
+                }, 500);
+            } else {
+                showPrincipalResearcherSelectModal();
+            }
+        }
+        
+        // 显示主要研究员选择模态框
+        function showPrincipalResearcherSelectModal() {
+            var modalHtml = '<div class="modal fade" id="principalResearcherSelectModal" tabindex="-1" role="dialog">' +
+                '<div class="modal-dialog modal-lg" role="document">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<h4 class="modal-title">选择主要研究员</h4>' +
+                '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                '<div class="row">' +
+                '<div class="col-md-12">' +
+                '<table class="table table-striped table-bordered">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>选择</th>' +
+                '<th>用户名</th>' +
+                '<th>姓名</th>' +
+                '<th>邮箱</th>' +
+                '<th>部门</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody id="principalResearcherTableBody">' +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '<button type="button" class="btn btn-primary" onclick="confirmPrincipalResearcherSelection()">确定</button>' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            
+            $('body').append(modalHtml);
+            
+            // 填充研究员数据
+            var tbody = $('#principalResearcherTableBody');
+            tbody.empty();
+            
+            $.each(allResearchers, function(index, researcher) {
+                var checked = selectedPrincipalResearcherId === researcher.userId ? 'checked' : '';
+                var deptName = researcher.dept ? researcher.dept.deptName : '';
+                var row = '<tr>' +
+                    '<td><input type="radio" name="principalResearcherRadio" class="principal-researcher-radio" value="' + researcher.userId + '" ' + checked + '></td>' +
+                    '<td>' + researcher.loginName + '</td>' +
+                    '<td>' + researcher.userName + '</td>' +
+                    '<td>' + (researcher.email || '') + '</td>' +
+                    '<td>' + deptName + '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
+            
+            $('#principalResearcherSelectModal').modal('show');
+        }
+        
+        // 确认主要研究员选择
+        function confirmPrincipalResearcherSelection() {
+            var selectedRadio = $('.principal-researcher-radio:checked');
+            if (selectedRadio.length > 0) {
+                selectedPrincipalResearcherId = parseInt(selectedRadio.val());
+                var researcher = allResearchers.find(r => r.userId === selectedPrincipalResearcherId);
+                if (researcher) {
+                    updatePrincipalResearcherDisplay(researcher);
+                }
+            }
+            
+            $('#principalResearcherSelectModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+        }
+        
+        // 更新主要研究员显示
+        function updatePrincipalResearcherDisplay(researcher) {
+            $('#selectedPrincipalResearcher').val(researcher.userName);
+            $('#principalResearcherId').val(researcher.userId);
+            
+            var deptName = researcher.dept ? researcher.dept.deptName : '未分配部门';
+            var email = researcher.email || '未设置邮箱';
+            var displayHtml = '<div class="researcher-item" style="display: flex; align-items: center; padding: 8px 12px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">' +
+                '<div class="researcher-avatar" style="width: 32px; height: 32px; background: #5cb85c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">' +
+                researcher.userName.charAt(0).toUpperCase() +
+                '</div>' +
+                '<div class="researcher-info" style="flex: 1;">' +
+                '<div style="font-weight: 500; color: #333;">' + researcher.userName + ' (' + researcher.loginName + ')</div>' +
+                '<div style="font-size: 12px; color: #666; margin-top: 2px;">' +
+                '<i class="fa fa-building-o"></i> ' + deptName + ' &nbsp;&nbsp;' +
+                '<i class="fa fa-envelope-o"></i> ' + email +
+                '</div>' +
+                '</div>' +
+                '<button type="button" class="btn btn-danger btn-xs" onclick="removePrincipalResearcher()" style="padding: 2px 6px;" title="清除选择">' +
+                '<i class="fa fa-times"></i>' +
+                '</button>' +
+                '</div>';
+            
+            $('#principalResearcherDisplay').html(displayHtml);
+        }
+        
+        // 清除主要研究员选择
+        function removePrincipalResearcher() {
+            selectedPrincipalResearcherId = null;
+            $('#selectedPrincipalResearcher').val('');
+            $('#principalResearcherId').val('');
+            $('#principalResearcherDisplay').html('');
+        }
+        
+        // 选择协作研究员
+        function selectCoResearchers() {
+            if (allResearchers.length === 0) {
+                loadAllResearchers();
+                setTimeout(function() {
+                    showCoResearchersSelectModal();
+                }, 500);
+            } else {
+                showCoResearchersSelectModal();
+            }
+        }
+        
+        // 显示协作研究员选择模态框
+        function showCoResearchersSelectModal() {
+            var modalHtml = '<div class="modal fade" id="coResearchersSelectModal" tabindex="-1" role="dialog">' +
+                '<div class="modal-dialog modal-lg" role="document">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<h4 class="modal-title">选择协作研究员</h4>' +
+                '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                '<div class="row">' +
+                '<div class="col-md-12">' +
+                '<table class="table table-striped table-bordered">' +
+                '<thead>' +
+                '<tr>' +
+                '<th><input type="checkbox" id="selectAllCoResearchers"></th>' +
+                '<th>用户名</th>' +
+                '<th>姓名</th>' +
+                '<th>邮箱</th>' +
+                '<th>部门</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody id="coResearchersTableBody">' +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '<button type="button" class="btn btn-primary" onclick="confirmCoResearchersSelection()">确定</button>' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            
+            $('body').append(modalHtml);
+            
+            // 填充研究员数据
+            var tbody = $('#coResearchersTableBody');
+            tbody.empty();
+            
+            $.each(allResearchers, function(index, researcher) {
+                var checked = selectedCoResearcherIds.indexOf(researcher.userId) !== -1 ? 'checked' : '';
+                var deptName = researcher.dept ? researcher.dept.deptName : '';
+                var row = '<tr>' +
+                    '<td><input type="checkbox" class="co-researcher-checkbox" value="' + researcher.userId + '" ' + checked + '></td>' +
+                    '<td>' + researcher.loginName + '</td>' +
+                    '<td>' + researcher.userName + '</td>' +
+                    '<td>' + (researcher.email || '') + '</td>' +
+                    '<td>' + deptName + '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
+            
+            // 全选功能
+            $('#selectAllCoResearchers').change(function() {
+                $('.co-researcher-checkbox').prop('checked', this.checked);
+            });
+            
+            $('#coResearchersSelectModal').modal('show');
+        }
+        
+        // 确认协作研究员选择
+        function confirmCoResearchersSelection() {
+            selectedCoResearcherIds = [];
+            var selectedResearchers = [];
+            
+            $('.co-researcher-checkbox:checked').each(function() {
+                var researcherId = parseInt($(this).val());
+                selectedCoResearcherIds.push(researcherId);
+                
+                var researcher = allResearchers.find(r => r.userId === researcherId);
+                if (researcher) {
+                    selectedResearchers.push(researcher);
+                }
+            });
+            
+            updateCoResearchersDisplay(selectedResearchers);
+            
+            $('#coResearchersSelectModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+        }
+        
+        // 更新协作研究员显示
+        function updateCoResearchersDisplay(researchers) {
+            var displayText = researchers.length > 0 ? '已选择 ' + researchers.length + ' 个协作研究员' : '点击选择协作研究员';
+            $('#selectedCoResearchers').val(displayText);
+            $('#coResearcherIds').val(selectedCoResearcherIds.join(';'));
+            
+            var listHtml = '';
+            if (researchers.length === 0) {
+                listHtml = '<div class="text-muted text-center" style="padding: 20px;"><i class="fa fa-users fa-2x"></i><br><br>暂无协作研究员<br><small>点击上方"选择研究员"按钮添加</small></div>';
+            } else {
+                $.each(researchers, function(index, researcher) {
+                    var deptName = researcher.dept ? researcher.dept.deptName : '未分配部门';
+                    var email = researcher.email || '未设置邮箱';
+                    listHtml += '<div class="researcher-item" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">' +
+                        '<div class="researcher-avatar" style="width: 32px; height: 32px; background: #5cb85c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">' +
+                        researcher.userName.charAt(0).toUpperCase() +
+                        '</div>' +
+                        '<div class="researcher-info" style="flex: 1;">' +
+                        '<div style="font-weight: 500; color: #333;">' + researcher.userName + ' (' + researcher.loginName + ')</div>' +
+                        '<div style="font-size: 12px; color: #666; margin-top: 2px;">' +
+                        '<i class="fa fa-building-o"></i> ' + deptName + ' &nbsp;&nbsp;' +
+                        '<i class="fa fa-envelope-o"></i> ' + email +
+                        '</div>' +
+                        '</div>' +
+                        '<button type="button" class="btn btn-danger btn-xs" onclick="removeCoResearcher(' + researcher.userId + ')" style="padding: 2px 6px;" title="移除此研究员">' +
+                        '<i class="fa fa-times"></i>' +
+                        '</button>' +
+                        '</div>';
+                });
+            }
+            
+            $('#coResearchersDisplay').html(listHtml);
+        }
+        
+        // 移除协作研究员
+        function removeCoResearcher(researcherId) {
+            var index = selectedCoResearcherIds.indexOf(researcherId);
+            if (index !== -1) {
+                selectedCoResearcherIds.splice(index, 1);
+                var selectedResearchers = allResearchers.filter(r => selectedCoResearcherIds.indexOf(r.userId) !== -1);
+                updateCoResearchersDisplay(selectedResearchers);
+            }
+        }
     </script>
 </body>
 </html>

@@ -102,6 +102,17 @@ public class SysExperimentCageController extends BaseController
         SysExperimentCage sysExperimentCage = sysExperimentCageService.selectSysExperimentCageByRelationId(relationId);
         return AjaxResult.success(sysExperimentCage);
     }
+    
+
+        // @RequiresPermissions("system:SysExperimentCage:edit")
+    @GetMapping("/edit1/{relationId}")
+    public String edit1(@PathVariable("relationId") Long relationId, ModelMap mmap)
+    {
+        SysExperimentCage sysExperimentCage = sysExperimentCageService.selectSysExperimentCageByRelationId(relationId);
+        mmap.put("sysExperimentCage", sysExperimentCage);
+        return prefix + "/edit1";
+    }
+
 
     /**
      * 修改保存实验笼子关系

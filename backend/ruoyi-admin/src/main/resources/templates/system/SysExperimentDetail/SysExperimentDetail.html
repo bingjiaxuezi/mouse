@@ -492,13 +492,26 @@
                 url: ctx + "system/SysCage/list",
                 type: "POST",
                 data: {
-                    pageSize: 100,
-                    pageNum: 1,
-                    status: 'AVAILABLE'  // 只获取可用的笼子
+                    pageSize: 1000,
+                    pageNum: 1
+                    // 获取所有笼子，不限制状态
                 },
                 dataType: "json",
                 success: function(result) {
-                    allCages = result.rows || [];
+                    if (result.rows) {
+                        // 将可用状态的笼子排在前面
+                        allCages = result.rows.sort(function(a, b) {
+                            if (a.cageStatus === 'AVAILABLE' && b.cageStatus !== 'AVAILABLE') {
+                                return -1;
+                            }
+                            if (a.cageStatus !== 'AVAILABLE' && b.cageStatus === 'AVAILABLE') {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    } else {
+                        allCages = [];
+                    }
                 },
                 error: function() {
                     $.modal.alertError("加载笼子列表失败");
@@ -572,8 +585,15 @@
             
             $.each(allCages, function(index, cage) {
                 var checked = selectedCageIds.indexOf(cage.cageId) !== -1 ? 'checked' : '';
-                var row = '<tr>' +
-                     '<td><input type="checkbox" class="cage-checkbox" value="' + cage.cageId + '" ' + checked + '></td>' +
+                var isAvailable = cage.cageStatus === 'AVAILABLE';
+                var disabled = !isAvailable ? 'disabled' : '';
+                var rowClass = !isAvailable ? 'text-muted' : '';
+                var checkboxHtml = isAvailable ? 
+                    '<input type="checkbox" class="cage-checkbox" value="' + cage.cageId + '" ' + checked + '>' :
+                    '<input type="checkbox" class="cage-checkbox" value="' + cage.cageId + '" disabled title="该笼子不可用">';
+                
+                var row = '<tr class="' + rowClass + '">' +
+                     '<td>' + checkboxHtml + '</td>' +
                      '<td>' + (cage.cageCode || '') + '</td>' +
                      '<td>' + (cage.cageName || '') + '</td>' +
                      '<td>' + getCageTypeText(cage.cageType) + '</td>' +
@@ -583,14 +603,14 @@
                      '<td>' + (cage.positionColumn || '') + '</td>' +
                      '<td>' + (cage.maxCapacity || '') + '</td>' +
                      '<td>' + (cage.currentCount || 0) + '</td>' +
-                     '<td>' + getCageStatusText(cage.cageStatus) + '</td>' +
+                     '<td><span class="' + (isAvailable ? 'text-success' : 'text-warning') + '">' + getCageStatusText(cage.cageStatus) + '</span></td>' +
                      '</tr>';
                 tbody.append(row);
             });
             
-            // 全选功能
+            // 全选功能（只选择可用的笼子）
             $('#selectAllCages').change(function() {
-                $('.cage-checkbox').prop('checked', this.checked);
+                $('.cage-checkbox:not(:disabled)').prop('checked', this.checked);
             });
             
             $('#cageSelectModal').modal('show');
