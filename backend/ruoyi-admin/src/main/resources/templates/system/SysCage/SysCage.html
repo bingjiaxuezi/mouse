@@ -50,6 +50,13 @@
                                 <input type="text" name="currentCount"/>
                             </li>
                             <li>
+                                <label>笼子状态：</label>
+                                <select name="cageStatus" th:with="type=${@dict.getType('sys_cage_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
                                 <label>温度范围(°C)：</label>
                                 <input type="text" name="temperatureRange"/>
                             </li>
@@ -90,7 +97,7 @@
         var editFlag = [[${@permission.hasPermi('system:SysCage:edit')}]];
         var removeFlag = [[${@permission.hasPermi('system:SysCage:remove')}]];
         var cageTypeDatas = [[${@dict.getType('sys_cage_type')}]];
-        var temperatureRangeDatas = [[${@dict.getType('sys_cage_status')}]];
+        var cageStatusDatas = [[${@dict.getType('sys_cage_status')}]];
         var delFlagDatas = [[${@dict.getType('sys_status')}]];
         var prefix = ctx + "system/SysCage";
 
@@ -151,14 +158,14 @@
                 },
                 {
                     field: 'cageStatus',
-                    title: '笼子状态'
+                    title: '笼子状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(cageStatusDatas, value);
+                    }
                 },
                 {
                     field: 'temperatureRange',
-                    title: '温度范围(°C)',
-                    formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(temperatureRangeDatas, value);
-                    }
+                    title: '温度范围(°C)'
                 },
                 {
                     field: 'humidityRange',

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysExperimentCageMapper">
+    
+    <resultMap type="SysExperimentCage" id="SysExperimentCageResult">
+        <result property="relationId"    column="relation_id"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="cageId"    column="cage_id"    />
+        <result property="bindTime"    column="bind_time"    />
+        <result property="unbindTime"    column="unbind_time"    />
+        <result property="bindStatus"    column="bind_status"    />
+        <result property="bindMethod"    column="bind_method"    />
+        <result property="bindOperator"    column="bind_operator"    />
+        <result property="cageRole"    column="cage_role"    />
+        <result property="monitoringConfig"    column="monitoring_config"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="modifyBy"    column="modify_by"    />
+    </resultMap>
+
+    <sql id="selectSysExperimentCageVo">
+        select relation_id, experiment_id, cage_id, bind_time, unbind_time, bind_status, bind_method, bind_operator, cage_role, monitoring_config, build_by, build_time, modify_time, remark, modify_by from sys_experiment_cage
+    </sql>
+
+    <select id="selectSysExperimentCageList" parameterType="SysExperimentCage" resultMap="SysExperimentCageResult">
+        <include refid="selectSysExperimentCageVo"/>
+        <where>  
+            <if test="experimentId != null "> and experiment_id = #{experimentId}</if>
+            <if test="cageId != null "> and cage_id = #{cageId}</if>
+            <if test="bindTime != null "> and bind_time = #{bindTime}</if>
+            <if test="unbindTime != null "> and unbind_time = #{unbindTime}</if>
+            <if test="bindStatus != null  and bindStatus != ''"> and bind_status = #{bindStatus}</if>
+            <if test="bindMethod != null  and bindMethod != ''"> and bind_method = #{bindMethod}</if>
+            <if test="bindOperator != null  and bindOperator != ''"> and bind_operator = #{bindOperator}</if>
+            <if test="cageRole != null  and cageRole != ''"> and cage_role = #{cageRole}</if>
+            <if test="monitoringConfig != null  and monitoringConfig != ''"> and monitoring_config = #{monitoringConfig}</if>
+            <if test="modifyBy != null  and modifyBy != ''"> and modify_by = #{modifyBy}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysExperimentCageByRelationId" parameterType="Long" resultMap="SysExperimentCageResult">
+        <include refid="selectSysExperimentCageVo"/>
+        where relation_id = #{relationId}
+    </select>
+
+    <insert id="insertSysExperimentCage" parameterType="SysExperimentCage" useGeneratedKeys="true" keyProperty="relationId">
+        insert into sys_experiment_cage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="cageId != null">cage_id,</if>
+            <if test="bindTime != null">bind_time,</if>
+            <if test="unbindTime != null">unbind_time,</if>
+            <if test="bindStatus != null">bind_status,</if>
+            <if test="bindMethod != null">bind_method,</if>
+            <if test="bindOperator != null">bind_operator,</if>
+            <if test="cageRole != null">cage_role,</if>
+            <if test="monitoringConfig != null">monitoring_config,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="modifyBy != null">modify_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="cageId != null">#{cageId},</if>
+            <if test="bindTime != null">#{bindTime},</if>
+            <if test="unbindTime != null">#{unbindTime},</if>
+            <if test="bindStatus != null">#{bindStatus},</if>
+            <if test="bindMethod != null">#{bindMethod},</if>
+            <if test="bindOperator != null">#{bindOperator},</if>
+            <if test="cageRole != null">#{cageRole},</if>
+            <if test="monitoringConfig != null">#{monitoringConfig},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysExperimentCage" parameterType="SysExperimentCage">
+        update sys_experiment_cage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="cageId != null">cage_id = #{cageId},</if>
+            <if test="bindTime != null">bind_time = #{bindTime},</if>
+            <if test="unbindTime != null">unbind_time = #{unbindTime},</if>
+            <if test="bindStatus != null">bind_status = #{bindStatus},</if>
+            <if test="bindMethod != null">bind_method = #{bindMethod},</if>
+            <if test="bindOperator != null">bind_operator = #{bindOperator},</if>
+            <if test="cageRole != null">cage_role = #{cageRole},</if>
+            <if test="monitoringConfig != null">monitoring_config = #{monitoringConfig},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+        </trim>
+        where relation_id = #{relationId}
+    </update>
+
+    <delete id="deleteSysExperimentCageByRelationId" parameterType="Long">
+        delete from sys_experiment_cage where relation_id = #{relationId}
+    </delete>
+
+    <delete id="deleteSysExperimentCageByRelationIds" parameterType="String">
+        delete from sys_experiment_cage where relation_id in 
+        <foreach item="relationId" collection="array" open="(" separator="," close=")">
+            #{relationId}
+        </foreach>
+    </delete>
+
+    <!-- 实验笼子关系VO结果映射 -->
+    <resultMap type="com.ruoyi.system.domain.vo.SysExperimentCageVO" id="SysExperimentCageVOResult">
+        <result property="relationId"    column="relation_id"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="cageId"    column="cage_id"    />
+        <result property="cageCode"    column="cage_code"    />
+        <result property="cageName"    column="cage_name"    />
+        <result property="cageType"    column="cage_type"    />
+        <result property="cageStatus"    column="cage_status"    />
+        <result property="laboratoryRoom"    column="laboratory_room"    />
+        <result property="maxCapacity"    column="max_capacity"    />
+        <result property="currentCount"    column="current_count"    />
+        <result property="bindTime"    column="bind_time"    />
+        <result property="unbindTime"    column="unbind_time"    />
+        <result property="bindStatus"    column="bind_status"    />
+        <result property="bindMethod"    column="bind_method"    />
+        <result property="bindOperator"    column="bind_operator"    />
+        <result property="cageRole"    column="cage_role"    />
+        <result property="monitoringConfig"    column="monitoring_config"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="modifyBy"    column="modify_by"    />
+    </resultMap>
+
+    <!-- 查询实验笼子关系列表（包含笼子详细信息） -->
+    <select id="selectSysExperimentCageVOList" parameterType="SysExperimentCage" resultMap="SysExperimentCageVOResult">
+        select 
+            ec.relation_id, ec.experiment_id, ec.cage_id, ec.bind_time, ec.unbind_time, 
+            ec.bind_status, ec.bind_method, 
+            CASE WHEN u.user_name IS NOT NULL THEN u.user_name ELSE ec.bind_operator END as bind_operator, 
+            ec.cage_role, ec.monitoring_config, 
+            ec.build_by, ec.build_time, ec.modify_time, ec.remark, ec.modify_by,
+            c.cage_code, c.cage_name, c.cage_type, c.cage_status, c.laboratory_room, 
+            c.max_capacity, c.current_count
+        from sys_experiment_cage ec
+        left join sys_cage c on ec.cage_id = c.cage_id
+        left join sys_user u on ec.bind_operator = u.user_id
+        <where>  
+            <if test="experimentId != null "> and ec.experiment_id = #{experimentId}</if>
+            <if test="cageId != null "> and ec.cage_id = #{cageId}</if>
+            <if test="bindTime != null "> and ec.bind_time = #{bindTime}</if>
+            <if test="unbindTime != null "> and ec.unbind_time = #{unbindTime}</if>
+            <if test="bindStatus != null  and bindStatus != ''"> and ec.bind_status = #{bindStatus}</if>
+            <if test="bindMethod != null  and bindMethod != ''"> and ec.bind_method = #{bindMethod}</if>
+            <if test="bindOperator != null  and bindOperator != ''"> and ec.bind_operator = #{bindOperator}</if>
+            <if test="cageRole != null  and cageRole != ''"> and ec.cage_role = #{cageRole}</if>
+            <if test="monitoringConfig != null  and monitoringConfig != ''"> and ec.monitoring_config = #{monitoringConfig}</if>
+            <if test="modifyBy != null  and modifyBy != ''"> and ec.modify_by = #{modifyBy}</if>
+        </where>
+        order by ec.bind_time desc
+    </select>
+
+</mapper>

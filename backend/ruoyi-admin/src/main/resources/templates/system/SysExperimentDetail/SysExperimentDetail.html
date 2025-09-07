@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('实验详情')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+    <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- 实验基本信息 -->
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>实验基本信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验编号：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentCode}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验名称：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentName}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验类型：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentType}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验状态：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentStatus}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验模板：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentTemplate}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">主要研究员：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.principalResearcher}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">实验目标：</label>
+                                    <div class="col-sm-10">
+                                        <p class="form-control-static" th:text="${experiment.experimentObjective}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">实验描述：</label>
+                                    <div class="col-sm-10">
+                                        <p class="form-control-static" th:text="${experiment.experimentDesc}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 时间信息 -->
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>时间信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">计划开始时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${#dates.format(experiment.plannedBeginTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">计划结束时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${#dates.format(experiment.plannedFinishTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实际开始时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.actualBeginTime != null ? #dates.format(experiment.actualBeginTime, 'yyyy-MM-dd HH:mm:ss') : '未开始'}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实际结束时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.actualFinishTime != null ? #dates.format(experiment.actualFinishTime, 'yyyy-MM-dd HH:mm:ss') : '未结束'}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>统计信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">关联笼子总数：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.totalCages != null ? experiment.totalCages : 0}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">关联小鼠总数：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.totalMice != null ? experiment.totalMice : 0}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">实验团队：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.experimentTeam}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">创建者：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.buildBy}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" th:if="${experiment != null}">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">创建时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${#dates.format(experiment.buildTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">更新时间：</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" th:text="${experiment.updateTime != null ? #dates.format(experiment.updateTime, 'yyyy-MM-dd HH:mm:ss') : '未更新'}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 笼子绑定关系管理 -->
+                <div class="ibox float-e-margins" th:if="${experiment != null}">
+                    <div class="ibox-title">
+                        <h5>笼子绑定关系管理</h5>
+                        <div class="ibox-tools">
+                            <a class="btn btn-success btn-sm" onclick="addCageBinding()" shiro:hasPermission="system:SysExperimentCage:add">
+                                <i class="fa fa-plus"></i> 添加绑定
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table id="cage-binding-table" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>笼子信息</th>
+                                        <th>绑定时间</th>
+                                        <th>解绑时间</th>
+                                        <th>绑定状态</th>
+                                        <th>绑定方式</th>
+                                        <th>绑定操作员</th>
+                                        <th>笼子角色</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 数据将通过JavaScript动态加载 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 未找到实验信息时的提示 -->
+                <div class="ibox float-e-margins" th:if="${experiment == null}">
+                    <div class="ibox-content">
+                        <div class="text-center">
+                            <h3>未找到实验信息</h3>
+                            <p>请检查实验ID是否正确</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    
+    <!-- 添加/编辑笼子绑定关系的模态框 -->
+    <div class="modal fade" id="cageBindingModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="cageBindingModalTitle">添加笼子绑定</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="cageBindingForm" class="form-horizontal">
+                        <input type="hidden" id="relationId" name="relationId">
+                        <input type="hidden" id="experimentId" name="experimentId" th:value="${experiment?.experimentId}">
+                        
+                        <div class="form-group" id="cageSelectionGroup">
+                            <label class="col-sm-3 control-label is-required">选择笼子：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="selectedCages" placeholder="点击选择笼子" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" onclick="selectCages()"><i class="fa fa-home"></i> 选择笼子</button>
+                                    </span>
+                                </div>
+                                <input type="hidden" id="cageIds" name="cageIds">
+                                <div id="selectedCagesList" class="mt-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e6e7; border-radius: 3px; padding: 10px; background-color: #f9f9f9;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="singleCageGroup" style="display: none;">
+                            <label class="col-sm-3 control-label">笼子ID：</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="singleCageId" name="cageId" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label is-required">绑定时间：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date" id="bindTimeGroup">
+                                    <input type="text" class="form-control" id="bindTime" name="bindTime" placeholder="yyyy-MM-dd HH:mm:ss" required>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">解绑时间：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group date" id="unbindTimeGroup">
+                                    <input type="text" class="form-control" id="unbindTime" name="unbindTime" placeholder="yyyy-MM-dd HH:mm:ss">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">绑定状态：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="bindStatus" name="bindStatus">
+                                    <option value="ACTIVE">激活</option>
+                                    <option value="INACTIVE">未激活</option>
+                                    <option value="SUSPENDED">暂停</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">绑定方式：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="bindMethod" name="bindMethod">
+                                    <option value="MANUAL">手动绑定</option>
+                                    <option value="AUTO">自动绑定</option>
+                                    <option value="BATCH">批量绑定</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">绑定操作员：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="selectedOperator" placeholder="点击选择操作员" readonly>
+                                    <input type="hidden" name="bindOperator" id="bindOperator">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" onclick="selectOperator()"><i class="fa fa-user"></i> 选择操作员</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">笼子角色：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="cageRole" name="cageRole">
+                                    <option value="EXPERIMENTAL">实验组</option>
+                                    <option value="CONTROL">对照组</option>
+                                    <option value="BACKUP">备用组</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">监控配置：</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="monitoringConfig" name="monitoringConfig" rows="3" placeholder="JSON格式的监控配置"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">备注：</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="remark" name="remark" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCageBinding()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block th:include="include :: datetimepicker-js" />
+    
+    <script th:inline="javascript">
+        var experimentId = [[${experiment?.experimentId}]];
+        
+        var selectedCageIds = [];
+        var allCages = [];
+        var allUsers = [];
+        var cageTypeDatas = [[${@dict.getType('sys_cage_type')}]];
+        var cageStatusDatas = [[${@dict.getType('sys_cage_status')}]];
+        
+        // 加载所有用户数据（用于操作员选择）
+        function loadAllUsers() {
+            $.ajax({
+                url: ctx + "system/user/list",
+                type: "POST",
+                data: { pageSize: 1000 }, // 获取大量用户数据
+                dataType: "json",
+                success: function(result) {
+                    if (result.rows) {
+                        allUsers = result.rows;
+                    } else {
+                        allUsers = [];
+                    }
+                },
+                error: function() {
+                    console.error("加载用户数据失败");
+                    allUsers = [];
+                }
+            });
+        }
+        
+        $(document).ready(function() {
+            // 初始化日期选择器
+            $('#bindTimeGroup').datetimepicker({
+                format: 'yyyy-mm-dd hh:ii:ss',
+                autoclose: true,
+                todayBtn: true,
+                todayHighlight: true,
+                startView: 2,
+                minView: 0,
+                forceParse: 0,
+                language: 'zh-CN'
+            });
+            
+            $('#unbindTimeGroup').datetimepicker({
+                format: 'yyyy-mm-dd hh:ii:ss',
+                autoclose: true,
+                todayBtn: true,
+                todayHighlight: true,
+                startView: 2,
+                minView: 0,
+                forceParse: 0,
+                language: 'zh-CN'
+            });
+            
+            // 加载用户列表
+            loadUsers();
+            
+            // 加载笼子列表
+            loadCages();
+            
+            // 加载笼子绑定关系数据
+            if (experimentId) {
+                loadCageBindings();
+            }
+            
+            // 加载所有用户数据（用于操作员选择）
+            loadAllUsers();
+        });
+        
+        // 加载用户列表
+        function loadUsers() {
+            $.ajax({
+                url: ctx + "system/user/list",
+                type: "POST",
+                data: {
+                    pageNum: 1,
+                    pageSize: 1000
+                },
+                dataType: "json",
+                success: function(result) {
+                    if (result.code === 0 && result.rows) {
+                        allUsers = result.rows;
+                        
+                        var select = $('#bindOperator');
+                        select.empty();
+                        select.append('<option value="">请选择操作员</option>');
+                        
+                        $.each(allUsers, function(index, user) {
+                            var displayText = user.userName;
+                            if (user.nickName && user.nickName !== user.userName) {
+                                displayText += ' (' + user.nickName + ')';
+                            }
+                            if (user.dept && user.dept.deptName) {
+                                displayText += ' - ' + user.dept.deptName;
+                            }
+                            if (user.phonenumber) {
+                                displayText += ' [' + user.phonenumber + ']';
+                            }
+                            
+                            select.append('<option value="' + user.userName + '" data-user-id="' + user.userId + '">' + displayText + '</option>');
+                        });
+                        
+                        console.log('用户列表加载成功，共' + allUsers.length + '个用户');
+                    } else {
+                        console.error('用户列表加载失败：', result.msg || '未知错误');
+                        $.modal.alertError('加载用户列表失败：' + (result.msg || '请检查网络连接'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('用户列表请求失败：', error);
+                    $.modal.alertError('加载用户列表失败，请检查网络连接');
+                }
+            });
+        }
+        
+        // 加载笼子列表
+        function loadCages() {
+            $.ajax({
+                url: ctx + "system/SysCage/list",
+                type: "POST",
+                data: {
+                    pageSize: 100,
+                    pageNum: 1,
+                    status: 'AVAILABLE'  // 只获取可用的笼子
+                },
+                dataType: "json",
+                success: function(result) {
+                    allCages = result.rows || [];
+                },
+                error: function() {
+                    $.modal.alertError("加载笼子列表失败");
+                }
+            });
+        }
+        
+        // 选择笼子
+        function selectCages() {
+            if (allCages.length === 0) {
+                loadCages();
+                setTimeout(function() {
+                    if (allCages.length === 0) {
+                        $.modal.alertWarning("暂无可用笼子");
+                        return;
+                    }
+                    showCageSelectModal();
+                }, 500);
+            } else {
+                showCageSelectModal();
+            }
+        }
+        
+        // 显示笼子选择模态框
+        function showCageSelectModal() {
+            var modalHtml = '<div class="modal fade" id="cageSelectModal" tabindex="-1" role="dialog">' +
+                '<div class="modal-dialog modal-lg" role="document" style="width: 90%; max-width: 1200px;">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<h4 class="modal-title">选择笼子</h4>' +
+                '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+                '</div>' +
+                '<div class="modal-body" style="max-height: 600px; overflow-y: auto;">' +
+                '<div class="row">' +
+                '<div class="col-md-12">' +
+                '<table class="table table-striped table-bordered table-hover">' +
+                '<thead>' +
+                '<tr>' +
+                '<th width="50"><input type="checkbox" id="selectAllCages"></th>' +
+                '<th width="100">笼子编号</th>' +
+                '<th width="120">笼子名称</th>' +
+                '<th width="80">类型</th>' +
+                '<th width="100">实验室房间</th>' +
+                '<th width="80">货架编号</th>' +
+                '<th width="60">行位置</th>' +
+                '<th width="60">列位置</th>' +
+                '<th width="80">最大容量</th>' +
+                '<th width="80">当前数量</th>' +
+                '<th width="80">状态</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody id="cageTableBody">' +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                '<button type="button" class="btn btn-primary" onclick="confirmCageSelection()">确定</button>' +
+                '<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            
+            $('body').append(modalHtml);
+            
+            // 填充笼子数据
+            var tbody = $('#cageTableBody');
+            tbody.empty();
+            
+            $.each(allCages, function(index, cage) {
+                var checked = selectedCageIds.indexOf(cage.cageId) !== -1 ? 'checked' : '';
+                var row = '<tr>' +
+                     '<td><input type="checkbox" class="cage-checkbox" value="' + cage.cageId + '" ' + checked + '></td>' +
+                     '<td>' + (cage.cageCode || '') + '</td>' +
+                     '<td>' + (cage.cageName || '') + '</td>' +
+                     '<td>' + getCageTypeText(cage.cageType) + '</td>' +
+                     '<td>' + (cage.laboratoryRoom || '') + '</td>' +
+                     '<td>' + (cage.rackNumber || '') + '</td>' +
+                     '<td>' + (cage.positionRow || '') + '</td>' +
+                     '<td>' + (cage.positionColumn || '') + '</td>' +
+                     '<td>' + (cage.maxCapacity || '') + '</td>' +
+                     '<td>' + (cage.currentCount || 0) + '</td>' +
+                     '<td>' + getCageStatusText(cage.cageStatus) + '</td>' +
+                     '</tr>';
+                tbody.append(row);
+            });
+            
+            // 全选功能
+            $('#selectAllCages').change(function() {
+                $('.cage-checkbox').prop('checked', this.checked);
+            });
+            
+            $('#cageSelectModal').modal('show');
+        }
+        
+        // 确认笼子选择
+        function confirmCageSelection() {
+            selectedCageIds = [];
+            var selectedCages = [];
+            
+            $('.cage-checkbox:checked').each(function() {
+                var cageId = parseInt($(this).val());
+                selectedCageIds.push(cageId);
+                
+                var cage = allCages.find(c => c.cageId === cageId);
+                if (cage) {
+                    selectedCages.push(cage);
+                }
+            });
+            
+            updateSelectedCagesDisplay(selectedCages);
+            
+            // 先移除模态框，再隐藏遮罩层
+            $('#cageSelectModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+        }
+        
+        // 更新已选笼子显示
+        function updateSelectedCagesDisplay(cages) {
+            var displayText = cages.length > 0 ? '已选择 ' + cages.length + ' 个笼子' : '点击选择笼子';
+            $('#selectedCages').val(displayText);
+            $('#cageIds').val(selectedCageIds.join(','));
+            
+            var listHtml = '';
+            if (cages.length === 0) {
+                listHtml = '<div class="text-muted text-center" style="padding: 20px;"><i class="fa fa-home fa-2x"></i><br><br>暂无选择笼子<br><small>点击上方"选择笼子"按钮添加</small></div>';
+            } else {
+                $.each(cages, function(index, cage) {
+                    listHtml += '<div class="cage-item" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 8px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">' +
+                        '<div class="cage-icon" style="width: 32px; height: 32px; background: #5bc0de; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 12px;">' +
+                        '<i class="fa fa-home"></i>' +
+                        '</div>' +
+                        '<div class="cage-info" style="flex: 1;">' +
+                        '<div style="font-weight: bold; color: #333;">' + (cage.cageCode || '') + ' (' + (cage.cageName || '') + ')</div>' +
+                         '<div style="font-size: 12px; color: #666; margin-top: 2px;">' + getCageTypeText(cage.cageType) + ' | 容量: ' + (cage.maxCapacity || '') + ' | 房间: ' + (cage.laboratoryRoom || '') + '</div>' +
+                        '</div>' +
+                        '<button type="button" class="btn btn-xs btn-danger" onclick="removeCage(' + cage.cageId + ')" style="margin-left: 8px;"><i class="fa fa-times"></i></button>' +
+                        '</div>';
+                });
+            }
+            $('#selectedCagesList').html(listHtml);
+        }
+        
+        // 移除单个笼子
+        function removeCage(cageId) {
+            selectedCageIds = selectedCageIds.filter(id => id !== cageId);
+            var selectedCages = allCages.filter(c => selectedCageIds.indexOf(c.cageId) !== -1);
+            updateSelectedCagesDisplay(selectedCages);
+        }
+        
+        // 获取笼子状态文本
+        function getCageStatusText(status) {
+            if (typeof $.table !== 'undefined' && $.table.selectDictLabel) {
+                return $.table.selectDictLabel(cageStatusDatas, status);
+            }
+            // 备用映射
+            switch(status) {
+                case 'AVAILABLE': return '可用';
+                case 'OCCUPIED': return '占用中';
+                case 'MAINTENANCE': return '维护中';
+                case 'DAMAGED': return '损坏';
+                case 'RETIRED': return '退役';
+                default: return status || '';
+            }
+        }
+        
+        // 获取笼子类型文本
+        function getCageTypeText(type) {
+            if (typeof $.table !== 'undefined' && $.table.selectDictLabel) {
+                return $.table.selectDictLabel(cageTypeDatas, type);
+            }
+            // 备用映射
+            switch(type) {
+                case 'STANDARD': return '标准笼';
+                case 'BREEDING': return '繁殖笼';
+                case 'ISOLATION': return '隔离笼';
+                case 'QUARANTINE': return '检疫笼';
+                case 'EXPERIMENTAL': return '实验笼';
+                default: return type || '';
+            }
+        }
+        
+        // 选择操作员
+         function selectOperator() {
+             if (allUsers.length === 0) {
+                 loadAllUsers();
+                 setTimeout(function() {
+                     showOperatorSelectModal();
+                 }, 500);
+             } else {
+                 showOperatorSelectModal();
+             }
+         }
+         
+         // 显示操作员选择模态框
+         function showOperatorSelectModal() {
+             var modalHtml = '<div class="modal fade" id="operatorSelectModal" tabindex="-1" role="dialog">' +
+                 '<div class="modal-dialog modal-lg" role="document">' +
+                 '<div class="modal-content">' +
+                 '<div class="modal-header">' +
+                 '<h4 class="modal-title">选择操作员</h4>' +
+                 '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+                 '</div>' +
+                 '<div class="modal-body">' +
+                 '<div class="row">' +
+                 '<div class="col-md-12">' +
+                 '<table class="table table-striped table-bordered table-hover">' +
+                 '<thead>' +
+                 '<tr>' +
+                 '<th width="50">选择</th>' +
+                 '<th width="100">用户名</th>' +
+                 '<th width="100">姓名</th>' +
+                 '<th width="150">邮箱</th>' +
+                 '<th width="120">部门</th>' +
+                 '<th width="100">手机号</th>' +
+                 '</tr>' +
+                 '</thead>' +
+                 '<tbody id="operatorTableBody">' +
+                 '</tbody>' +
+                 '</table>' +
+                 '</div>' +
+                 '</div>' +
+                 '</div>' +
+                 '<div class="modal-footer">' +
+                 '<button type="button" class="btn btn-primary" onclick="confirmOperatorSelection()">确定</button>' +
+                 '<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>' +
+                 '</div>' +
+                 '</div>' +
+                 '</div>' +
+                 '</div>';
+             
+             $('body').append(modalHtml);
+             
+             // 填充用户数据
+             var tbody = $('#operatorTableBody');
+             tbody.empty();
+             
+             $.each(allUsers, function(index, user) {
+                 var deptName = user.dept ? user.dept.deptName : '未分配部门';
+                 var email = user.email || '未设置邮箱';
+                 var phonenumber = user.phonenumber || '未设置手机';
+                 var row = '<tr>' +
+                     '<td><input type="radio" name="operator-radio" class="operator-radio" value="' + user.userId + '" data-username="' + user.userName + '" data-loginname="' + user.loginName + '"></td>' +
+                     '<td>' + user.loginName + '</td>' +
+                     '<td>' + user.userName + '</td>' +
+                     '<td>' + email + '</td>' +
+                     '<td>' + deptName + '</td>' +
+                     '<td>' + phonenumber + '</td>' +
+                     '</tr>';
+                 tbody.append(row);
+             });
+             
+             $('#operatorSelectModal').modal('show');
+         }
+         
+         // 确认操作员选择
+         function confirmOperatorSelection() {
+             var selectedRadio = $('.operator-radio:checked');
+             if (selectedRadio.length > 0) {
+                 var userId = selectedRadio.val();
+                 var userName = selectedRadio.data('username');
+                 var loginName = selectedRadio.data('loginname');
+                 
+                 $('#bindOperator').val(userId);
+                 $('#selectedOperator').val(userName + ' (' + loginName + ')');
+                 
+                 // 先移除模态框，再隐藏遮罩层
+                 $('#operatorSelectModal').remove();
+                 $('.modal-backdrop').remove();
+                 $('body').removeClass('modal-open');
+             } else {
+                 $.modal.alertWarning('请选择一个操作员');
+             }
+         }
+         
+        // 加载笼子绑定关系数据
+        function loadCageBindings() {
+            $.ajax({
+                url: ctx + "system/SysExperimentCage/listByExperimentId",
+                type: "POST",
+                data: { experimentId: experimentId },
+                dataType: "json",
+                success: function(result) {
+                    var tbody = $('#cage-binding-table tbody');
+                    tbody.empty();
+                    
+                    if (result.rows && result.rows.length > 0) {
+                        $.each(result.rows, function(index, item) {
+                            var cageInfo = '';
+                            if (item.cageCode && item.cageName) {
+                                cageInfo = item.cageCode + ' (' + item.cageName + ')';
+                            } else if (item.cageCode) {
+                                cageInfo = item.cageCode;
+                            } else {
+                                cageInfo = 'ID:' + (item.cageId || '');
+                            }
+                            
+                            var row = '<tr>' +
+                                '<td>' + cageInfo + '</td>' +
+                                '<td>' + (item.bindTime || '') + '</td>' +
+                                '<td>' + (item.unbindTime || '未解绑') + '</td>' +
+                                '<td>' + getBindStatusText(item.bindStatus) + '</td>' +
+                                '<td>' + getBindMethodText(item.bindMethod) + '</td>' +
+                                '<td>' + (item.bindOperator || '') + '</td>' +
+                                '<td>' + getCageRoleText(item.cageRole) + '</td>' +
+                                '<td>' +
+                                    '<a class="btn btn-primary btn-xs" onclick="editCageBinding(' + item.relationId + ')" shiro:hasPermission="system:SysExperimentCage:edit">' +
+                                        '<i class="fa fa-edit"></i> 编辑' +
+                                    '</a> ' +
+                                    '<a class="btn btn-danger btn-xs" onclick="deleteCageBinding(' + item.relationId + ')" shiro:hasPermission="system:SysExperimentCage:remove">' +
+                                        '<i class="fa fa-remove"></i> 删除' +
+                                    '</a>' +
+                                '</td>' +
+                            '</tr>';
+                            tbody.append(row);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="8" class="text-center">暂无数据</td></tr>');
+                    }
+                },
+                error: function() {
+                    $.modal.alertError("加载笼子绑定关系失败");
+                }
+            });
+        }
+        
+        // 添加笼子绑定
+        function addCageBinding() {
+            // 切换到添加模式 - 显示多选笼子
+            $('#singleCageGroup').hide();
+            $('#cageSelectionGroup').show();
+            
+            $('#cageBindingModalTitle').text('添加笼子绑定');
+            $('#cageBindingForm')[0].reset();
+            $('#relationId').val('');
+            $('#experimentId').val(experimentId);
+            
+            // 重置笼子选择
+            selectedCageIds = [];
+            updateSelectedCagesDisplay([]);
+            
+            $('#cageBindingModal').modal('show');
+        }
+        
+        // 编辑笼子绑定
+        function editCageBinding(relationId) {
+            $.ajax({
+                url: ctx + "system/SysExperimentCage/edit/" + relationId,
+                type: "GET",
+                dataType: "json",
+                success: function(result) {
+                    if (result.code === 0 && result.data) {
+                        var data = result.data;
+                        
+                        // 切换到编辑模式 - 显示单个笼子输入框
+                        $('#cageSelectionGroup').hide();
+                        $('#singleCageGroup').show();
+                        
+                        // 填充表单数据
+                        $('#cageBindingModalTitle').text('编辑笼子绑定');
+                        $('#relationId').val(data.relationId);
+                        $('#experimentId').val(data.experimentId || experimentId);
+                        $('#singleCageId').val(data.cageId);
+                        $('#bindTime').val(data.bindTime);
+                        $('#unbindTime').val(data.unbindTime);
+                        $('#bindStatus').val(data.bindStatus);
+                        $('#bindMethod').val(data.bindMethod);
+                        $('#bindOperator').val(data.bindOperator);
+                        $('#cageRole').val(data.cageRole);
+                        $('#monitoringConfig').val(data.monitoringConfig);
+                        $('#remark').val(data.remark);
+                        
+                        // 显示模态框
+                        $('#cageBindingModal').modal('show');
+                    } else {
+                        $.modal.alertError(result.msg || "获取数据失败");
+                    }
+                },
+                error: function() {
+                    $.modal.alertError("获取绑定关系信息失败");
+                }
+            });
+        }
+        
+        // 保存笼子绑定
+        function saveCageBinding() {
+            var relationId = $('#relationId').val();
+            
+            if (relationId) {
+                 // 编辑单个绑定关系
+                 var formData = {
+                     relationId: relationId,
+                     experimentId: experimentId,
+                     cageId: $('#singleCageId').val(),
+                     bindTime: $('#bindTime').val(),
+                     unbindTime: $('#unbindTime').val(),
+                     bindStatus: $('#bindStatus').val(),
+                     bindMethod: $('#bindMethod').val(),
+                     bindOperator: $('#bindOperator').val(),
+                     cageRole: $('#cageRole').val(),
+                     monitoringConfig: $('#monitoringConfig').val(),
+                     remark: $('#remark').val()
+                 };
+                 
+                 $.ajax({
+                     url: ctx + "system/SysExperimentCage/edit",
+                     type: "POST",
+                     data: formData,
+                     dataType: "json",
+                     success: function(result) {
+                         if (result.code === 0) {
+                             $.modal.alertSuccess("修改成功");
+                             $('#cageBindingModal').modal('hide');
+                             loadCageBindings();
+                         } else {
+                             $.modal.alertError(result.msg || "修改失败");
+                         }
+                     },
+                     error: function() {
+                         $.modal.alertError("修改失败");
+                     }
+                 });
+            } else {
+                // 添加多个绑定关系
+                var cageIdsStr = $('#cageIds').val();
+                if (!cageIdsStr) {
+                    $.modal.alertWarning("请选择笼子");
+                    return;
+                }
+                
+                var cageIds = cageIdsStr.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+                if (cageIds.length === 0) {
+                    $.modal.alertWarning("请选择笼子");
+                    return;
+                }
+                
+                var baseData = {
+                    experimentId: experimentId,
+                    bindTime: $('#bindTime').val(),
+                    unbindTime: $('#unbindTime').val(),
+                    bindStatus: $('#bindStatus').val(),
+                    bindMethod: $('#bindMethod').val(),
+                    bindOperator: $('#bindOperator').val(),
+                    cageRole: $('#cageRole').val(),
+                    monitoringConfig: $('#monitoringConfig').val(),
+                    remark: $('#remark').val()
+                };
+                
+                // 批量保存
+                var promises = [];
+                $.each(cageIds, function(index, cageId) {
+                    var formData = $.extend({}, baseData, { cageId: cageId });
+                    
+                    var promise = $.ajax({
+                        url: ctx + "system/SysExperimentCage/add",
+                        type: "POST",
+                        data: formData,
+                        dataType: "json"
+                    });
+                    
+                    promises.push(promise);
+                });
+                
+                // 等待所有请求完成
+                $.when.apply($, promises).done(function() {
+                    var allSuccess = true;
+                    var errorMessages = [];
+                    
+                    // 检查所有结果
+                    if (promises.length === 1) {
+                        // 单个请求的情况
+                        var result = arguments[0];
+                        if (result.code !== 0) {
+                            allSuccess = false;
+                            errorMessages.push(result.msg || "保存失败");
+                        }
+                    } else {
+                        // 多个请求的情况
+                        for (var i = 0; i < arguments.length; i++) {
+                            var result = arguments[i][0];
+                            if (result.code !== 0) {
+                                allSuccess = false;
+                                errorMessages.push(result.msg || "保存失败");
+                            }
+                        }
+                    }
+                    
+                    if (allSuccess) {
+                        // 更新笼子状态为OCCUPIED
+                        updateCageStatus(cageIds, 'OCCUPIED');
+                        $.modal.alertSuccess("保存成功，共保存 " + cageIds.length + " 个笼子绑定关系");
+                        $('#cageBindingModal').modal('hide');
+                        loadCageBindings();
+                    } else {
+                        $.modal.alertError("部分保存失败：" + errorMessages.join('; '));
+                    }
+                }).fail(function() {
+                    $.modal.alertError("保存失败");
+                });
+            }
+        }
+        
+        // 更新笼子状态
+        function updateCageStatus(cageIds, status) {
+            if (!cageIds || cageIds.length === 0) {
+                return;
+            }
+            
+            console.log('开始批量更新笼子状态:', cageIds, status);
+            
+            // 批量更新笼子状态
+            $.ajax({
+                url: ctx + "system/SysCage/updateStatus",
+                type: "POST",
+                data: {
+                    cageIds: cageIds.join(','),
+                    status: status
+                },
+                dataType: "json",
+                success: function(result) {
+                    if (result.code === 0) {
+                        console.log('笼子状态更新成功');
+                        // 如果是设置为OCCUPIED状态，检查是否需要禁用新增按钮
+                        if (status === 'OCCUPIED') {
+                            checkAndDisableAddButton();
+                        }
+                    } else {
+                        console.error('笼子状态更新失败:', result.msg);
+                        $.modal.alertError('笼子状态更新失败: ' + result.msg);
+                    }
+                },
+                error: function() {
+                    console.error('笼子状态更新请求失败');
+                    $.modal.alertError('笼子状态更新请求失败');
+                }
+            });
+        }
+        
+        // 检查并禁用新增按钮
+        function checkAndDisableAddButton() {
+            // 检查当前实验是否还有可用的笼子
+            $.ajax({
+                url: ctx + "system/SysCage/list",
+                type: "POST",
+                data: {
+                    cageStatus: 'AVAILABLE'
+                },
+                dataType: "json",
+                success: function(result) {
+                    if (result.code === 0 && result.rows && result.rows.length === 0) {
+                        // 没有可用笼子，禁用新增按钮
+                        $('a[onclick="addCageBinding()"]').addClass('disabled').attr('onclick', '').off('click');
+                        $('a[onclick="addCageBinding()"]').attr('title', '暂无可用笼子');
+                    }
+                },
+                error: function() {
+                    console.warn('检查可用笼子状态失败');
+                }
+            });
+        }
+        
+        // 删除笼子绑定
+        function deleteCageBinding(relationId) {
+            $.modal.confirm("确定删除该笼子绑定关系吗？", function() {
+                $.ajax({
+                    url: ctx + "system/SysExperimentCage/remove",
+                    type: "POST",
+                    data: { ids: relationId },
+                    dataType: "json",
+                    success: function(result) {
+                        if (result.code === 0) {
+                            $.modal.alertSuccess("删除成功");
+                            loadCageBindings(); // 重新加载数据
+                        } else {
+                            $.modal.alertError(result.msg || "删除失败");
+                        }
+                    },
+                    error: function() {
+                        $.modal.alertError("删除失败");
+                    }
+                });
+            });
+        }
+        
+        // 获取绑定状态文本
+        function getBindStatusText(status) {
+            switch(status) {
+                case 'ACTIVE': return '激活';
+                case 'INACTIVE': return '未激活';
+                case 'SUSPENDED': return '暂停';
+                default: return status || '';
+            }
+        }
+        
+        // 获取绑定方式文本
+        function getBindMethodText(method) {
+            switch(method) {
+                case 'MANUAL': return '手动绑定';
+                case 'AUTO': return '自动绑定';
+                case 'BATCH': return '批量绑定';
+                default: return method || '';
+            }
+        }
+        
+        // 获取笼子角色文本
+        function getCageRoleText(role) {
+            switch(role) {
+                case 'EXPERIMENTAL': return '实验组';
+                case 'CONTROL': return '对照组';
+                case 'BACKUP': return '备用组';
+                default: return role || '';
+            }
+        }
+    </script>
+</body>
+</html>

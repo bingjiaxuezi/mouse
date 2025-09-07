@@ -91,4 +91,17 @@ public class SysCageServiceImpl implements ISysCageService
     {
         return sysCageMapper.deleteSysCageByCageId(cageId);
     }
+
+    /**
+     * 批量更新笼子状态
+     * 
+     * @param cageIds 笼子ID字符串，逗号分隔
+     * @param status 新状态
+     * @return 结果
+     */
+    @Override
+    public int updateCageStatus(String cageIds, String status)
+    {
+        return sysCageMapper.updateCageStatus(cageIds, status);
+    }
 }

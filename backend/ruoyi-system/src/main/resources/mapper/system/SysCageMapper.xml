@@ -173,4 +173,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <update id="updateCageStatus">
+        update sys_cage set cage_status = #{param2}, modify_time = now()
+        where cage_id in (${param1})
+    </update>
+
 </mapper>

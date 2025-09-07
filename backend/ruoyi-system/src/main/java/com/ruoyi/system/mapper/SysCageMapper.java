@@ -58,4 +58,13 @@ public interface SysCageMapper
      * @return 结果
      */
     public int deleteSysCageByCageIds(String[] cageIds);
+
+    /**
+     * 批量更新笼子状态
+     * 
+     * @param cageIds 笼子ID字符串，逗号分隔
+     * @param status 新状态
+     * @return 结果
+     */
+    public int updateCageStatus(String cageIds, String status);
 }

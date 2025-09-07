@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('实验笼子关系列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>实验ID：</label>
+                                <input type="text" name="experimentId"/>
+                            </li>
+                            <li>
+                                <label>笼子ID：</label>
+                                <input type="text" name="cageId"/>
+                            </li>
+                            <li>
+                                <label>绑定时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择绑定时间" name="bindTime"/>
+                            </li>
+                            <li>
+                                <label>解绑时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择解绑时间" name="unbindTime"/>
+                            </li>
+                            <li>
+                                <label>绑定状态：</label>
+                                <select name="bindStatus" th:with="type=${@dict.getType('sys_bind_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>绑定方式、：</label>
+                                <select name="bindMethod" th:with="type=${@dict.getType('sys_bind_method')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>绑定操作员：</label>
+                                <input type="text" name="bindOperator"/>
+                            </li>
+                            <li>
+                                <label>笼子角色：</label>
+                                <select name="cageRole" th:with="type=${@dict.getType('sys_cage_role')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>更新者：</label>
+                                <input type="text" name="modifyBy"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:SysExperimentCage:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:SysExperimentCage:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:SysExperimentCage:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:SysExperimentCage:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysExperimentCage:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysExperimentCage:remove')}]];
+        var bindStatusDatas = [[${@dict.getType('sys_bind_status')}]];
+        var bindMethodDatas = [[${@dict.getType('sys_bind_method')}]];
+        var cageRoleDatas = [[${@dict.getType('sys_cage_role')}]];
+        var prefix = ctx + "system/SysExperimentCage";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "实验笼子关系",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'relationId',
+                    title: '关系ID',
+                    visible: false
+                },
+                {
+                    field: 'experimentId',
+                    title: '实验ID'
+                },
+                {
+                    field: 'cageId',
+                    title: '笼子ID'
+                },
+                {
+                    field: 'bindTime',
+                    title: '绑定时间'
+                },
+                {
+                    field: 'unbindTime',
+                    title: '解绑时间'
+                },
+                {
+                    field: 'bindStatus',
+                    title: '绑定状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(bindStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'bindMethod',
+                    title: '绑定方式、',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(bindMethodDatas, value);
+                    }
+                },
+                {
+                    field: 'bindOperator',
+                    title: '绑定操作员'
+                },
+                {
+                    field: 'cageRole',
+                    title: '笼子角色',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(cageRoleDatas, value);
+                    }
+                },
+                {
+                    field: 'monitoringConfig',
+                    title: '监控配置(JSON格式):'
+                },
+                {
+                    field: 'buildBy',
+                    title: '创建者'
+                },
+                {
+                    field: 'buildTime',
+                    title: '创建时间'
+                },
+                {
+                    field: 'modifyTime',
+                    title: '创建时间'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.relationId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.relationId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

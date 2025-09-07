@@ -108,6 +108,13 @@
         var experimentStatusDatas = [[${@dict.getType('sys_experiment_status')}]];
         var prefix = ctx + "system/SysExperiment";
 
+        // 查看实验详情
+        function viewExperimentDetail(experimentId) {
+            var url = ctx + "system/SysExperimentDetail?experimentId=" + experimentId;
+            // 直接在当前窗口打开，避免iframe问题
+            window.location.href = url;
+        }
+
         $(function() {
             var options = {
                 url: prefix + "/list",
@@ -219,6 +226,7 @@
                     align: 'center',
                     formatter: function(value, row, index) {
                         var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="viewExperimentDetail(\'' + row.experimentId + '\');"><i class="fa fa-search"></i>详情</a> ');
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.experimentId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.experimentId + '\')"><i class="fa fa-remove"></i>删除</a>');
                         return actions.join('');

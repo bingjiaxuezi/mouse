@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
@@ -112,6 +113,22 @@ public class SysCageController extends BaseController
     public AjaxResult editSave(SysCage sysCage)
     {
         return toAjax(sysCageService.updateSysCage(sysCage));
+    }
+
+    /**
+     * 批量更新笼子状态
+     */
+    @RequiresPermissions("system:SysCage:edit")
+    @Log(title = "笼子管理", businessType = BusinessType.UPDATE)
+    @PostMapping("/updateStatus")
+    @ResponseBody
+    public AjaxResult updateStatus(@RequestParam("cageIds") String cageIds, @RequestParam("status") String status)
+    {
+        try {
+            return toAjax(sysCageService.updateCageStatus(cageIds, status));
+        } catch (Exception e) {
+            return AjaxResult.error("批量更新笼子状态失败: " + e.getMessage());
+        }
     }
 
     /**
