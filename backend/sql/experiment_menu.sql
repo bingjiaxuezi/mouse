@@ -14,7 +14,7 @@ INSERT INTO sys_menu VALUES('2100', '实验管理', '0', '4', 'experiment', NULL
 -- ----------------------------
 
 -- 实验列表管理
-INSERT INTO sys_menu VALUES('2101', '实验列表', '2100', '1', 'experiment', 'system/experiment/experiment', NULL, '1', '0', 'C', '0', '0', 'system:experiment:view', 'experiment', 'admin', NOW(), '', NULL, '实验列表菜单');
+INSERT INTO sys_menu VALUES('2101', '实验列表', '2100', '1', 'experiment', 'system/SysExperiment', NULL, '1', '0', 'C', '0', '0', 'system:SysExperiment:view', 'experiment', 'admin', NOW(), '', NULL, '实验列表菜单');
 
 -- 创建实验
 INSERT INTO sys_menu VALUES('2102', '创建实验', '2100', '2', 'add', 'system/experiment/add', NULL, '1', '0', 'C', '0', '0', 'system:experiment:add', 'plus', 'admin', NOW(), '', NULL, '创建实验菜单');
@@ -23,7 +23,10 @@ INSERT INTO sys_menu VALUES('2102', '创建实验', '2100', '2', 'add', 'system/
 INSERT INTO sys_menu VALUES('2103', '实验模板', '2100', '3', 'template', 'system/experiment/template', NULL, '1', '0', 'C', '0', '0', 'system:experiment:template', 'form', 'admin', NOW(), '', NULL, '实验模板管理菜单');
 
 -- 实验详情
-INSERT INTO sys_menu VALUES('2104', '实验详情', '2100', '4', 'detail', 'system/experiment/detail', NULL, '1', '0', 'C', '1', '0', 'system:experiment:detail', 'eye', 'admin', NOW(), '', NULL, '实验详情菜单');
+INSERT INTO sys_menu VALUES('2104', '实验详情', '2100', '4', 'detail', 'system/SysExperimentDetail', NULL, '1', '0', 'C', '1', '0', 'system:SysExperimentDetail:view', 'eye', 'admin', NOW(), '', NULL, '实验详情菜单');
+
+-- 实验文件管理
+INSERT INTO sys_menu VALUES('2107', '实验文件', '2100', '7', 'file', 'system/SysExperimentFile', NULL, '1', '0', 'C', '1', '0', 'system:SysExperimentFile:view', 'folder', 'admin', NOW(), '', NULL, '实验文件管理菜单');
 
 -- 实验二维码管理
 INSERT INTO sys_menu VALUES('2105', '二维码管理', '2100', '5', 'qrcode', 'system/experiment/qrcode', NULL, '1', '0', 'C', '0', '0', 'system:experiment:qrcode', 'qrcode', 'admin', NOW(), '', NULL, '实验二维码管理菜单');
@@ -116,6 +119,7 @@ INSERT INTO sys_role_menu VALUES ('1', '2103');
 INSERT INTO sys_role_menu VALUES ('1', '2104');
 INSERT INTO sys_role_menu VALUES ('1', '2105');
 INSERT INTO sys_role_menu VALUES ('1', '2106');
+INSERT INTO sys_role_menu VALUES ('1', '2107');
 
 -- 笼子管理权限
 INSERT INTO sys_role_menu VALUES ('1', '2200');

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysExperimentFileMapper">
+    
+    <resultMap type="SysExperimentFile" id="SysExperimentFileResult">
+        <result property="fileId"    column="file_id"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="recordId"    column="record_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="fileOriginalName"    column="file_original_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="fileType"    column="file_type"    />
+        <result property="fileSize"    column="file_size"    />
+        <result property="fileExtension"    column="file_extension"    />
+        <result property="fileCategory"    column="file_category"    />
+        <result property="fileDescription"    column="file_description"    />
+        <result property="fileTags"    column="file_tags"    />
+        <result property="bucketName"    column="bucket_name"    />
+        <result property="objectName"    column="object_name"    />
+        <result property="fileStatus"    column="file_status"    />
+        <result property="downloadCount"    column="download_count"    />
+        <result property="version"    column="version"    />
+        <result property="parentFileId"    column="parent_file_id"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysExperimentFileVo">
+        select file_id, experiment_id, record_id, file_name, file_original_name, file_path, file_type, file_size, file_extension, file_category, file_description, file_tags, bucket_name, object_name, file_status, download_count, version, parent_file_id, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_experiment_file
+    </sql>
+
+    <select id="selectSysExperimentFileList" parameterType="SysExperimentFile" resultMap="SysExperimentFileResult">
+        <include refid="selectSysExperimentFileVo"/>
+        <where>  
+            <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
+            <if test="fileType != null  and fileType != ''"> and file_type = #{fileType}</if>
+            <if test="fileCategory != null  and fileCategory != ''"> and file_category = #{fileCategory}</if>
+            <if test="fileDescription != null  and fileDescription != ''"> and file_description = #{fileDescription}</if>
+            <if test="fileTags != null  and fileTags != ''"> and file_tags like concat('%', #{fileTags}, '%')</if>
+            <if test="bucketName != null  and bucketName != ''"> and bucket_name like concat('%', #{bucketName}, '%')</if>
+            <if test="objectName != null  and objectName != ''"> and object_name like concat('%', #{objectName}, '%')</if>
+            <if test="fileStatus != null  and fileStatus != ''"> and file_status = #{fileStatus}</if>
+            <if test="buildBy != null  and buildBy != ''"> and build_by = #{buildBy}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysExperimentFileByFileId" parameterType="Long" resultMap="SysExperimentFileResult">
+        <include refid="selectSysExperimentFileVo"/>
+        where file_id = #{fileId}
+    </select>
+
+    <insert id="insertSysExperimentFile" parameterType="SysExperimentFile" useGeneratedKeys="true" keyProperty="fileId">
+        insert into sys_experiment_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="recordId != null">record_id,</if>
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="fileOriginalName != null and fileOriginalName != ''">file_original_name,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="fileType != null and fileType != ''">file_type,</if>
+            <if test="fileSize != null">file_size,</if>
+            <if test="fileExtension != null">file_extension,</if>
+            <if test="fileCategory != null">file_category,</if>
+            <if test="fileDescription != null">file_description,</if>
+            <if test="fileTags != null">file_tags,</if>
+            <if test="bucketName != null">bucket_name,</if>
+            <if test="objectName != null and objectName != ''">object_name,</if>
+            <if test="fileStatus != null">file_status,</if>
+            <if test="downloadCount != null">download_count,</if>
+            <if test="version != null">version,</if>
+            <if test="parentFileId != null">parent_file_id,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="recordId != null">#{recordId},</if>
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="fileOriginalName != null and fileOriginalName != ''">#{fileOriginalName},</if>
+            <if test="filePath != null and filePath != ''">#{filePath},</if>
+            <if test="fileType != null and fileType != ''">#{fileType},</if>
+            <if test="fileSize != null">#{fileSize},</if>
+            <if test="fileExtension != null">#{fileExtension},</if>
+            <if test="fileCategory != null">#{fileCategory},</if>
+            <if test="fileDescription != null">#{fileDescription},</if>
+            <if test="fileTags != null">#{fileTags},</if>
+            <if test="bucketName != null">#{bucketName},</if>
+            <if test="objectName != null and objectName != ''">#{objectName},</if>
+            <if test="fileStatus != null">#{fileStatus},</if>
+            <if test="downloadCount != null">#{downloadCount},</if>
+            <if test="version != null">#{version},</if>
+            <if test="parentFileId != null">#{parentFileId},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysExperimentFile" parameterType="SysExperimentFile">
+        update sys_experiment_file
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="recordId != null">record_id = #{recordId},</if>
+            <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
+            <if test="fileOriginalName != null and fileOriginalName != ''">file_original_name = #{fileOriginalName},</if>
+            <if test="filePath != null and filePath != ''">file_path = #{filePath},</if>
+            <if test="fileType != null and fileType != ''">file_type = #{fileType},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="fileExtension != null">file_extension = #{fileExtension},</if>
+            <if test="fileCategory != null">file_category = #{fileCategory},</if>
+            <if test="fileDescription != null">file_description = #{fileDescription},</if>
+            <if test="fileTags != null">file_tags = #{fileTags},</if>
+            <if test="bucketName != null">bucket_name = #{bucketName},</if>
+            <if test="objectName != null and objectName != ''">object_name = #{objectName},</if>
+            <if test="fileStatus != null">file_status = #{fileStatus},</if>
+            <if test="downloadCount != null">download_count = #{downloadCount},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="parentFileId != null">parent_file_id = #{parentFileId},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where file_id = #{fileId}
+    </update>
+
+    <delete id="deleteSysExperimentFileByFileId" parameterType="Long">
+        delete from sys_experiment_file where file_id = #{fileId}
+    </delete>
+
+    <delete id="deleteSysExperimentFileByFileIds" parameterType="String">
+        delete from sys_experiment_file where file_id in 
+        <foreach item="fileId" collection="array" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </delete>
+
+</mapper>

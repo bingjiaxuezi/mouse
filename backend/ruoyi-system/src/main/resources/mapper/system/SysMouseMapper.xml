@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMouseMapper">
+    
+    <resultMap type="SysMouse" id="SysMouseResult">
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="mouseCode"    column="mouse_code"    />
+        <result property="mouseName"    column="mouse_name"    />
+        <result property="species"    column="species"    />
+        <result property="strain"    column="strain"    />
+        <result property="gender"    column="gender"    />
+        <result property="birthDate"    column="birth_date"    />
+        <result property="weight"    column="weight"    />
+        <result property="healthStatus"    column="health_status"    />
+        <result property="photoUrl"    column="photo_url"    />
+        <result property="rfidTag"    column="rfid_tag"    />
+        <result property="earTag"    column="ear_tag"    />
+        <result property="status"    column="status"    />
+        <result property="source"    column="source"    />
+        <result property="supplier"    column="supplier"    />
+        <result property="arrivalDate"    column="arrival_date"    />
+        <result property="weaningDate"    column="weaning_date"    />
+        <result property="genotype"    column="genotype"    />
+        <result property="breedingStatus"    column="breeding_status"    />
+        <result property="fatherMouseId"    column="father_mouse_id"    />
+        <result property="motherMouseId"    column="mother_mouse_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+    </resultMap>
+
+    <sql id="selectSysMouseVo">
+        select mouse_id, mouse_code, mouse_name, species, strain, gender, birth_date, weight, health_status, photo_url, rfid_tag, ear_tag, status, source, supplier, arrival_date, weaning_date, genotype, breeding_status, father_mouse_id, mother_mouse_id, create_by, create_time, update_by, update_time, del_flag, remark, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5 from sys_mouse
+    </sql>
+
+    <select id="selectSysMouseList" parameterType="SysMouse" resultMap="SysMouseResult">
+        <include refid="selectSysMouseVo"/>
+        <where>  
+            <if test="mouseCode != null  and mouseCode != ''"> and mouse_code = #{mouseCode}</if>
+            <if test="mouseName != null  and mouseName != ''"> and mouse_name like concat('%', #{mouseName}, '%')</if>
+            <if test="species != null  and species != ''"> and species = #{species}</if>
+            <if test="strain != null  and strain != ''"> and strain = #{strain}</if>
+            <if test="gender != null  and gender != ''"> and gender = #{gender}</if>
+            <if test="birthDate != null "> and birth_date = #{birthDate}</if>
+            <if test="weight != null "> and weight = #{weight}</if>
+            <if test="healthStatus != null  and healthStatus != ''"> and health_status = #{healthStatus}</if>
+            <if test="photoUrl != null  and photoUrl != ''"> and photo_url = #{photoUrl}</if>
+            <if test="rfidTag != null  and rfidTag != ''"> and rfid_tag = #{rfidTag}</if>
+            <if test="earTag != null  and earTag != ''"> and ear_tag = #{earTag}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="source != null  and source != ''"> and source = #{source}</if>
+            <if test="supplier != null  and supplier != ''"> and supplier = #{supplier}</if>
+            <if test="arrivalDate != null "> and arrival_date = #{arrivalDate}</if>
+            <if test="weaningDate != null "> and weaning_date = #{weaningDate}</if>
+            <if test="genotype != null  and genotype != ''"> and genotype = #{genotype}</if>
+            <if test="breedingStatus != null  and breedingStatus != ''"> and breeding_status = #{breedingStatus}</if>
+            <if test="fatherMouseId != null "> and father_mouse_id = #{fatherMouseId}</if>
+            <if test="motherMouseId != null "> and mother_mouse_id = #{motherMouseId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMouseByMouseId" parameterType="Long" resultMap="SysMouseResult">
+        <include refid="selectSysMouseVo"/>
+        where mouse_id = #{mouseId}
+    </select>
+
+    <insert id="insertSysMouse" parameterType="SysMouse" useGeneratedKeys="true" keyProperty="mouseId">
+        insert into sys_mouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">mouse_code,</if>
+            <if test="mouseName != null">mouse_name,</if>
+            <if test="species != null and species != ''">species,</if>
+            <if test="strain != null">strain,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="birthDate != null">birth_date,</if>
+            <if test="weight != null">weight,</if>
+            <if test="healthStatus != null">health_status,</if>
+            <if test="photoUrl != null">photo_url,</if>
+            <if test="rfidTag != null">rfid_tag,</if>
+            <if test="earTag != null">ear_tag,</if>
+            <if test="status != null">status,</if>
+            <if test="source != null">source,</if>
+            <if test="supplier != null">supplier,</if>
+            <if test="arrivalDate != null">arrival_date,</if>
+            <if test="weaningDate != null">weaning_date,</if>
+            <if test="genotype != null">genotype,</if>
+            <if test="breedingStatus != null">breeding_status,</if>
+            <if test="fatherMouseId != null">father_mouse_id,</if>
+            <if test="motherMouseId != null">mother_mouse_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">#{mouseCode},</if>
+            <if test="mouseName != null">#{mouseName},</if>
+            <if test="species != null and species != ''">#{species},</if>
+            <if test="strain != null">#{strain},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="birthDate != null">#{birthDate},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="healthStatus != null">#{healthStatus},</if>
+            <if test="photoUrl != null">#{photoUrl},</if>
+            <if test="rfidTag != null">#{rfidTag},</if>
+            <if test="earTag != null">#{earTag},</if>
+            <if test="status != null">#{status},</if>
+            <if test="source != null">#{source},</if>
+            <if test="supplier != null">#{supplier},</if>
+            <if test="arrivalDate != null">#{arrivalDate},</if>
+            <if test="weaningDate != null">#{weaningDate},</if>
+            <if test="genotype != null">#{genotype},</if>
+            <if test="breedingStatus != null">#{breedingStatus},</if>
+            <if test="fatherMouseId != null">#{fatherMouseId},</if>
+            <if test="motherMouseId != null">#{motherMouseId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMouse" parameterType="SysMouse">
+        update sys_mouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mouseCode != null and mouseCode != ''">mouse_code = #{mouseCode},</if>
+            <if test="mouseName != null">mouse_name = #{mouseName},</if>
+            <if test="species != null and species != ''">species = #{species},</if>
+            <if test="strain != null">strain = #{strain},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="healthStatus != null">health_status = #{healthStatus},</if>
+            <if test="photoUrl != null">photo_url = #{photoUrl},</if>
+            <if test="rfidTag != null">rfid_tag = #{rfidTag},</if>
+            <if test="earTag != null">ear_tag = #{earTag},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="supplier != null">supplier = #{supplier},</if>
+            <if test="arrivalDate != null">arrival_date = #{arrivalDate},</if>
+            <if test="weaningDate != null">weaning_date = #{weaningDate},</if>
+            <if test="genotype != null">genotype = #{genotype},</if>
+            <if test="breedingStatus != null">breeding_status = #{breedingStatus},</if>
+            <if test="fatherMouseId != null">father_mouse_id = #{fatherMouseId},</if>
+            <if test="motherMouseId != null">mother_mouse_id = #{motherMouseId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+        </trim>
+        where mouse_id = #{mouseId}
+    </update>
+
+    <delete id="deleteSysMouseByMouseId" parameterType="Long">
+        delete from sys_mouse where mouse_id = #{mouseId}
+    </delete>
+
+    <delete id="deleteSysMouseByMouseIds" parameterType="String">
+        delete from sys_mouse where mouse_id in 
+        <foreach item="mouseId" collection="array" open="(" separator="," close=")">
+            #{mouseId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                e.experiment_name,
                u1.user_name as createByName, u2.user_name as updateByName
         from t_mouse m
-        left join t_experiment e on m.experiment_id = e.id
+        left join sys_experiment e on m.experiment_id = e.experiment_id
         left join sys_user u1 on m.create_by = u1.user_name
         left join sys_user u2 on m.update_by = u2.user_name
         where 1=1
@@ -70,7 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                e.experiment_name,
                u1.user_name as createByName, u2.user_name as updateByName
         from t_mouse m
-        left join t_experiment e on m.experiment_id = e.id
+        left join sys_experiment e on m.experiment_id = e.experiment_id
         left join sys_user u1 on m.create_by = u1.user_name
         left join sys_user u2 on m.update_by = u2.user_name
         where m.id = #{id}
@@ -147,7 +147,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                e.experiment_name,
                u1.user_name as createByName, u2.user_name as updateByName
         from t_mouse m
-        left join t_experiment e on m.experiment_id = e.id
+        left join sys_experiment e on m.experiment_id = e.experiment_id
         left join sys_user u1 on m.create_by = u1.user_name
         left join sys_user u2 on m.update_by = u2.user_name
         where m.mouse_code = #{mouseCode}

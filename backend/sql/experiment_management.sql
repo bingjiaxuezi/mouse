@@ -167,7 +167,7 @@ CREATE TABLE sys_experiment_cage (
   
   -- 系统字段
   build_by             VARCHAR(64)     DEFAULT ''                 COMMENT '创建者',
-build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP    COMMENT '创建时间',
+  build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP    COMMENT '创建时间',
   modify_by            VARCHAR(64)     DEFAULT ''                 COMMENT '更新者',
   modify_time          DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   remark               VARCHAR(500)    DEFAULT NULL               COMMENT '备注',
@@ -181,40 +181,83 @@ build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP    COMMENT '创�
 ) ENGINE=INNODB AUTO_INCREMENT=1 COMMENT = '实验笼子关系表';
 
 -- ----------------------------
--- 5、实验进度记录表
+-- 5、实验记录表(实验日报)
 -- ----------------------------
-DROP TABLE IF EXISTS sys_experiment_progress;
-CREATE TABLE sys_experiment_progress (
-  progress_id          BIGINT(20)      NOT NULL AUTO_INCREMENT    COMMENT '进度ID',
+DROP TABLE IF EXISTS sys_experiment_record;
+CREATE TABLE sys_experiment_record (
+  record_id            BIGINT(20)      NOT NULL AUTO_INCREMENT    COMMENT '记录ID',
   experiment_id        BIGINT(20)      NOT NULL                   COMMENT '实验ID',
   
-  -- 进度信息
-  progress_date        DATE            NOT NULL                   COMMENT '进度日期',
-  progress_stage       VARCHAR(50)     NOT NULL                   COMMENT '进度阶段',
-  progress_desc        TEXT                                       COMMENT '进度描述',
-  completion_rate      DECIMAL(5,2)    DEFAULT 0.00               COMMENT '完成率(%)',
+  -- 记录基本信息
+  record_date          DATE            NOT NULL                   COMMENT '记录日期',
+  record_title         VARCHAR(200)    NOT NULL                   COMMENT '记录标题',
+  record_content       LONGTEXT                                   COMMENT '记录内容(富文本)',
+  record_type          VARCHAR(50)     DEFAULT 'DAILY'            COMMENT '记录类型：DAILY-日常记录,MILESTONE-里程碑,ISSUE-问题记录,OBSERVATION-观察记录',
   
-  -- 数据统计
-  data_collected       INT             DEFAULT 0                  COMMENT '已收集数据量',
-  mice_monitored       INT             DEFAULT 0                  COMMENT '监控小鼠数量',
+  -- 实验状态统计
+  experiment_status    VARCHAR(50)                                COMMENT '实验状态',
+  total_cages          INT             DEFAULT 0                  COMMENT '总笼子数',
+  active_cages         INT             DEFAULT 0                  COMMENT '活跃笼子数',
+  total_mice           INT             DEFAULT 0                  COMMENT '总小鼠数',
+  active_mice          INT             DEFAULT 0                  COMMENT '活跃小鼠数',
   
-  -- 异常记录
-  issues_found         TEXT                                       COMMENT '发现的问题(JSON格式)',
+  -- 小鼠健康指标
+  healthy_mice         INT             DEFAULT 0                  COMMENT '健康小鼠数',
+  sick_mice            INT             DEFAULT 0                  COMMENT '生病小鼠数',
+  dead_mice            INT             DEFAULT 0                  COMMENT '死亡小鼠数',
+  average_weight       DECIMAL(8,2)                               COMMENT '平均体重(克)',
+  
+  -- 数据收集统计
+  data_collected_today INT             DEFAULT 0                  COMMENT '当日收集数据量',
+  data_collected_total INT             DEFAULT 0                  COMMENT '累计收集数据量',
+  behavior_records     INT             DEFAULT 0                  COMMENT '行为记录数',
+  
+  -- 异常统计
+  issues_count         INT             DEFAULT 0                  COMMENT '异常数量',
+  resolved_issues      INT             DEFAULT 0                  COMMENT '已解决异常数量',
+  
+  -- 完成度统计
+  completion_rate      DECIMAL(5,2)    DEFAULT 0.00               COMMENT '总体完成率(%)',
+  daily_progress       DECIMAL(5,2)    DEFAULT 0.00               COMMENT '当日进度(%)',
+  
+  -- 环境数据
+  temperature          DECIMAL(5,2)                               COMMENT '平均温度(℃)',
+  humidity             DECIMAL(5,2)                               COMMENT '平均湿度(%)',
+  light_cycle          VARCHAR(50)                                COMMENT '光照周期',
+  
+  -- 生成信息
+  generated_by         VARCHAR(20)     DEFAULT 'MANUAL'           COMMENT '生成方式：SYSTEM-系统生成,MANUAL-手动生成',
+  generation_time      DATETIME        DEFAULT CURRENT_TIMESTAMP  COMMENT '生成时间',
+  
+  -- 文件统计
+  file_count           INT             DEFAULT 0                  COMMENT '关联文件数量',
   
   -- 系统字段
+  extend_info          TEXT                                       COMMENT '扩展信息(JSON格式)',
+  extend_config        TEXT                                       COMMENT '扩展配置(JSON格式)',
+  extend_data          TEXT                                       COMMENT '扩展数据(JSON格式)',
+  extend_info1         TEXT                                       COMMENT '扩展信息1(JSON格式)',  
+  extend_info2         TEXT                                       COMMENT '扩展信息2(JSON格式)',
+  extend_info3         TEXT                                       COMMENT '扩展信息3(JSON格式)',
+  extend_info4         TEXT                                       COMMENT '扩展信息4(JSON格式)',
+  extend_info5         TEXT                                       COMMENT '扩展信息5(JSON格式)',
+  extend_info6         TEXT                                       COMMENT '扩展信息2(JSON格式)',
+  extend_info7         TEXT                                       COMMENT '扩展信息3(JSON格式)',
+  extend_info8        TEXT                                       COMMENT '扩展信息4(JSON格式)',
+  extend_info9        TEXT                                       COMMENT '扩展信息5(JSON格式)',
   build_by             VARCHAR(64)     DEFAULT ''                 COMMENT '创建者',
-  build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP    COMMENT '创建时间',
+  build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP  COMMENT '创建时间',
   modify_by            VARCHAR(64)     DEFAULT ''                 COMMENT '更新者',
-  modify_time          DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  modify_time          DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   remark               VARCHAR(500)    DEFAULT NULL               COMMENT '备注',
   
-  PRIMARY KEY (progress_id),
-  KEY idx_planned_finish_time (planned_finish_time),
-  KEY idx_actual_begin_time (actual_begin_time),
-  KEY idx_actual_finish_time (actual_finish_time),
+  PRIMARY KEY (record_id),
+  UNIQUE KEY uk_experiment_date (experiment_id, record_date),
   KEY idx_experiment_id (experiment_id),
-  KEY idx_progress_date (progress_date)
-) ENGINE=INNODB AUTO_INCREMENT=1 COMMENT = '实验进度记录表';
+  KEY idx_record_date (record_date),
+  KEY idx_record_type (record_type),
+  KEY idx_generation_time (generation_time)
+) ENGINE=INNODB AUTO_INCREMENT=1 COMMENT = '实验记录表(实验日报)';
 
 -- ----------------------------
 -- 6、实验文件管理表
@@ -223,33 +266,124 @@ DROP TABLE IF EXISTS sys_experiment_file;
 CREATE TABLE sys_experiment_file (
   file_id              BIGINT(20)      NOT NULL AUTO_INCREMENT    COMMENT '文件ID',
   experiment_id        BIGINT(20)      NOT NULL                   COMMENT '实验ID',
+  record_id            BIGINT(20)                                 COMMENT '关联实验记录ID',
   
-  -- 文件信息
+  -- 文件基本信息
   file_name            VARCHAR(200)    NOT NULL                   COMMENT '文件名称',
+  file_original_name   VARCHAR(200)    NOT NULL                   COMMENT '原始文件名',
   file_path            VARCHAR(500)    NOT NULL                   COMMENT '文件路径',
-  file_type            VARCHAR(50)     NOT NULL                   COMMENT '文件类型：IMAGE-图片,VIDEO-视频,DOCUMENT-文档,DATA-数据文件',
+  file_type            VARCHAR(50)     NOT NULL                   COMMENT '文件类型：IMAGE-图片,VIDEO-视频,DOCUMENT-文档,DATA-数据文件,AUDIO-音频',
   file_size            BIGINT(20)      DEFAULT 0                  COMMENT '文件大小(字节)',
+  file_extension       VARCHAR(20)                                COMMENT '文件扩展名',
   
-  -- 文件分类
-  file_category        VARCHAR(50)     DEFAULT 'OTHER'            COMMENT '文件分类：PROTOCOL-实验方案,RESULT-实验结果,REPORT-实验报告,QR_CODE-二维码,OTHER-其他',
+  -- 文件分类和描述
+  file_category        VARCHAR(50)     DEFAULT 'OTHER'            COMMENT '文件分类：PROTOCOL-实验方案,RESULT-实验结果,REPORT-实验报告,IMAGE-图片资料,DATA-数据文件,OTHER-其他',
+  file_description     TEXT                                       COMMENT '文件描述',
+  file_tags            VARCHAR(500)                               COMMENT '文件标签(逗号分隔)',
   
   -- MinIO存储信息
   bucket_name          VARCHAR(100)    DEFAULT 'experiment'       COMMENT 'MinIO存储桶名称',
   object_name          VARCHAR(500)    NOT NULL                   COMMENT 'MinIO对象名称',
   
+  -- 文件状态
+  file_status          VARCHAR(20)     DEFAULT 'ACTIVE'           COMMENT '文件状态：ACTIVE-活跃,ARCHIVED-归档,DELETED-删除',
+  download_count       INT             DEFAULT 0                  COMMENT '下载次数',
+  
+  -- 版本信息
+  version              VARCHAR(20)     DEFAULT '1.0'              COMMENT '文件版本',
+  parent_file_id       BIGINT(20)                                 COMMENT '父文件ID(用于版本管理)',
+  
   -- 系统字段
+  extend_info          TEXT                                       COMMENT '扩展信息(JSON格式)',
+  extend_config        TEXT                                       COMMENT '扩展配置(JSON格式)',
+  extend_data          TEXT                                       COMMENT '扩展数据(JSON格式)',
+  extend_info1         TEXT                                       COMMENT '扩展信息1(JSON格式)',  
+  extend_info2         TEXT                                       COMMENT '扩展信息2(JSON格式)',
+  extend_info3         TEXT                                       COMMENT '扩展信息3(JSON格式)',
+  extend_info4         TEXT                                       COMMENT '扩展信息4(JSON格式)',
+  extend_info5         TEXT                                       COMMENT '扩展信息5(JSON格式)',
   build_by             VARCHAR(64)     DEFAULT ''                 COMMENT '创建者',
-build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP    COMMENT '创建时间',
+  build_time           DATETIME        DEFAULT CURRENT_TIMESTAMP  COMMENT '创建时间',
   modify_by            VARCHAR(64)     DEFAULT ''                 COMMENT '更新者',
-  modify_time          DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
-  del_flag             CHAR(1)         DEFAULT '0'                COMMENT '删除标志（0代表存在 2代表删除）',
+  modify_time          DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  del_flag             CHAR(1)         DEFAULT '0'                COMMENT '删除标志（0代表存在 1代表删除）',
   remark               VARCHAR(500)    DEFAULT NULL               COMMENT '备注',
   
   PRIMARY KEY (file_id),
   KEY idx_experiment_id (experiment_id),
+  KEY idx_record_id (record_id),
   KEY idx_file_type (file_type),
-  KEY idx_file_category (file_category)
+  KEY idx_file_category (file_category),
+  KEY idx_parent_file_id (parent_file_id)
 ) ENGINE=INNODB AUTO_INCREMENT=1 COMMENT = '实验文件管理表';
+
+-- ----------------------------
+-- 初始化数据和索引优化
+-- ----------------------------
+
+-- 插入测试实验记录数据
+INSERT INTO sys_experiment_record 
+(experiment_id, record_date, record_title, record_content, record_type, 
+ experiment_status, total_cages, active_cages, total_mice, active_mice, 
+ healthy_mice, sick_mice, dead_mice, average_weight, 
+ data_collected_today, data_collected_total, behavior_records, 
+ issues_count, resolved_issues, completion_rate, daily_progress, 
+ temperature, humidity, light_cycle, generated_by, build_by) 
+VALUES 
+(1, CURDATE(), CONCAT('实验记录-', DATE_FORMAT(CURDATE(), '%Y-%m-%d')), 
+ '今日实验进展顺利，所有笼子和小鼠状态正常。观察到小鼠活动水平较高，食欲正常。', 'DAILY', 
+ 'RUNNING', 5, 5, 20, 18, 
+ 18, 0, 0, 25.5, 
+ 150, 3500, 45, 
+ 2, 1, 75.50, 5.20, 
+ 22.5, 65.0, '12:12', 'MANUAL', 'admin');
+
+-- 添加索引优化
+ALTER TABLE sys_experiment_record ADD INDEX idx_experiment_status (experiment_status);
+ALTER TABLE sys_experiment_file ADD INDEX idx_file_status (file_status);
+
+-- 创建视图：实验记录汇总视图
+CREATE OR REPLACE VIEW v_experiment_record_summary AS
+SELECT 
+    r.record_id,
+    r.experiment_id,
+    r.record_date,
+    r.record_title,
+    r.record_type,
+    r.experiment_status,
+    r.total_mice,
+    r.active_mice,
+    r.completion_rate,
+    COUNT(f.file_id) as file_count,
+    SUM(f.file_size) as total_file_size,
+    r.build_time
+FROM sys_experiment_record r
+LEFT JOIN sys_experiment_file f ON r.record_id = f.record_id AND f.del_flag = '0'
+GROUP BY r.record_id;
+
+-- 创建视图：实验文件统计视图
+CREATE OR REPLACE VIEW v_experiment_file_stats AS
+SELECT 
+    experiment_id,
+    COUNT(*) as total_files,
+    SUM(file_size) as total_size,
+    COUNT(CASE WHEN file_type = 'IMAGE' THEN 1 END) as image_count,
+    COUNT(CASE WHEN file_type = 'VIDEO' THEN 1 END) as video_count,
+    COUNT(CASE WHEN file_type = 'DOCUMENT' THEN 1 END) as document_count,
+    COUNT(CASE WHEN file_type = 'DATA' THEN 1 END) as data_count,
+    COUNT(CASE WHEN file_type = 'AUDIO' THEN 1 END) as audio_count
+FROM sys_experiment_file 
+WHERE del_flag = '0'
+GROUP BY experiment_id;
+
+-- 添加注释
+ALTER TABLE sys_experiment_record COMMENT = '实验记录表 - 支持富文本内容和多媒体文件关联的实验日报系统';
+ALTER TABLE sys_experiment_file COMMENT = '实验文件管理表 - 支持图片、视频、文档等多媒体文件管理';
+
+-- 完成提示
+SELECT '实验记录系统数据库优化完成！' as message;
+SELECT '包含实验记录表和优化后的文件管理表' as tables;
+SELECT '支持富文本记录和多媒体文件管理' as features;
 
 -- ----------------------------
 -- 7、更新现有小鼠表，增加笼子关联

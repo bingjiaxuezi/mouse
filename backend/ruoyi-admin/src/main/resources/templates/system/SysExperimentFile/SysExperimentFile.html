@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('实验文件管理列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>实验ID：</label>
+                            <input type="text" name="experimentId" id="experimentIdInput" readonly/>
+                        </li>
+                        <li>
+                            <label>文件名称：</label>
+                            <input type="text" name="fileName"/>
+                        </li>
+                        <li>
+                            <label>文件类型：</label>
+                            <select name="fileType" th:with="type=${@dict.getType('sys_file_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>文件分类：</label>
+                            <select name="fileCategory" th:with="type=${@dict.getType('sys_file_category')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>MinIO存储桶名称：</label>
+                            <input type="text" name="bucketName"/>
+                        </li>
+                        <li>
+                            <label>文件状态：</label>
+                            <select name="fileStatus" th:with="type=${@dict.getType('sys_file_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>创建者：</label>
+                            <input type="text" name="buildBy"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="addWithExperimentId()" shiro:hasPermission="system:SysExperimentFile:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="system:SysExperimentFile:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="system:SysExperimentFile:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()"
+               shiro:hasPermission="system:SysExperimentFile:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysExperimentFile:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysExperimentFile:remove')}]];
+        var fileTypeDatas = [[${@dict.getType('sys_file_type')}]];
+        var fileCategoryDatas = [[${@dict.getType('sys_file_category')}]];
+        var fileStatusDatas = [[${@dict.getType('sys_file_status')}]];
+        var prefix = ctx + "system/SysExperimentFile";
+
+        $(function() {
+            // 获取URL参数中的experimentId
+            var urlParams = new URLSearchParams(window.location.search);
+            var experimentId = urlParams.get('experimentId');
+            console.log("experimentId ========================= " + experimentId);
+            if (experimentId) {
+                $('#experimentIdInput').val(experimentId);
+            }
+            
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add" + (experimentId ? ("?experimentId=" + encodeURIComponent(experimentId)) : ""),
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "实验文件管理",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'fileId',
+                    title: '文件ID',
+                    visible: false
+                },
+                {
+                    field: 'fileName',
+                    title: '文件名称'
+                },
+                {
+                    field: 'fileType',
+                    title: '文件类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(fileTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'fileCategory',
+                    title: '文件分类',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(fileCategoryDatas, value);
+                    }
+                },
+                {
+                    field: 'fileDescription',
+                    title: '文件描述'
+                },
+                {
+                    field: 'fileTags',
+                    title: '文件标签(逗号分隔)'
+                },
+                {
+                    field: 'bucketName',
+                    title: 'MinIO存储桶名称'
+                },
+                {
+                    field: 'objectName',
+                    title: 'MinIO对象名称'
+                },
+                {
+                    field: 'fileStatus',
+                    title: '文件状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(fileStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'version',
+                    title: '文件版本'
+                },
+                {
+                    field: 'buildBy',
+                    title: '创建者'
+                },
+                {
+                    field: 'buildTime',
+                    title: '创建时间'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+{
+    title: '操作',
+    align: 'center',
+    formatter: function(value, row, index) {
+        var actions = [];
+        actions.push('<a class="btn btn-white btn-bitbucket btn-xs" href="javascript:void(0)" onclick="previewFile(\'' + row.fileId + '\');" title="预览"><i class="fa fa-eye"></i></a> ');
+        actions.push('<a class="btn btn-white btn-bitbucket btn-xs" href="javascript:void(0)" onclick="downloadFile(\'' + row.fileId + '\');" title="下载"><i class="fa fa-download"></i></a> ');
+        actions.push('<a class="btn btn-white btn-bitbucket btn-xs" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.fileId + '\');" title="编辑"><i class="fa fa-edit"></i></a> ');
+        actions.push('<a class="btn btn-white btn-bitbucket btn-xs" href="javascript:void(0)" onclick="deleteFileWithMinio(\'' + row.fileId + '\');" title="删除"><i class="fa fa-trash"></i></a>');
+        return actions.join('');
+    }
+}
+
+
+                ]
+            };
+            $.table.init(options);
+            
+            // 从后端传递的参数或URL参数中获取实验ID并设置到搜索框
+            var experimentId = /*[[${experimentId}]]*/ '';
+            if (!experimentId || experimentId === '') {
+                var urlParams = new URLSearchParams(window.location.search);
+                experimentId = urlParams.get('experimentId');
+            }
+            if (experimentId && experimentId !== '') {
+                $('#experimentIdInput').val(experimentId);
+                // 自动触发搜索
+                $.table.search();
+            }
+        });
+        
+        // 文件预览功能（使用后端预览流接口）
+        function previewFile(fileId) {
+            var url = prefix + '/preview/' + fileId;
+            $.modal.open('文件预览', url, '800', '600');
+        }
+        
+        // 文件下载功能
+        function downloadFile(fileId) {
+            window.open(prefix + '/download/' + fileId);
+        }
+        
+        // 删除文件（包括MinIO）
+        function deleteFileWithMinio(fileId) {
+            $.modal.confirm('确定删除该文件吗？此操作将同时删除MinIO中的文件，不可恢复！', function() {
+                $.post(prefix + '/deleteWithMinio', { id: fileId }, function(result) {
+                    if (result.code === 0) {
+                        $.modal.msgSuccess('删除成功');
+                        $.table.refresh();
+                    } else {
+                        $.modal.alertError('删除失败：' + result.msg);
+                    }
+                });
+            });
+        }
+
+        // 自定义“添加”按钮逻辑：强制携带 experimentId 打开新增页面
+        function addWithExperimentId() {
+            var expId = $('#experimentIdInput').val();
+            if (!expId) {
+                var urlParams = new URLSearchParams(window.location.search);
+                expId = urlParams.get('experimentId');
+            }
+            if (!expId) {
+                $.modal.alertWarning('无法获取实验ID，请从实验列表页面进入。');
+                return;
+            }
+            var url = prefix + '/add?experimentId=' + encodeURIComponent(expId);
+            // 修复：避免读取未初始化的 $.table._option.modalName 导致报错
+            $.modal.open('添加实验文件管理', url);
+        }
+</script>
+</body>
+</html>

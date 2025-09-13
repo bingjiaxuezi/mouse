@@ -241,12 +241,7 @@
         var experimentStatusDatas = [[${@dict.getType('sys_experiment_status')}]];
         var prefix = ctx + "system/SysExperiment";
 
-        // 查看实验详情
-        function viewExperimentDetail(experimentId) {
-            var url = ctx + "system/SysExperimentDetail?experimentId=" + experimentId;
-            // 直接在当前窗口打开，避免iframe问题
-            window.location.href = url;
-        }
+        // 删除重复的函数定义，使用下面统一的函数定义
 
         $(function() {
             var options = {
@@ -355,7 +350,9 @@
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="saveAsTemplate(\'' + row.experimentId + '\');"><i class="fa fa-save"></i>保存为模板</a> ');
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="viewExperimentDetail(\'' + row.experimentId + '\');"><i class="fa fa-search"></i>详情</a> ');
                         actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.experimentId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-info btn-xs" href="javascript:void(0)" onclick="viewExperimentFiles(\'' + row.experimentId + '\');"><i class="fa fa-file-text-o"></i>实验记录</a>');
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.experimentId + '\')"><i class="fa fa-remove"></i>删除</a>');
+
                         return actions.join('');
                     }
                 }]
@@ -406,6 +403,12 @@
         function viewExperimentDetail(experimentId) {
             var url = ctx + "system/SysExperimentDetail?experimentId=" + experimentId;
             $.modal.openTab("实验详情", url);
+        }
+        
+        // 查看实验记录函数 - 完全参考详情按钮的逻辑
+        function viewExperimentFiles(experimentId) {
+            var url = ctx + "system/SysExperimentFile?experimentId=" + experimentId;
+            $.modal.openTab("实验记录", url);
         }
         
         // 研究员数据缓存
@@ -468,6 +471,12 @@
                     $this.text(researcherCache[researcherId]);
                 }
             });
+        }
+        
+        // 打开实验文件管理页面
+        function openExperimentFiles(experimentId) {
+            var url = ctx + 'system/SysExperimentFile?experimentId=' + experimentId;
+            $.modal.openTab('实验记录管理', url);
         }
         
         // 重写表格的onLoadSuccess回调

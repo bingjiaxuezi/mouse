@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('小鼠基础信息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>小鼠编号：</label>
+                                <input type="text" name="mouseCode"/>
+                            </li>
+                            <li>
+                                <label>小鼠名称：</label>
+                                <input type="text" name="mouseName"/>
+                            </li>
+                            <li>
+                                <label>物种：</label>
+                                <select name="species" th:with="type=${@dict.getType('sys_species')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>品系：</label>
+                                <input type="text" name="strain"/>
+                            </li>
+                            <li>
+                                <label>性别：</label>
+                                <select name="gender" th:with="type=${@dict.getType('sys_sex')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>出生日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择出生日期" name="birthDate"/>
+                            </li>
+                            <li>
+                                <label>体重：</label>
+                                <input type="text" name="weight"/>
+                            </li>
+                            <li>
+                                <label>健康状态：</label>
+                                <select name="healthStatus" th:with="type=${@dict.getType('sys_health_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>RFID标签号：</label>
+                                <input type="text" name="rfidTag"/>
+                            </li>
+                            <li>
+                                <label>耳标号：</label>
+                                <input type="text" name="earTag"/>
+                            </li>
+                            <li>
+                                <label>状态：</label>
+                                <select name="status" th:with="type=${@dict.getType('sys_mouse_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>来源：</label>
+                                <input type="text" name="source"/>
+                            </li>
+                            <li>
+                                <label>供应商：</label>
+                                <select name="supplier" th:with="type=${@dict.getType('sys_supplier')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>到达日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择到达日期" name="arrivalDate"/>
+                            </li>
+                            <li>
+                                <label>断奶日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择断奶日期" name="weaningDate"/>
+                            </li>
+                            <li>
+                                <label>基因型信息：</label>
+                                <input type="text" name="genotype"/>
+                            </li>
+                            <li>
+                                <label>繁殖状态：</label>
+                                <select name="breedingStatus" th:with="type=${@dict.getType('sys_breeding_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>父亲小鼠ID：</label>
+                                <input type="text" name="fatherMouseId"/>
+                            </li>
+                            <li>
+                                <label>母亲小鼠ID：</label>
+                                <input type="text" name="motherMouseId"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:SysMouse:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:SysMouse:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:SysMouse:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:SysMouse:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysMouse:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysMouse:remove')}]];
+        var speciesDatas = [[${@dict.getType('sys_species')}]];
+        var genderDatas = [[${@dict.getType('sys_sex')}]];
+        var healthStatusDatas = [[${@dict.getType('sys_health_status')}]];
+        var statusDatas = [[${@dict.getType('sys_mouse_status')}]];
+        var supplierDatas = [[${@dict.getType('sys_supplier')}]];
+        var breedingStatusDatas = [[${@dict.getType('sys_breeding_status')}]];
+        var prefix = ctx + "system/SysMouse";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "小鼠基础信息",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'mouseId',
+                    title: '小鼠ID',
+                    visible: false
+                },
+                {
+                    field: 'mouseCode',
+                    title: '小鼠编号'
+                },
+                {
+                    field: 'mouseName',
+                    title: '小鼠名称'
+                },
+                {
+                    field: 'species',
+                    title: '物种',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(speciesDatas, value);
+                    }
+                },
+                {
+                    field: 'strain',
+                    title: '品系'
+                },
+                {
+                    field: 'gender',
+                    title: '性别',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(genderDatas, value);
+                    }
+                },
+                {
+                    field: 'birthDate',
+                    title: '出生日期'
+                },
+                {
+                    field: 'weight',
+                    title: '体重'
+                },
+                {
+                    field: 'healthStatus',
+                    title: '健康状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(healthStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'photoUrl',
+                    title: '照片'
+                },
+                {
+                    field: 'rfidTag',
+                    title: 'RFID标签号'
+                },
+                {
+                    field: 'earTag',
+                    title: '耳标号'
+                },
+                {
+                    field: 'status',
+                    title: '状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(statusDatas, value);
+                    }
+                },
+                {
+                    field: 'source',
+                    title: '来源'
+                },
+                {
+                    field: 'supplier',
+                    title: '供应商',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(supplierDatas, value);
+                    }
+                },
+                {
+                    field: 'arrivalDate',
+                    title: '到达日期'
+                },
+                {
+                    field: 'weaningDate',
+                    title: '断奶日期'
+                },
+                {
+                    field: 'genotype',
+                    title: '基因型信息'
+                },
+                {
+                    field: 'breedingStatus',
+                    title: '繁殖状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(breedingStatusDatas, value);
+                    }
+                },
+                {
+                    field: 'fatherMouseId',
+                    title: '父亲小鼠ID'
+                },
+                {
+                    field: 'motherMouseId',
+                    title: '母亲小鼠ID'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.mouseId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.mouseId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增实验文件管理')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-SysExperimentFile-add">
+            <!-- 隐藏的实验ID字段 -->
+            <input name="experimentId" id="experimentIdInput" type="hidden" required>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">文件名称：</label>
+                    <div class="col-sm-8">
+                        <input name="fileName" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">原始文件名：</label>
+                    <div class="col-sm-8">
+                        <input name="fileOriginalName" id="fileOriginalNameInput" class="form-control" type="text" readonly>
+                        <span class="help-block m-b-none">通过文件上传自动获取</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label is-required">文件上传：</label>
+                    <div class="col-sm-10">
+                        <input type="hidden" name="filePath" id="filePathValue">
+                        <input type="hidden" name="bucketName" id="bucketNameValue">
+                        <input type="hidden" name="objectName" id="objectNameValue">
+                        <div class="file-loading">
+                            <input id="fileUpload" name="file" type="file">
+                        </div>
+                        <span class="help-block m-b-none">支持拖拽上传，上传后会自动填充存储信息。</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label is-required">文件类型：</label>
+                    <div class="col-sm-8">
+                        <select name="fileType" class="form-control" th:with="type=${@dict.getType('sys_file_type')}" required>
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">文件分类：</label>
+                    <div class="col-sm-8">
+                        <select name="fileCategory" class="form-control" th:with="type=${@dict.getType('sys_file_category')}">
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">文件描述：</label>
+                    <div class="col-sm-8">
+                        <textarea name="fileDescription" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">文件标签(逗号分隔)：</label>
+                    <div class="col-sm-8">
+                        <textarea name="fileTags" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">文件状态：</label>
+                    <div class="col-sm-8">
+                        <select name="fileStatus" class="form-control" th:with="type=${@dict.getType('sys_file_status')}">
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">文件版本：</label>
+                    <div class="col-sm-8">
+                        <input name="version" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">备注：</label>
+                    <div class="col-sm-8">
+                        <textarea name="remark" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <script th:inline="javascript">
+        var prefix = ctx + "system/SysExperimentFile";
+        
+        $(function() {
+            // 从URL参数中获取实验ID
+            var urlParams = new URLSearchParams(window.location.search);
+            var experimentId = urlParams.get('experimentId');
+            console.log('URL参数中的实验ID:', experimentId);
+            console.log('当前URL:', window.location.href);
+            if (experimentId) {
+                $('#experimentIdInput').val(experimentId);
+                console.log('设置实验ID成功:', experimentId);
+            } else {
+                console.warn('未从URL参数中获取到实验ID');
+                $.modal.alertWarning('未获取到实验ID，请从实验列表页面进入');
+            }
+            
+            // 初始化文件上传控件
+            var options = {
+                uploadUrl: prefix + '/uploadFile',
+                allowedFileExtensions: ['jpg','jpeg','png','gif','bmp','webp','mp4','avi','mov','pdf','doc','docx','xls','xlsx','txt'],
+                showUpload: true,
+                showRemove: true,
+                browseClass: 'btn btn-primary',
+                dropZoneEnabled: true,
+                maxFileCount: 1,
+                autoReplace: true,
+                language: 'zh',
+                uploadExtraData: function() {
+                    var expId = $('#experimentIdInput').val();
+                    console.log('上传文件时的实验ID:', expId);
+                    if (!expId) {
+                        $.modal.alertError('请先选择实验ID');
+                        return false;
+                    }
+                    return {
+                        experimentId: expId
+                    };
+                }
+            };
+            
+            $("#fileUpload").fileinput(options)
+                .on('fileuploaded', function (event, data) {
+                    var rsp = data.response || {};
+                    if (rsp.code === 0) {
+                        // 自动填充文件信息
+                        $('#filePathValue').val(rsp.data.filePath);
+                        $('#bucketNameValue').val(rsp.data.bucketName);
+                        $('#objectNameValue').val(rsp.data.objectName);
+                        
+                        // 自动填充文件名和原始文件名
+                        if (rsp.data.fileName || rsp.data.originalFileName) {
+                            var originalName = rsp.data.fileName || rsp.data.originalFileName;
+                            $('#fileOriginalNameInput').val(originalName);
+                            if (!$('input[name="fileName"]').val()) {
+                                $('input[name="fileName"]').val(originalName);
+                            }
+                        }
+                        
+                        // 自动检测文件类型
+                        if (rsp.data.fileType) {
+                            $('select[name="fileType"]').val(rsp.data.fileType);
+                        } else {
+                            // 根据文件扩展名自动检测
+                            var fileName = rsp.data.fileName || rsp.data.originalFileName || '';
+                            var ext = fileName.split('.').pop().toLowerCase();
+                            var fileType = '';
+                            if (['jpg','jpeg','png','gif','bmp','webp'].includes(ext)) {
+                                fileType = 'image';
+                            } else if (['mp4','avi','mov','wmv','flv'].includes(ext)) {
+                                fileType = 'video';
+                            } else if (['pdf'].includes(ext)) {
+                                fileType = 'document';
+                            } else if (['doc','docx','xls','xlsx','txt'].includes(ext)) {
+                                fileType = 'document';
+                            } else {
+                                fileType = 'other';
+                            }
+                            $('select[name="fileType"]').val(fileType);
+                        }
+                        
+                        $.modal.msgSuccess('文件上传成功');
+                    } else {
+                        $.modal.alertError('文件上传失败：' + rsp.msg);
+                    }
+                })
+                .on('filesuccessremove filecleared', function () {
+                    $('#filePathValue').val('');
+                    $('#bucketNameValue').val('');
+                    $('#objectNameValue').val('');
+                });
+        });
+        
+        $("#form-SysExperimentFile-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-SysExperimentFile-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>
