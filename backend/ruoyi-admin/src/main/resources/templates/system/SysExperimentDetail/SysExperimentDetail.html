@@ -834,6 +834,9 @@
                                     '<a class="btn btn-danger btn-xs" onclick="deleteCageBinding(' + item.relationId + ')" shiro:hasPermission="system:SysExperimentCage:remove">' +
                                         '<i class="fa fa-remove"></i> 删除' +
                                     '</a>' +
+                                    '<a class="btn btn-info btn-xs" onclick="showCageDetail(' + item.cageId + ')" shiro:hasPermission="system:SysCage:view">' +
+                                        '<i class="fa fa-info"></i> 详情' +
+                                    '</a>' +
                                 '</td>' +
                             '</tr>';
                             tbody.append(row);
@@ -1134,6 +1137,12 @@
                 case 'BACKUP': return '备用组';
                 default: return role || '';
             }
+        }
+        
+        // 显示笼子详情
+        function showCageDetail(cageId) {
+            var url = ctx + "system/SysCageMouse?cageId=" + cageId;
+            $.modal.openTab("笼子-小鼠关系详情", url);
         }
     </script>
 </body>

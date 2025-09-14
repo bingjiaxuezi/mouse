@@ -49,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSysMouseList" parameterType="SysMouse" resultMap="SysMouseResult">
         <include refid="selectSysMouseVo"/>
         <where>  
+            <if test="mouseId != null"> and mouse_id = #{mouseId}</if>
             <if test="mouseCode != null  and mouseCode != ''"> and mouse_code = #{mouseCode}</if>
             <if test="mouseName != null  and mouseName != ''"> and mouse_name like concat('%', #{mouseName}, '%')</if>
             <if test="species != null  and species != ''"> and species = #{species}</if>

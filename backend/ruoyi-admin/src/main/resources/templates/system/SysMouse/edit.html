@@ -3,6 +3,7 @@
 <head>
     <th:block th:include="include :: header('修改小鼠基础信息')" />
     <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css" />
 </head>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
@@ -10,9 +11,10 @@
             <input name="mouseId" th:field="*{mouseId}" type="hidden">
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label is-required">小鼠编号：</label>
+                    <label class="col-sm-4 control-label">小鼠编号：</label>
                     <div class="col-sm-8">
-                        <input name="mouseCode" th:field="*{mouseCode}" class="form-control" type="text" required>
+                        <input name="mouseCode" th:field="*{mouseCode}" class="form-control" type="text" placeholder="留空将自动生成">
+                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如不填写，系统将自动生成唯一编号</span>
                     </div>
                 </div>
             </div>
@@ -67,7 +69,8 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">体重：</label>
                     <div class="col-sm-8">
-                        <input name="weight" th:field="*{weight}" class="form-control" type="text">
+                        <input name="weight" th:field="*{weight}" class="form-control" type="number" step="0.01" min="0" max="999999.99" placeholder="请输入体重（克）">
+                        <span class="help-block m-b-none">请输入数字，最多保留2位小数</span>
                     </div>
                 </div>
             </div>
@@ -75,17 +78,23 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">健康状态：</label>
                     <div class="col-sm-8">
-                        <select name="healthStatus" class="form-control" th:with="type=${@dict.getType('sys_health_status')}">
-                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{healthStatus}"></option>
+                        <select name="healthStatus" class="form-control" th:field="*{healthStatus}">
+                            <option value="HEALTHY">健康(HEALTHY)</option>
+                            <option value="SICK">生病(SICK)</option>
+                            <option value="QUARANTINE">隔离(QUARANTINE)</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
+            <div class="col-xs-12">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label">照片：</label>
-                    <div class="col-sm-8">
-                        <textarea name="photoUrl" class="form-control">[[*{photoUrl}]]</textarea>
+                    <label class="col-sm-2 control-label">照片：</label>
+                    <div class="col-sm-10">
+                        <div class="file-loading" style="clear: both; margin-bottom: 10px;">
+                            <input id="mousePhoto" name="file" type="file" accept="image/*">
+                        </div>
+                        <input type="hidden" id="photoUrlValue" name="photoUrl" th:value="*{photoUrl}">
+                        <span class="help-block m-b-none">支持 jpg、jpeg、png、gif、bmp、webp 格式，上传后会自动填充隐藏字段用于保存。</span>
                     </div>
                 </div>
             </div>
@@ -167,8 +176,11 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">繁殖状态：</label>
                     <div class="col-sm-8">
-                        <select name="breedingStatus" class="form-control" th:with="type=${@dict.getType('sys_breeding_status')}">
-                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{breedingStatus}"></option>
+                        <select name="breedingStatus" class="form-control" th:field="*{breedingStatus}">
+                            <option value="">请选择繁殖状态</option>
+                            <option value="NON_BREEDER">非繁殖(NON_BREEDER)</option>
+                            <option value="BREEDER">繁殖(BREEDER)</option>
+                            <option value="RETIRED">退役(RETIRED)</option>
                         </select>
                     </div>
                 </div>
@@ -177,7 +189,7 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">父亲小鼠ID：</label>
                     <div class="col-sm-8">
-                        <input name="fatherMouseId" th:field="*{fatherMouseId}" class="form-control" type="text">
+                        <input name="fatherMouseId" th:field="*{fatherMouseId}" class="form-control" type="number" min="1" placeholder="请输入父亲小鼠ID">
                     </div>
                 </div>
             </div>
@@ -185,7 +197,7 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">母亲小鼠ID：</label>
                     <div class="col-sm-8">
-                        <input name="motherMouseId" th:field="*{motherMouseId}" class="form-control" type="text">
+                        <input name="motherMouseId" th:field="*{motherMouseId}" class="form-control" type="number" min="1" placeholder="请输入母亲小鼠ID">
                     </div>
                 </div>
             </div>
@@ -201,8 +213,40 @@
     </div>
     <th:block th:include="include :: footer" />
     <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: bootstrap-fileinput-js" />
     <script th:inline="javascript">
         var prefix = ctx + "system/SysMouse";
+        $(function(){
+            // 初始化上传控件
+            var initial = $("#photoUrlValue").val();
+            var options = {
+                uploadUrl: ctx + 'common/upload',
+                allowedFileExtensions: ['jpg','jpeg','png','gif','bmp','webp'],
+                showUpload: true,
+                showRemove: true,
+                initialPreviewAsData: true,
+                browseClass: 'btn btn-primary',
+                dropZoneEnabled: false,
+                maxFileCount: 1,
+                autoReplace: true
+            };
+            if (initial) {
+                options.initialPreview = [initial];
+                options.overwriteInitial = true;
+            }
+            $("#mousePhoto").fileinput(options)
+                .on('fileuploaded', function (event, data) {
+                    var rsp = data.response || {};
+                    if (rsp.url) {
+                        $("#photoUrlValue").val(rsp.url);
+                    } else if (rsp.fileName) {
+                        $("#photoUrlValue").val(rsp.fileName);
+                    }
+                })
+                .on('filesuccessremove filecleared', function () {
+                    $("#photoUrlValue").val('');
+                });
+        });
         $("#form-SysMouse-edit").validate({
             focusCleanup: true
         });

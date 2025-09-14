@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCageMouseMapper">
+    
+    <resultMap type="SysCageMouse" id="SysCageMouseResult">
+        <result property="cageMouseId"    column="cage_mouse_id"    />
+        <result property="cageId"    column="cage_id"    />
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="moveInDate"    column="move_in_date"    />
+        <result property="moveOutDate"    column="move_out_date"    />
+        <result property="isCurrent"    column="is_current"    />
+        <result property="moveReason"    column="move_reason"    />
+        <result property="positionInCage"    column="position_in_cage"    />
+        <result property="priorityLevel"    column="priority_level"    />
+        <result property="socialGroup"    column="social_group"    />
+        <result property="isolationFlag"    column="isolation_flag"    />
+        <result property="feedingSchedule"    column="feeding_schedule"    />
+        <result property="monitoringLevel"    column="monitoring_level"    />
+        <result property="environmentalEnrichment"    column="environmental_enrichment"    />
+        <result property="healthCheckFrequency"    column="health_check_frequency"    />
+        <result property="lastHealthCheck"    column="last_health_check"    />
+        <result property="nextHealthCheck"    column="next_health_check"    />
+        <result property="weightAtMoveIn"    column="weight_at_move_in"    />
+        <result property="weightAtMoveOut"    column="weight_at_move_out"    />
+        <result property="behavioralNotes"    column="behavioral_notes"    />
+        <result property="specialCareInstructions"    column="special_care_instructions"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+    </resultMap>
+
+    <sql id="selectSysCageMouseVo">
+        select cage_mouse_id, cage_id, mouse_id, move_in_date, move_out_date, is_current, move_reason, position_in_cage, priority_level, social_group, isolation_flag, feeding_schedule, monitoring_level, environmental_enrichment, health_check_frequency, last_health_check, next_health_check, weight_at_move_in, weight_at_move_out, behavioral_notes, special_care_instructions, create_by, create_time, update_by, update_time, del_flag, remark, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5 from sys_cage_mouse
+    </sql>
+
+    <select id="selectSysCageMouseList" parameterType="SysCageMouse" resultMap="SysCageMouseResult">
+        <include refid="selectSysCageMouseVo"/>
+        <where>  
+            <if test="cageId != null "> and cage_id = #{cageId}</if>
+            <if test="mouseId != null "> and mouse_id = #{mouseId}</if>
+            <if test="moveInDate != null "> and move_in_date = #{moveInDate}</if>
+            <if test="moveOutDate != null "> and move_out_date = #{moveOutDate}</if>
+            <if test="isCurrent != null  and isCurrent != ''"> and is_current = #{isCurrent}</if>
+            <if test="moveReason != null  and moveReason != ''"> and move_reason = #{moveReason}</if>
+            <if test="positionInCage != null  and positionInCage != ''"> and position_in_cage = #{positionInCage}</if>
+            <if test="priorityLevel != null "> and priority_level = #{priorityLevel}</if>
+            <if test="socialGroup != null  and socialGroup != ''"> and social_group = #{socialGroup}</if>
+            <if test="isolationFlag != null  and isolationFlag != ''"> and isolation_flag = #{isolationFlag}</if>
+            <if test="monitoringLevel != null  and monitoringLevel != ''"> and monitoring_level = #{monitoringLevel}</if>
+            <if test="lastHealthCheck != null "> and last_health_check = #{lastHealthCheck}</if>
+            <if test="nextHealthCheck != null "> and next_health_check = #{nextHealthCheck}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCageMouseByCageMouseId" parameterType="Long" resultMap="SysCageMouseResult">
+        <include refid="selectSysCageMouseVo"/>
+        where cage_mouse_id = #{cageMouseId}
+    </select>
+
+    <insert id="insertSysCageMouse" parameterType="SysCageMouse" useGeneratedKeys="true" keyProperty="cageMouseId">
+        insert into sys_cage_mouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cageId != null">cage_id,</if>
+            <if test="mouseId != null">mouse_id,</if>
+            <if test="moveInDate != null">move_in_date,</if>
+            <if test="moveOutDate != null">move_out_date,</if>
+            <if test="isCurrent != null">is_current,</if>
+            <if test="moveReason != null">move_reason,</if>
+            <if test="positionInCage != null">position_in_cage,</if>
+            <if test="priorityLevel != null">priority_level,</if>
+            <if test="socialGroup != null">social_group,</if>
+            <if test="isolationFlag != null">isolation_flag,</if>
+            <if test="feedingSchedule != null">feeding_schedule,</if>
+            <if test="monitoringLevel != null">monitoring_level,</if>
+            <if test="environmentalEnrichment != null">environmental_enrichment,</if>
+            <if test="healthCheckFrequency != null">health_check_frequency,</if>
+            <if test="lastHealthCheck != null">last_health_check,</if>
+            <if test="nextHealthCheck != null">next_health_check,</if>
+            <if test="weightAtMoveIn != null">weight_at_move_in,</if>
+            <if test="weightAtMoveOut != null">weight_at_move_out,</if>
+            <if test="behavioralNotes != null">behavioral_notes,</if>
+            <if test="specialCareInstructions != null">special_care_instructions,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cageId != null">#{cageId},</if>
+            <if test="mouseId != null">#{mouseId},</if>
+            <if test="moveInDate != null">#{moveInDate},</if>
+            <if test="moveOutDate != null">#{moveOutDate},</if>
+            <if test="isCurrent != null">#{isCurrent},</if>
+            <if test="moveReason != null">#{moveReason},</if>
+            <if test="positionInCage != null">#{positionInCage},</if>
+            <if test="priorityLevel != null">#{priorityLevel},</if>
+            <if test="socialGroup != null">#{socialGroup},</if>
+            <if test="isolationFlag != null">#{isolationFlag},</if>
+            <if test="feedingSchedule != null">#{feedingSchedule},</if>
+            <if test="monitoringLevel != null">#{monitoringLevel},</if>
+            <if test="environmentalEnrichment != null">#{environmentalEnrichment},</if>
+            <if test="healthCheckFrequency != null">#{healthCheckFrequency},</if>
+            <if test="lastHealthCheck != null">#{lastHealthCheck},</if>
+            <if test="nextHealthCheck != null">#{nextHealthCheck},</if>
+            <if test="weightAtMoveIn != null">#{weightAtMoveIn},</if>
+            <if test="weightAtMoveOut != null">#{weightAtMoveOut},</if>
+            <if test="behavioralNotes != null">#{behavioralNotes},</if>
+            <if test="specialCareInstructions != null">#{specialCareInstructions},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCageMouse" parameterType="SysCageMouse">
+        update sys_cage_mouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cageId != null">cage_id = #{cageId},</if>
+            <if test="mouseId != null">mouse_id = #{mouseId},</if>
+            <if test="moveInDate != null">move_in_date = #{moveInDate},</if>
+            <if test="moveOutDate != null">move_out_date = #{moveOutDate},</if>
+            <if test="isCurrent != null">is_current = #{isCurrent},</if>
+            <if test="moveReason != null">move_reason = #{moveReason},</if>
+            <if test="positionInCage != null">position_in_cage = #{positionInCage},</if>
+            <if test="priorityLevel != null">priority_level = #{priorityLevel},</if>
+            <if test="socialGroup != null">social_group = #{socialGroup},</if>
+            <if test="isolationFlag != null">isolation_flag = #{isolationFlag},</if>
+            <if test="feedingSchedule != null">feeding_schedule = #{feedingSchedule},</if>
+            <if test="monitoringLevel != null">monitoring_level = #{monitoringLevel},</if>
+            <if test="environmentalEnrichment != null">environmental_enrichment = #{environmentalEnrichment},</if>
+            <if test="healthCheckFrequency != null">health_check_frequency = #{healthCheckFrequency},</if>
+            <if test="lastHealthCheck != null">last_health_check = #{lastHealthCheck},</if>
+            <if test="nextHealthCheck != null">next_health_check = #{nextHealthCheck},</if>
+            <if test="weightAtMoveIn != null">weight_at_move_in = #{weightAtMoveIn},</if>
+            <if test="weightAtMoveOut != null">weight_at_move_out = #{weightAtMoveOut},</if>
+            <if test="behavioralNotes != null">behavioral_notes = #{behavioralNotes},</if>
+            <if test="specialCareInstructions != null">special_care_instructions = #{specialCareInstructions},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+        </trim>
+        where cage_mouse_id = #{cageMouseId}
+    </update>
+
+    <delete id="deleteSysCageMouseByCageMouseId" parameterType="Long">
+        delete from sys_cage_mouse where cage_mouse_id = #{cageMouseId}
+    </delete>
+
+    <delete id="deleteSysCageMouseByCageMouseIds" parameterType="String">
+        delete from sys_cage_mouse where cage_mouse_id in 
+        <foreach item="cageMouseId" collection="array" open="(" separator="," close=")">
+            #{cageMouseId}
+        </foreach>
+    </delete>
+
+</mapper>

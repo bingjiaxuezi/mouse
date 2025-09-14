@@ -54,6 +54,11 @@ public class SysMouseServiceImpl implements ISysMouseService
     @Override
     public int insertSysMouse(SysMouse sysMouse)
     {
+        // 如果小鼠编号为空，自动生成UUID
+        if (sysMouse.getMouseCode() == null || sysMouse.getMouseCode().trim().isEmpty()) {
+            sysMouse.setMouseCode(java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16));
+        }
+        
         sysMouse.setCreateTime(DateUtils.getNowDate());
         return sysMouseMapper.insertSysMouse(sysMouse);
     }

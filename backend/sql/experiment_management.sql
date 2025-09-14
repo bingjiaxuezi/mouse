@@ -506,3 +506,72 @@ CREATE INDEX idx_experiment_file_build_time ON sys_experiment_file(build_time);
 -- 6. sys_experiment_file - 实验文件管理表
 -- 7. v_experiment_overview - 实验概览视图
 -- ===========================
+
+
+
+
+-- mouse_behavior.sys_cage definition
+
+CREATE TABLE `sys_cage` (
+  `cage_id` bigint NOT NULL AUTO_INCREMENT COMMENT '笼子ID',
+  `cage_code` varchar(50) NOT NULL COMMENT '笼子编号',
+  `cage_name` varchar(100) NOT NULL COMMENT '笼子名称',
+  `cage_type` varchar(50) DEFAULT 'STANDARD' COMMENT '笼子类型：STANDARD-标准笼,LARGE-大型笼,SPECIAL-特殊笼',
+  `laboratory_room` varchar(50) NOT NULL COMMENT '实验室房间',
+  `rack_number` varchar(20) DEFAULT NULL COMMENT '货架编号',
+  `position_row` int DEFAULT NULL COMMENT '行位置',
+  `position_column` int DEFAULT NULL COMMENT '列位置',
+  `max_capacity` int DEFAULT '5' COMMENT '最大容量(只)',
+  `current_count` int DEFAULT '0' COMMENT '当前小鼠数量',
+  `cage_status` varchar(20) DEFAULT 'AVAILABLE' COMMENT '笼子状态：AVAILABLE-可用,OCCUPIED-占用中,MAINTENANCE-维护中,DAMAGED-损坏,RETIRED-退役',
+  `temperature_range` varchar(20) DEFAULT '20-25' COMMENT '温度范围(°C)',
+  `humidity_range` varchar(20) DEFAULT '40-70' COMMENT '湿度范围(%)',
+  `qr_code_content` text COMMENT '笼子二维码内容',
+  `qr_code_image_url` varchar(500) DEFAULT NULL COMMENT '二维码图片URL',
+  `extend_info` text COMMENT '扩展信息(JSON格式)',
+  `extend_config` text COMMENT '扩展配置(JSON格式)',
+  `extend_data` text COMMENT '扩展数据(JSON格式)',
+  `extend_info1` text COMMENT '扩展信息1(JSON格式)',
+  `extend_info2` text COMMENT '扩展信息2(JSON格式)',
+  `extend_info3` text COMMENT '扩展信息3(JSON格式)',
+  `extend_info4` text COMMENT '扩展信息4(JSON格式)',
+  `extend_info5` text COMMENT '扩展信息5(JSON格式)',
+  `build_by` varchar(64) DEFAULT '' COMMENT '创建者',
+  `build_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `modify_by` varchar(64) DEFAULT '' COMMENT '更新者',
+  `modify_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `del_flag` char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`cage_id`),
+  UNIQUE KEY `uk_cage_code` (`cage_code`),
+  KEY `idx_cage_status` (`cage_status`),
+  KEY `idx_cage_type` (`cage_type`),
+  KEY `idx_rack_number` (`rack_number`),
+  KEY `idx_laboratory_room` (`laboratory_room`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='笼子管理表';
+
+
+
+-- mouse_behavior.t_mouse definition
+
+-- 1) 新的小鼠基础信息表（第三范式；已移除 experiment_id；仅索引不加外键） 
+DROP TABLE IF EXISTS sys_mouse; 
+CREATE TABLE sys_mouse ( mouse_id bigint NOT NULL AUTO_INCREMENT COMMENT '小鼠ID', mouse_code varchar(50) NOT NULL COMMENT '小鼠编号', mouse_name varchar(100) NOT NULL COMMENT '小鼠名称', species varchar(50) NOT NULL COMMENT '物种', strain varchar(100) DEFAULT NULL COMMENT '品系', gender char(1) NOT NULL COMMENT '性别（M男 F女）', birth_date date DEFAULT NULL COMMENT '出生日期', weight decimal(8,2) DEFAULT NULL COMMENT '体重（克）', health_status varchar(20) DEFAULT 'HEALTHY' COMMENT '健康状态：HEALTHY-健康，SICK-生病，QUARANTINE-隔离', photo_url varchar(500) DEFAULT NULL COMMENT '照片URL', rfid_tag varchar(50) DEFAULT NULL COMMENT 'RFID标签号', ear_tag varchar(50) DEFAULT NULL COMMENT '耳标号', status char(1) DEFAULT '0' COMMENT '状态（0正常 1死亡 2转移 3退役）', source varchar(100) DEFAULT NULL COMMENT '来源', supplier varchar(100) DEFAULT NULL COMMENT '供应商', arrival_date date DEFAULT NULL COMMENT '到达日期', weaning_date date DEFAULT NULL COMMENT '断奶日期', genotype text COMMENT '基因型信息', breeding_status varchar(20) DEFAULT 'NON_BREEDER' COMMENT '繁殖状态：NON_BREEDER-非繁殖，BREEDER-繁殖，RETIRED-退役', father_mouse_id bigint DEFAULT NULL COMMENT '父亲小鼠ID', mother_mouse_id bigint DEFAULT NULL COMMENT '母亲小鼠ID', create_by varchar(64) DEFAULT '' COMMENT '创建者', create_time datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', update_by varchar(64) DEFAULT '' COMMENT '更新者', update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间', del_flag char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）', remark varchar(500) DEFAULT NULL COMMENT '备注', extend_info text COMMENT '扩展信息(JSON格式)', extend_config text COMMENT '扩展配置(JSON格式)', extend_data text COMMENT '扩展数据(JSON格式)', extend_info1 text COMMENT '扩展信息1(JSON格式)', extend_info2 text COMMENT '扩展信息2(JSON格式)', extend_info3 text COMMENT '扩展信息3(JSON格式)', extend_info4 text COMMENT '扩展信息4(JSON格式)', extend_info5 text COMMENT '扩展信息5(JSON格式)', PRIMARY KEY (mouse_id), UNIQUE KEY uk_mouse_code (mouse_code), UNIQUE KEY uk_rfid_tag (rfid_tag), UNIQUE KEY uk_ear_tag (ear_tag), KEY idx_gender (gender), KEY idx_species (species), KEY idx_strain (strain), KEY idx_birth_date (birth_date), KEY idx_status (status), KEY idx_health_status (health_status), KEY idx_breeding_status (breeding_status), KEY idx_father_mouse (father_mouse_id), KEY idx_mother_mouse (mother_mouse_id), KEY idx_create_time (create_time) ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小鼠基础信息表';
+
+-- 2) 笼子-小鼠关系表（强化扩展字段；仅索引不加外键；支持同一只小鼠在不同时间段住不同笼子） 
+DROP TABLE IF EXISTS sys_cage_mouse; 
+CREATE TABLE sys_cage_mouse ( cage_mouse_id bigint NOT NULL AUTO_INCREMENT COMMENT '关系ID', cage_id bigint NOT NULL COMMENT '笼子ID', mouse_id bigint NOT NULL COMMENT '小鼠ID', move_in_date datetime NOT NULL COMMENT '迁入时间', move_out_date datetime DEFAULT NULL COMMENT '迁出时间', is_current char(1) DEFAULT '1' COMMENT '是否当前居住（0否 1是）', move_reason varchar(100) DEFAULT NULL COMMENT '迁移原因', position_in_cage varchar(20) DEFAULT NULL COMMENT '笼内位置', priority_level int DEFAULT '0' COMMENT '优先级（用于同笼分组）', social_group varchar(50) DEFAULT NULL COMMENT '社会群组标识', isolation_flag char(1) DEFAULT '0' COMMENT '隔离标识（0否 1是）', feeding_schedule varchar(100) DEFAULT NULL COMMENT '喂食计划', monitoring_level varchar(20) DEFAULT 'NORMAL' COMMENT '监控级别：LOW-低，NORMAL-普通，HIGH-高，CRITICAL-严重', environmental_enrichment text COMMENT '环境丰富化配置', health_check_frequency int DEFAULT '7' COMMENT '健康检查频率（天）', last_health_check datetime DEFAULT NULL COMMENT '上次健康检查时间', next_health_check datetime DEFAULT NULL COMMENT '下次健康检查时间', weight_at_move_in decimal(8,2) DEFAULT NULL COMMENT '迁入时体重（克）', weight_at_move_out decimal(8,2) DEFAULT NULL COMMENT '迁出时体重（克）', behavioral_notes text COMMENT '行为观察笔记', special_care_instructions text COMMENT '特殊护理说明', create_by varchar(64) DEFAULT '' COMMENT '创建者', create_time datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', update_by varchar(64) DEFAULT '' COMMENT '更新者', update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间', del_flag char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）', remark varchar(500) DEFAULT NULL COMMENT '备注', extend_info text COMMENT '扩展信息(JSON格式)', extend_config text COMMENT '扩展配置(JSON格式)', extend_data text COMMENT '扩展数据(JSON格式)', extend_info1 text COMMENT '扩展信息1(JSON格式)', extend_info2 text COMMENT '扩展信息2(JSON格式)', extend_info3 text COMMENT '扩展信息3(JSON格式)', extend_info4 text COMMENT '扩展信息4(JSON格式)', extend_info5 text COMMENT '扩展信息5(JSON格式)', PRIMARY KEY (cage_mouse_id), KEY idx_cage_id (cage_id), KEY idx_mouse_id (mouse_id), KEY idx_move_in_date (move_in_date), KEY idx_move_out_date (move_out_date), KEY idx_is_current (is_current), KEY idx_monitoring_level (monitoring_level), KEY idx_social_group (social_group), KEY idx_next_health_check (next_health_check), UNIQUE KEY uk_current_cage_mouse (cage_id, mouse_id, is_current) ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='笼子-小鼠关系表';
+
+-- 3) 行为类型字典表（支撑19类识别，方便扩展与配置） 
+DROP TABLE IF EXISTS sys_behavior_type; 
+CREATE TABLE sys_behavior_type ( behavior_type_id bigint NOT NULL AUTO_INCREMENT COMMENT '行为类型ID', behavior_code varchar(50) NOT NULL COMMENT '行为编码', behavior_name varchar(100) NOT NULL COMMENT '行为名称', behavior_category varchar(50) NOT NULL COMMENT '行为分类：LOCOMOTION-运动，FEEDING-进食，SOCIAL-社交，GROOMING-梳理，REST-休息，EXPLORATION-探索，AGGRESSION-攻击，MATING-交配，NESTING-筑巢', description text COMMENT '行为描述', detection_method varchar(50) DEFAULT NULL COMMENT '检测方法：CV-计算机视觉，SENSOR-传感器，MANUAL-人工', ai_model_version varchar(50) DEFAULT NULL COMMENT 'AI模型版本', confidence_threshold decimal(5,3) DEFAULT '0.8' COMMENT '置信度阈值', is_active char(1) DEFAULT '1' COMMENT '是否启用（0否 1是）', sort_order int DEFAULT '0' COMMENT '排序序号', color_code varchar(10) DEFAULT NULL COMMENT '颜色代码（用于图表显示）', icon_url varchar(500) DEFAULT NULL COMMENT '图标URL', create_by varchar(64) DEFAULT '' COMMENT '创建者', create_time datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', update_by varchar(64) DEFAULT '' COMMENT '更新者', update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间', del_flag char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）', remark varchar(500) DEFAULT NULL COMMENT '备注', extend_info text COMMENT '扩展信息(JSON格式)', extend_config text COMMENT '扩展配置(JSON格式)', PRIMARY KEY (behavior_type_id), UNIQUE KEY uk_behavior_code (behavior_code), KEY idx_behavior_category (behavior_category), KEY idx_detection_method (detection_method), KEY idx_is_active (is_active), KEY idx_sort_order (sort_order) ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='行为类型字典表';
+
+-- 初始化19种行为类型 
+INSERT INTO sys_behavior_type (behavior_code, behavior_name, behavior_category, description, detection_method, confidence_threshold, sort_order, color_code) VALUES ('WALKING', '行走', 'LOCOMOTION', '小鼠正常行走运动', 'CV', 0.85, 1, '#4CAF50'), ('RUNNING', '跑步', 'LOCOMOTION', '小鼠快速跑步运动', 'CV', 0.85, 2, '#FF9800'), ('JUMPING', '跳跃', 'LOCOMOTION', '小鼠跳跃动作', 'CV', 0.80, 3, '#2196F3'), ('REARING', '直立', 'LOCOMOTION', '小鼠后腿直立探索', 'CV', 0.80, 4, '#9C27B0'), ('CLIMBING', '攀爬', 'LOCOMOTION', '小鼠攀爬行为', 'CV', 0.75, 5, '#795548'), ('EATING', '进食', 'FEEDING', '小鼠进食行为', 'CV', 0.90, 6, '#4CAF50'), ('DRINKING', '饮水', 'FEEDING', '小鼠饮水行为', 'CV', 0.90, 7, '#03A9F4'), ('GROOMING', '梳理', 'GROOMING', '小鼠自我梳理行为', 'CV', 0.85, 8, '#FF5722'), ('SOCIAL_CONTACT', '社交接触', 'SOCIAL', '小鼠间的社交接触', 'CV', 0.80, 9, '#E91E63'), ('FIGHTING', '打斗', 'AGGRESSION', '小鼠间的攻击性行为', 'CV', 0.85, 10, '#F44336'), ('SLEEPING', '睡眠', 'REST', '小鼠睡眠或休息', 'CV', 0.90, 11, '#607D8B'), ('NESTING', '筑巢', 'NESTING', '小鼠筑巢行为', 'CV', 0.80, 12, '#8BC34A'), ('EXPLORATION', '探索', 'EXPLORATION', '小鼠探索环境行为', 'CV', 0.75, 13, '#FFC107'), ('FREEZING', '僵直', 'REST', '小鼠恐惧僵直行为', 'CV', 0.85, 14, '#9E9E9E'), ('MATING', '交配', 'MATING', '小鼠交配行为', 'CV', 0.80, 15, '#E91E63'), ('DIGGING', '挖掘', 'EXPLORATION', '小鼠挖掘行为', 'CV', 0.80, 16, '#795548'), ('SNIFFING', '嗅探', 'EXPLORATION', '小鼠嗅探行为', 'CV', 0.75, 17, '#FF9800'), ('STRETCHING', '伸展', 'GROOMING', '小鼠伸展身体', 'CV', 0.80, 18, '#3F51B5'), ('TAIL_RATTLING', '摆尾', 'SOCIAL', '小鼠摆尾行为', 'CV', 0.75, 19, '#009688');
+
+-- 4) 小鼠行为事件事实表（记录具体事件；experiment_id 可选用于“实验期间”打标） 
+DROP TABLE IF EXISTS sys_mouse_behavior_event; 
+CREATE TABLE sys_mouse_behavior_event ( event_id bigint NOT NULL AUTO_INCREMENT COMMENT '事件ID', mouse_id bigint NOT NULL COMMENT '小鼠ID', behavior_type_id bigint NOT NULL COMMENT '行为类型ID', cage_id bigint DEFAULT NULL COMMENT '笼子ID', experiment_id bigint DEFAULT NULL COMMENT '实验ID（如事件发生于某实验期间）', event_time datetime NOT NULL COMMENT '事件发生时间', duration_seconds int DEFAULT NULL COMMENT '持续时间（秒）', intensity_level varchar(20) DEFAULT 'NORMAL' COMMENT '强度级别：LOW-低，NORMAL-普通，HIGH-高，EXTREME-极高', confidence_score decimal(5,3) DEFAULT NULL COMMENT '检测置信度', detection_method varchar(50) DEFAULT NULL COMMENT '检测方法', x_coordinate decimal(10,3) DEFAULT NULL COMMENT 'X坐标', y_coordinate decimal(10,3) DEFAULT NULL COMMENT 'Y坐标', z_coordinate decimal(10,3) DEFAULT NULL COMMENT 'Z坐标', velocity decimal(10,3) DEFAULT NULL COMMENT '速度', acceleration decimal(10,3) DEFAULT NULL COMMENT '加速度', temperature decimal(5,2) DEFAULT NULL COMMENT '环境温度（°C）', humidity decimal(5,2) DEFAULT NULL COMMENT '环境湿度（%）', light_intensity decimal(10,3) DEFAULT NULL COMMENT '光照强度', sound_level decimal(10,3) DEFAULT NULL COMMENT '声音级别', interaction_target_mouse_id bigint DEFAULT NULL COMMENT '交互目标小鼠ID（社交行为）', video_clip_url varchar(500) DEFAULT NULL COMMENT '视频片段URL', image_url varchar(500) DEFAULT NULL COMMENT '截图URL', raw_data text COMMENT '原始数据（JSON格式）', processed_data text COMMENT '处理后数据（JSON格式）', analysis_results text COMMENT '分析结果（JSON格式）', anomaly_flag char(1) DEFAULT '0' COMMENT '异常标识（0正常 1异常）', quality_score decimal(5,3) DEFAULT NULL COMMENT '数据质量评分', operator_id varchar(64) DEFAULT NULL COMMENT '操作员ID（人工记录时）', device_id varchar(100) DEFAULT NULL COMMENT '设备ID', session_id varchar(100) DEFAULT NULL COMMENT '会话ID', create_by varchar(64) DEFAULT '' COMMENT '创建者', create_time datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间', update_by varchar(64) DEFAULT '' COMMENT '更新者', update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间', del_flag char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）', remark varchar(500) DEFAULT NULL COMMENT '备注', extend_info text COMMENT '扩展信息(JSON格式)', extend_config text COMMENT '扩展配置(JSON格式)', extend_data text COMMENT '扩展数据(JSON格式)', extend_info1 text COMMENT '扩展信息1(JSON格式)', extend_info2 text COMMENT '扩展信息2(JSON格式)', extend_info3 text COMMENT '扩展信息3(JSON格式)', PRIMARY KEY (event_id), KEY idx_mouse_id (mouse_id), KEY idx_behavior_type_id (behavior_type_id), KEY idx_cage_id (cage_id), KEY idx_experiment_id (experiment_id), KEY idx_event_time (event_time), KEY idx_detection_method (detection_method), KEY idx_confidence_score (confidence_score), KEY idx_anomaly_flag (anomaly_flag), KEY idx_session_id (session_id), KEY idx_device_id (device_id), KEY idx_interaction_target (interaction_target_mouse_id), KEY idx_mouse_behavior_time (mouse_id, behavior_type_id, event_time) ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小鼠行为事件事实表';
+
+
+

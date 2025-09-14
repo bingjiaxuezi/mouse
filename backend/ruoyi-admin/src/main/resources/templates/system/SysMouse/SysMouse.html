@@ -11,6 +11,10 @@
                     <div class="select-list">
                         <ul>
                             <li>
+                                <label>小鼠ID：</label>
+                                <input type="text" name="mouseId"/>
+                            </li>
+                            <li>
                                 <label>小鼠编号：</label>
                                 <input type="text" name="mouseCode"/>
                             </li>
@@ -145,6 +149,19 @@
         var prefix = ctx + "system/SysMouse";
 
         $(function() {
+            // 获取URL参数中的mouseId
+            var urlParams = new URLSearchParams(window.location.search);
+            var mouseId = urlParams.get('mouseId');
+            
+            // 如果有mouseId参数，自动填充到搜索框并执行搜索
+            if (mouseId) {
+                $('input[name="mouseId"]').val(mouseId);
+                // 延迟执行搜索，确保表格已初始化
+                setTimeout(function() {
+                    $.table.search();
+                }, 500);
+            }
+            
             var options = {
                 url: prefix + "/list",
                 createUrl: prefix + "/add",
@@ -155,10 +172,11 @@
                 columns: [{
                     checkbox: true
                 },
+
                 {
                     field: 'mouseId',
                     title: '小鼠ID',
-                    visible: false
+                    visible: true
                 },
                 {
                     field: 'mouseCode',
@@ -203,7 +221,15 @@
                 },
                 {
                     field: 'photoUrl',
-                    title: '照片'
+                    title: '照片',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        if (value && value.trim() !== '') {
+                            return '<img src="' + value + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showImagePreview(\'' + value + '\')" title="点击查看大图" />';
+                        } else {
+                            return '<span class="text-muted">无照片</span>';
+                        }
+                    }
                 },
                 {
                     field: 'rfidTag',
@@ -275,6 +301,31 @@
             };
             $.table.init(options);
         });
+
+        /* 图片预览功能 */
+        function showImagePreview(imageUrl) {
+            var modalHtml = '<div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog">' +
+                '<div class="modal-dialog modal-lg" role="document">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+                '<h4 class="modal-title">小鼠照片预览</h4>' +
+                '</div>' +
+                '<div class="modal-body text-center">' +
+                '<img src="' + imageUrl + '" style="max-width: 100%; max-height: 500px; object-fit: contain;" />' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            
+            // 移除已存在的模态框
+            $('#imagePreviewModal').remove();
+            // 添加新的模态框并显示
+            $('body').append(modalHtml);
+            $('#imagePreviewModal').modal('show');
+        }
     </script>
 </body>
 </html>

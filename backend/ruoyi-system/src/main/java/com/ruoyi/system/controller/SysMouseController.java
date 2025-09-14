@@ -18,6 +18,8 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import java.sql.SQLIntegrityConstraintViolationException;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * 小鼠基础信息Controller
@@ -87,7 +89,11 @@ public class SysMouseController extends BaseController
     @ResponseBody
     public AjaxResult addSave(SysMouse sysMouse)
     {
-        return toAjax(sysMouseService.insertSysMouse(sysMouse));
+        try {
+            return toAjax(sysMouseService.insertSysMouse(sysMouse));
+        } catch (Exception e) {
+            return handleDatabaseException(e);
+        }
     }
 
     /**
@@ -111,7 +117,11 @@ public class SysMouseController extends BaseController
     @ResponseBody
     public AjaxResult editSave(SysMouse sysMouse)
     {
-        return toAjax(sysMouseService.updateSysMouse(sysMouse));
+        try {
+            return toAjax(sysMouseService.updateSysMouse(sysMouse));
+        } catch (Exception e) {
+            return handleDatabaseException(e);
+        }
     }
 
     /**
@@ -124,5 +134,60 @@ public class SysMouseController extends BaseController
     public AjaxResult remove(String ids)
     {
         return toAjax(sysMouseService.deleteSysMouseByMouseIds(ids));
+    }
+    
+    /**
+     * 查看小鼠详情
+     */
+    @RequiresPermissions("system:SysMouse:view")
+    @GetMapping("/detail/{mouseId}")
+    public String detail(@PathVariable("mouseId") Long mouseId, ModelMap mmap)
+    {
+        SysMouse sysMouse = sysMouseService.selectSysMouseByMouseId(mouseId);
+        mmap.put("sysMouse", sysMouse);
+        return prefix + "/detail";
+    }
+    
+    /**
+     * 处理数据库异常，提供友好的错误信息
+     */
+    private AjaxResult handleDatabaseException(Exception e) {
+        String errorMessage = e.getMessage();
+        
+        // 处理RFID标签号重复
+        if (errorMessage.contains("uk_rfid_tag")) {
+            if (errorMessage.contains("Duplicate entry ''")) {
+                return AjaxResult.error("RFID标签号不能为空，请填写唯一的RFID标签号");
+            } else {
+                return AjaxResult.error("RFID标签号已存在，请使用不同的RFID标签号");
+            }
+        }
+        
+        // 处理耳标号重复
+        if (errorMessage.contains("uk_ear_tag")) {
+            if (errorMessage.contains("Duplicate entry ''")) {
+                return AjaxResult.error("耳标号不能为空，请填写唯一的耳标号");
+            } else {
+                return AjaxResult.error("耳标号已存在，请使用不同的耳标号");
+            }
+        }
+        
+        // 处理小鼠编号重复
+        if (errorMessage.contains("uk_mouse_code")) {
+            return AjaxResult.error("小鼠编号已存在，请使用不同的编号");
+        }
+        
+        // 处理其他唯一约束冲突
+        if (errorMessage.contains("Duplicate entry")) {
+            return AjaxResult.error("数据重复，请检查RFID标签号、耳标号等字段是否唯一");
+        }
+        
+        // 处理其他数据库约束异常
+        if (e instanceof SQLIntegrityConstraintViolationException || e instanceof DuplicateKeyException) {
+            return AjaxResult.error("数据约束冲突，请检查输入的数据是否符合要求");
+        }
+        
+        // 默认错误信息
+        return AjaxResult.error("操作失败：" + e.getMessage());
     }
 }

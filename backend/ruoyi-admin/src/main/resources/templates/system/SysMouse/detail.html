@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('小鼠详情')" />
+    <style>
+        .detail-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px;
+            overflow: hidden;
+        }
+        .detail-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .detail-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        .detail-content {
+            padding: 30px;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+        .detail-label {
+            width: 150px;
+            font-weight: 600;
+            color: #333;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            flex: 1;
+            color: #666;
+            word-break: break-all;
+        }
+        .photo-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .photo-container:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        .mouse-photo {
+            max-width: 280px;
+            max-height: 280px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            object-fit: cover;
+            border: 3px solid #fff;
+        }
+        .mouse-photo:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .no-photo {
+            width: 220px;
+            height: 220px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #ced4da;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 16px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+        .no-photo:hover {
+            border-color: #adb5bd;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .status-healthy { background: #d4edda; color: #155724; }
+        .status-sick { background: #f8d7da; color: #721c24; }
+        .status-quarantine { background: #fff3cd; color: #856404; }
+        .status-normal { background: #d1ecf1; color: #0c5460; }
+        .status-dead { background: #f8d7da; color: #721c24; }
+        .status-transferred { background: #e2e3e5; color: #383d41; }
+        .status-retired { background: #ffeaa7; color: #6c5ce7; }
+        .gender-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .gender-m { background: #cce5ff; color: #0066cc; }
+        .gender-f { background: #ffe0f0; color: #cc0066; }
+        .breeding-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .breeding-non-breeder { background: #e9ecef; color: #495057; }
+        .breeding-breeder { background: #d4edda; color: #155724; }
+        .breeding-retired { background: #fff3cd; color: #856404; }
+        .btn-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        .btn-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="detail-container">
+        <div class="detail-header">
+            <button type="button" class="btn-close" onclick="$.modal.close()">×</button>
+            <h2>小鼠详情信息</h2>
+            <p th:text="${sysMouse.mouseCode}" style="margin: 5px 0 0 0; opacity: 0.9;">小鼠编号</p>
+        </div>
+        
+        <div class="detail-content">
+            <!-- 照片展示 -->
+            <div class="photo-container" th:if="${sysMouse.photoUrl != null and sysMouse.photoUrl != ''}">
+                <img th:src="${sysMouse.photoUrl}" class="mouse-photo" 
+                     th:data-image-url="${sysMouse.photoUrl}"
+                     onclick="showImagePreview(this.getAttribute('data-image-url'))"
+                     alt="小鼠照片" title="点击查看大图" />
+            </div>
+            <div class="photo-container" th:if="${sysMouse.photoUrl == null or sysMouse.photoUrl == ''}">
+                <div class="no-photo">
+                    <i class="fa fa-image" style="margin-right: 8px;"></i>暂无照片
+                </div>
+            </div>
+            
+            <!-- 基本信息 -->
+            <div class="detail-row">
+                <div class="detail-label">小鼠编号：</div>
+                <div class="detail-value" th:text="${sysMouse.mouseCode}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">小鼠名称：</div>
+                <div class="detail-value" th:text="${sysMouse.mouseName ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">物种：</div>
+                <div class="detail-value" th:text="${sysMouse.species ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">品系：</div>
+                <div class="detail-value" th:text="${sysMouse.strain ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">性别：</div>
+                <div class="detail-value">
+                    <span th:if="${sysMouse.gender == 'M'}" class="gender-badge gender-m">雄性 (M)</span>
+                    <span th:if="${sysMouse.gender == 'F'}" class="gender-badge gender-f">雌性 (F)</span>
+                    <span th:if="${sysMouse.gender != 'M' and sysMouse.gender != 'F'}" th:text="${sysMouse.gender ?: '-'}">-</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">出生日期：</div>
+                <div class="detail-value" th:text="${#dates.format(sysMouse.birthDate, 'yyyy-MM-dd') ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">体重：</div>
+                <div class="detail-value">
+                    <span th:if="${sysMouse.weight != null}" th:text="${sysMouse.weight} + 'g'">-</span>
+                    <span th:if="${sysMouse.weight == null}">-</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">健康状态：</div>
+                <div class="detail-value">
+                    <span th:if="${sysMouse.healthStatus == 'HEALTHY'}" class="status-badge status-healthy">健康</span>
+                    <span th:if="${sysMouse.healthStatus == 'SICK'}" class="status-badge status-sick">生病</span>
+                    <span th:if="${sysMouse.healthStatus == 'QUARANTINE'}" class="status-badge status-quarantine">隔离</span>
+                    <span th:if="${sysMouse.healthStatus != 'HEALTHY' and sysMouse.healthStatus != 'SICK' and sysMouse.healthStatus != 'QUARANTINE'}" th:text="${sysMouse.healthStatus ?: '-'}">-</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">RFID标签号：</div>
+                <div class="detail-value" th:text="${sysMouse.rfidTag ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">耳标号：</div>
+                <div class="detail-value" th:text="${sysMouse.earTag ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">状态：</div>
+                <div class="detail-value">
+                    <span th:if="${sysMouse.status == '0'}" class="status-badge status-normal">正常</span>
+                    <span th:if="${sysMouse.status == '1'}" class="status-badge status-dead">死亡</span>
+                    <span th:if="${sysMouse.status == '2'}" class="status-badge status-transferred">转移</span>
+                    <span th:if="${sysMouse.status == '3'}" class="status-badge status-retired">退役</span>
+                    <span th:if="${sysMouse.status != '0' and sysMouse.status != '1' and sysMouse.status != '2' and sysMouse.status != '3'}" th:text="${sysMouse.status ?: '-'}">-</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">来源：</div>
+                <div class="detail-value" th:text="${sysMouse.source ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">供应商：</div>
+                <div class="detail-value" th:text="${sysMouse.supplier ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">到达日期：</div>
+                <div class="detail-value" th:text="${#dates.format(sysMouse.arrivalDate, 'yyyy-MM-dd') ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">断奶日期：</div>
+                <div class="detail-value" th:text="${#dates.format(sysMouse.weaningDate, 'yyyy-MM-dd') ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">基因型信息：</div>
+                <div class="detail-value" th:text="${sysMouse.genotype ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">繁殖状态：</div>
+                <div class="detail-value">
+                    <span th:if="${sysMouse.breedingStatus == 'NON_BREEDER'}" class="breeding-badge breeding-non-breeder">非繁殖</span>
+                    <span th:if="${sysMouse.breedingStatus == 'BREEDER'}" class="breeding-badge breeding-breeder">繁殖</span>
+                    <span th:if="${sysMouse.breedingStatus == 'RETIRED'}" class="breeding-badge breeding-retired">退役</span>
+                    <span th:if="${sysMouse.breedingStatus != 'NON_BREEDER' and sysMouse.breedingStatus != 'BREEDER' and sysMouse.breedingStatus != 'RETIRED'}" th:text="${sysMouse.breedingStatus ?: '-'}">-</span>
+                </div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">父亲小鼠ID：</div>
+                <div class="detail-value" th:text="${sysMouse.fatherMouseId ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">母亲小鼠ID：</div>
+                <div class="detail-value" th:text="${sysMouse.motherMouseId ?: '-'}">-</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label">备注：</div>
+                <div class="detail-value" th:text="${sysMouse.remark ?: '-'}">-</div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block th:include="include :: footer" />
+    <script>
+        /* 图片预览功能 */
+        function showImagePreview(imageUrl) {
+            var modalHtml = '<div class="modal fade" id="imagePreviewModal" tabindex="-1" role="dialog">' +
+                '<div class="modal-dialog modal-lg" role="document">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+                '<h4 class="modal-title">小鼠照片预览</h4>' +
+                '</div>' +
+                '<div class="modal-body text-center">' +
+                '<img src="' + imageUrl + '" style="max-width: 100%; max-height: 500px; object-fit: contain;" />' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            
+            // 移除已存在的模态框
+            $('#imagePreviewModal').remove();
+            // 添加新的模态框并显示
+            $('body').append(modalHtml);
+            $('#imagePreviewModal').modal('show');
+        }
+    </script>
+</body>
+</html>

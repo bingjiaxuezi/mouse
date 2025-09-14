@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('笼子-小鼠关系列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>笼子ID：</label>
+                                <input type="text" name="cageId"/>
+                            </li>
+                            <li>
+                                <label>小鼠ID：</label>
+                                <input type="text" name="mouseId"/>
+                            </li>
+                            <li>
+                                <label>迁入时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择迁入时间" name="moveInDate"/>
+                            </li>
+                            <li>
+                                <label>迁出时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择迁出时间" name="moveOutDate"/>
+                            </li>
+                            <li>
+                                <label>是否当前居住：</label>
+                                <select name="isCurrent" th:with="type=${@dict.getType('sys_yes_or_no')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>迁移原因：</label>
+                                <input type="text" name="moveReason"/>
+                            </li>
+                            <li>
+                                <label>笼内位置：</label>
+                                <input type="text" name="positionInCage"/>
+                            </li>
+                            <li>
+                                <label>优先级：</label>
+                                <input type="text" name="priorityLevel"/>
+                            </li>
+                            <li>
+                                <label>社会群组标识：</label>
+                                <input type="text" name="socialGroup"/>
+                            </li>
+                            <li>
+                                <label>隔离标识：</label>
+                                <select name="isolationFlag" th:with="type=${@dict.getType('sys_yes_or_no')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>监控级别：：</label>
+                                <select name="monitoringLevel" th:with="type=${@dict.getType('sys_monitoring_level')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>上次健康检查时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择上次健康检查时间" name="lastHealthCheck"/>
+                            </li>
+                            <li>
+                                <label>下次健康检查时间：</label>
+                                <input type="text" class="time-input" placeholder="请选择下次健康检查时间" name="nextHealthCheck"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:SysCageMouse:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:SysCageMouse:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:SysCageMouse:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:SysCageMouse:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:SysCageMouse:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:SysCageMouse:remove')}]];
+        var detailFlag = [[${@permission.hasPermi('system:SysMouse:view')}]];
+        var isCurrentDatas = [[${@dict.getType('sys_yes_or_no')}]];
+        var isolationFlagDatas = [[${@dict.getType('sys_yes_or_no')}]];
+        var monitoringLevelDatas = [[${@dict.getType('sys_monitoring_level')}]];
+        var prefix = ctx + "system/SysCageMouse";
+
+        $(function() {
+            // 获取URL参数中的cageId
+            var urlParams = new URLSearchParams(window.location.search);
+            var cageId = urlParams.get('cageId');
+            
+            // 如果有cageId参数，自动填充到搜索框并执行搜索
+            if (cageId) {
+                $('input[name="cageId"]').val(cageId);
+                // 延迟执行搜索，确保表格已初始化
+                setTimeout(function() {
+                    $.table.search();
+                }, 500);
+            }
+            
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "笼子-小鼠关系",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'cageMouseId',
+                    title: '关系ID',
+                    visible: false
+                },
+                {
+                    field: 'cageId',
+                    title: '笼子ID'
+                },
+                {
+                    field: 'mouseId',
+                    title: '小鼠ID'
+                },
+                {
+                    field: 'moveInDate',
+                    title: '迁入时间'
+                },
+                {
+                    field: 'moveOutDate',
+                    title: '迁出时间'
+                },
+                {
+                    field: 'isCurrent',
+                    title: '是否当前居住',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(isCurrentDatas, value);
+                    }
+                },
+                {
+                    field: 'moveReason',
+                    title: '迁移原因'
+                },
+                {
+                    field: 'positionInCage',
+                    title: '笼内位置'
+                },
+                {
+                    field: 'priorityLevel',
+                    title: '优先级'
+                },
+                {
+                    field: 'socialGroup',
+                    title: '社会群组标识'
+                },
+                {
+                    field: 'isolationFlag',
+                    title: '隔离标识',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(isolationFlagDatas, value);
+                    }
+                },
+                {
+                    field: 'feedingSchedule',
+                    title: '喂食备注'
+                },
+                {
+                    field: 'monitoringLevel',
+                    title: '监控级别：',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(monitoringLevelDatas, value);
+                    }
+                },
+                {
+                    field: 'environmentalEnrichment',
+                    title: '环境丰富化配置'
+                },
+                {
+                    field: 'healthCheckFrequency',
+                    title: '健康检查频率'
+                },
+                {
+                    field: 'lastHealthCheck',
+                    title: '上次健康检查时间'
+                },
+                {
+                    field: 'nextHealthCheck',
+                    title: '下次健康检查时间'
+                },
+                {
+                    field: 'weightAtMoveIn',
+                    title: '迁入时体重'
+                },
+                {
+                    field: 'weightAtMoveOut',
+                    title: '迁出时体重'
+                },
+                {
+                    field: 'behavioralNotes',
+                    title: '行为观察笔记'
+                },
+                {
+                    field: 'specialCareInstructions',
+                    title: '特殊护理说明'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.cageMouseId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.cageMouseId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-primary btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="showMouseDetail(\'' + row.mouseId + '\')"><i class="fa fa-detail"></i>详情</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+        
+        /* 显示小鼠详情 */
+        function showMouseDetail(mouseId) {
+            var url = ctx + "system/SysMouse?mouseId=" + mouseId;
+            $.modal.openTab("小鼠详情", url);
+        }
+    </script>
+</body>
+</html>
