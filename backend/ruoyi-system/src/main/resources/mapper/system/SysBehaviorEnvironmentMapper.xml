@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBehaviorEnvironmentMapper">
+    
+    <resultMap type="SysBehaviorEnvironment" id="SysBehaviorEnvironmentResult">
+        <result property="envId"    column="env_id"    />
+        <result property="eventId"    column="event_id"    />
+        <result property="temperature"    column="temperature"    />
+        <result property="humidity"    column="humidity"    />
+        <result property="lightIntensity"    column="light_intensity"    />
+        <result property="soundLevel"    column="sound_level"    />
+        <result property="airPressure"    column="air_pressure"    />
+        <result property="co2Level"    column="co2_level"    />
+        <result property="lightCyclePhase"    column="light_cycle_phase"    />
+        <result property="lightColorTemp"    column="light_color_temp"    />
+        <result property="recordTime"    column="record_time"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap id="SysBehaviorEnvironmentSysBehaviorEventResult" type="SysBehaviorEnvironment" extends="SysBehaviorEnvironmentResult">
+        <collection property="sysBehaviorEventList" ofType="SysBehaviorEvent" column="env_id" select="selectSysBehaviorEventList" />
+    </resultMap>
+
+    <resultMap type="SysBehaviorEvent" id="SysBehaviorEventResult">
+        <result property="eventId"    column="event_id"    />
+        <result property="sessionId"    column="session_id"    />
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="behaviorTypeId"    column="behavior_type_id"    />
+        <result property="eventStartTime"    column="event_start_time"    />
+        <result property="eventEndTime"    column="event_end_time"    />
+        <result property="durationSeconds"    column="duration_seconds"    />
+        <result property="intensityLevel"    column="intensity_level"    />
+        <result property="confidenceScore"    column="confidence_score"    />
+        <result property="detectionMethod"    column="detection_method"    />
+        <result property="startXCoordinate"    column="start_x_coordinate"    />
+        <result property="startYCoordinate"    column="start_y_coordinate"    />
+        <result property="endXCoordinate"    column="end_x_coordinate"    />
+        <result property="endYCoordinate"    column="end_y_coordinate"    />
+        <result property="maxVelocity"    column="max_velocity"    />
+        <result property="avgVelocity"    column="avg_velocity"    />
+        <result property="maxAcceleration"    column="max_acceleration"    />
+        <result property="distanceTraveled"    column="distance_traveled"    />
+        <result property="interactionTargetMouseId"    column="interaction_target_mouse_id"    />
+        <result property="interactionType"    column="interaction_type"    />
+        <result property="anomalyFlag"    column="anomaly_flag"    />
+        <result property="qualityScore"    column="quality_score"    />
+        <result property="validationStatus"    column="validation_status"    />
+        <result property="validatorId"    column="validator_id"    />
+        <result property="validationTime"    column="validation_time"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysBehaviorEnvironmentVo">
+        select env_id, event_id, temperature, humidity, light_intensity, sound_level, air_pressure, co2_level, light_cycle_phase, light_color_temp, record_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_behavior_environment
+    </sql>
+
+    <select id="selectSysBehaviorEnvironmentList" parameterType="SysBehaviorEnvironment" resultMap="SysBehaviorEnvironmentResult">
+        <include refid="selectSysBehaviorEnvironmentVo"/>
+        <where>  
+            <if test="eventId != null "> and event_id = #{eventId}</if>
+            <if test="temperature != null "> and temperature = #{temperature}</if>
+            <if test="humidity != null "> and humidity = #{humidity}</if>
+            <if test="lightIntensity != null "> and light_intensity = #{lightIntensity}</if>
+            <if test="soundLevel != null "> and sound_level = #{soundLevel}</if>
+            <if test="airPressure != null "> and air_pressure = #{airPressure}</if>
+            <if test="co2Level != null "> and co2_level = #{co2Level}</if>
+            <if test="lightCyclePhase != null  and lightCyclePhase != ''"> and light_cycle_phase = #{lightCyclePhase}</if>
+            <if test="lightColorTemp != null "> and light_color_temp = #{lightColorTemp}</if>
+            <if test="recordTime != null "> and record_time = #{recordTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysBehaviorEnvironmentByEnvId" parameterType="Long" resultMap="SysBehaviorEnvironmentSysBehaviorEventResult">
+        select env_id, event_id, temperature, humidity, light_intensity, sound_level, air_pressure, co2_level, light_cycle_phase, light_color_temp, record_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark
+        from sys_behavior_environment
+        where env_id = #{envId}
+    </select>
+
+    <select id="selectSysBehaviorEventList" resultMap="SysBehaviorEventResult">
+        select event_id, session_id, mouse_id, behavior_type_id, event_start_time, event_end_time, duration_seconds, intensity_level, confidence_score, detection_method, start_x_coordinate, start_y_coordinate, end_x_coordinate, end_y_coordinate, max_velocity, avg_velocity, max_acceleration, distance_traveled, interaction_target_mouse_id, interaction_type, anomaly_flag, quality_score, validation_status, validator_id, validation_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark
+        from sys_behavior_event
+        where event_id = #{event_id}
+    </select>
+
+    <insert id="insertSysBehaviorEnvironment" parameterType="SysBehaviorEnvironment" useGeneratedKeys="true" keyProperty="envId">
+        insert into sys_behavior_environment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="eventId != null">event_id,</if>
+            <if test="temperature != null">temperature,</if>
+            <if test="humidity != null">humidity,</if>
+            <if test="lightIntensity != null">light_intensity,</if>
+            <if test="soundLevel != null">sound_level,</if>
+            <if test="airPressure != null">air_pressure,</if>
+            <if test="co2Level != null">co2_level,</if>
+            <if test="lightCyclePhase != null">light_cycle_phase,</if>
+            <if test="lightColorTemp != null">light_color_temp,</if>
+            <if test="recordTime != null">record_time,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="eventId != null">#{eventId},</if>
+            <if test="temperature != null">#{temperature},</if>
+            <if test="humidity != null">#{humidity},</if>
+            <if test="lightIntensity != null">#{lightIntensity},</if>
+            <if test="soundLevel != null">#{soundLevel},</if>
+            <if test="airPressure != null">#{airPressure},</if>
+            <if test="co2Level != null">#{co2Level},</if>
+            <if test="lightCyclePhase != null">#{lightCyclePhase},</if>
+            <if test="lightColorTemp != null">#{lightColorTemp},</if>
+            <if test="recordTime != null">#{recordTime},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBehaviorEnvironment" parameterType="SysBehaviorEnvironment">
+        update sys_behavior_environment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="eventId != null">event_id = #{eventId},</if>
+            <if test="temperature != null">temperature = #{temperature},</if>
+            <if test="humidity != null">humidity = #{humidity},</if>
+            <if test="lightIntensity != null">light_intensity = #{lightIntensity},</if>
+            <if test="soundLevel != null">sound_level = #{soundLevel},</if>
+            <if test="airPressure != null">air_pressure = #{airPressure},</if>
+            <if test="co2Level != null">co2_level = #{co2Level},</if>
+            <if test="lightCyclePhase != null">light_cycle_phase = #{lightCyclePhase},</if>
+            <if test="lightColorTemp != null">light_color_temp = #{lightColorTemp},</if>
+            <if test="recordTime != null">record_time = #{recordTime},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where env_id = #{envId}
+    </update>
+
+    <delete id="deleteSysBehaviorEnvironmentByEnvId" parameterType="Long">
+        delete from sys_behavior_environment where env_id = #{envId}
+    </delete>
+
+    <delete id="deleteSysBehaviorEnvironmentByEnvIds" parameterType="String">
+        delete from sys_behavior_environment where env_id in 
+        <foreach item="envId" collection="array" open="(" separator="," close=")">
+            #{envId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSysBehaviorEventByEventIds" parameterType="String">
+        delete from sys_behavior_event where event_id in 
+        <foreach item="eventId" collection="array" open="(" separator="," close=")">
+            #{eventId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSysBehaviorEventByEventId" parameterType="Long">
+        delete from sys_behavior_event where event_id = #{eventId}
+    </delete>
+
+    <insert id="batchSysBehaviorEvent">
+        insert into sys_behavior_event( event_id, session_id, mouse_id, behavior_type_id, event_start_time, event_end_time, duration_seconds, intensity_level, confidence_score, detection_method, start_x_coordinate, start_y_coordinate, end_x_coordinate, end_y_coordinate, max_velocity, avg_velocity, max_acceleration, distance_traveled, interaction_target_mouse_id, interaction_type, anomaly_flag, quality_score, validation_status, validator_id, validation_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.eventId}, #{item.sessionId}, #{item.mouseId}, #{item.behaviorTypeId}, #{item.eventStartTime}, #{item.eventEndTime}, #{item.durationSeconds}, #{item.intensityLevel}, #{item.confidenceScore}, #{item.detectionMethod}, #{item.startXCoordinate}, #{item.startYCoordinate}, #{item.endXCoordinate}, #{item.endYCoordinate}, #{item.maxVelocity}, #{item.avgVelocity}, #{item.maxAcceleration}, #{item.distanceTraveled}, #{item.interactionTargetMouseId}, #{item.interactionType}, #{item.anomalyFlag}, #{item.qualityScore}, #{item.validationStatus}, #{item.validatorId}, #{item.validationTime}, #{item.extendInfo}, #{item.extendConfig}, #{item.extendData}, #{item.extendInfo1}, #{item.extendInfo2}, #{item.extendInfo3}, #{item.extendInfo4}, #{item.extendInfo5}, #{item.buildBy}, #{item.buildTime}, #{item.modifyBy}, #{item.modifyTime}, #{item.delFlag}, #{item.remark})
+        </foreach>
+    </insert>
+
+</mapper>

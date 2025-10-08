@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBehaviorTypeMapper">
+    
+    <resultMap type="SysBehaviorType" id="SysBehaviorTypeResult">
+        <result property="behaviorTypeId"    column="behavior_type_id"    />
+        <result property="behaviorCode"    column="behavior_code"    />
+        <result property="behaviorName"    column="behavior_name"    />
+        <result property="behaviorCategory"    column="behavior_category"    />
+        <result property="description"    column="description"    />
+        <result property="detectionMethod"    column="detection_method"    />
+        <result property="aiModelVersion"    column="ai_model_version"    />
+        <result property="confidenceThreshold"    column="confidence_threshold"    />
+        <result property="isActive"    column="is_active"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="colorCode"    column="color_code"    />
+        <result property="iconUrl"    column="icon_url"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+    </resultMap>
+
+    <sql id="selectSysBehaviorTypeVo">
+        select behavior_type_id, behavior_code, behavior_name, behavior_category, description, detection_method, ai_model_version, confidence_threshold, is_active, sort_order, color_code, icon_url, create_by, create_time, update_by, update_time, del_flag, remark, extend_info, extend_config from sys_behavior_type
+    </sql>
+
+    <select id="selectSysBehaviorTypeList" parameterType="SysBehaviorType" resultMap="SysBehaviorTypeResult">
+        <include refid="selectSysBehaviorTypeVo"/>
+        <where>  
+            <if test="behaviorCode != null  and behaviorCode != ''"> and behavior_code = #{behaviorCode}</if>
+            <if test="behaviorName != null  and behaviorName != ''"> and behavior_name like concat('%', #{behaviorName}, '%')</if>
+            <if test="behaviorCategory != null  and behaviorCategory != ''"> and behavior_category = #{behaviorCategory}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="detectionMethod != null  and detectionMethod != ''"> and detection_method = #{detectionMethod}</if>
+            <if test="aiModelVersion != null  and aiModelVersion != ''"> and ai_model_version = #{aiModelVersion}</if>
+            <if test="confidenceThreshold != null "> and confidence_threshold = #{confidenceThreshold}</if>
+            <if test="isActive != null  and isActive != ''"> and is_active = #{isActive}</if>
+            <if test="sortOrder != null "> and sort_order = #{sortOrder}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysBehaviorTypeByBehaviorTypeId" parameterType="Long" resultMap="SysBehaviorTypeResult">
+        <include refid="selectSysBehaviorTypeVo"/>
+        where behavior_type_id = #{behaviorTypeId}
+    </select>
+
+    <insert id="insertSysBehaviorType" parameterType="SysBehaviorType" useGeneratedKeys="true" keyProperty="behaviorTypeId">
+        insert into sys_behavior_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="behaviorCode != null and behaviorCode != ''">behavior_code,</if>
+            <if test="behaviorName != null and behaviorName != ''">behavior_name,</if>
+            <if test="behaviorCategory != null and behaviorCategory != ''">behavior_category,</if>
+            <if test="description != null">description,</if>
+            <if test="detectionMethod != null">detection_method,</if>
+            <if test="aiModelVersion != null">ai_model_version,</if>
+            <if test="confidenceThreshold != null">confidence_threshold,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="colorCode != null">color_code,</if>
+            <if test="iconUrl != null">icon_url,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="behaviorCode != null and behaviorCode != ''">#{behaviorCode},</if>
+            <if test="behaviorName != null and behaviorName != ''">#{behaviorName},</if>
+            <if test="behaviorCategory != null and behaviorCategory != ''">#{behaviorCategory},</if>
+            <if test="description != null">#{description},</if>
+            <if test="detectionMethod != null">#{detectionMethod},</if>
+            <if test="aiModelVersion != null">#{aiModelVersion},</if>
+            <if test="confidenceThreshold != null">#{confidenceThreshold},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="colorCode != null">#{colorCode},</if>
+            <if test="iconUrl != null">#{iconUrl},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBehaviorType" parameterType="SysBehaviorType">
+        update sys_behavior_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="behaviorCode != null and behaviorCode != ''">behavior_code = #{behaviorCode},</if>
+            <if test="behaviorName != null and behaviorName != ''">behavior_name = #{behaviorName},</if>
+            <if test="behaviorCategory != null and behaviorCategory != ''">behavior_category = #{behaviorCategory},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="detectionMethod != null">detection_method = #{detectionMethod},</if>
+            <if test="aiModelVersion != null">ai_model_version = #{aiModelVersion},</if>
+            <if test="confidenceThreshold != null">confidence_threshold = #{confidenceThreshold},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="colorCode != null">color_code = #{colorCode},</if>
+            <if test="iconUrl != null">icon_url = #{iconUrl},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+        </trim>
+        where behavior_type_id = #{behaviorTypeId}
+    </update>
+
+    <delete id="deleteSysBehaviorTypeByBehaviorTypeId" parameterType="Long">
+        delete from sys_behavior_type where behavior_type_id = #{behaviorTypeId}
+    </delete>
+
+    <delete id="deleteSysBehaviorTypeByBehaviorTypeIds" parameterType="String">
+        delete from sys_behavior_type where behavior_type_id in 
+        <foreach item="behaviorTypeId" collection="array" open="(" separator="," close=")">
+            #{behaviorTypeId}
+        </foreach>
+    </delete>
+
+</mapper>

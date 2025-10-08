@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBehaviorSessionMapper">
+    
+    <resultMap type="SysBehaviorSession" id="SysBehaviorSessionResult">
+        <result property="sessionId"    column="session_id"    />
+        <result property="sessionCode"    column="session_code"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="cageId"    column="cage_id"    />
+        <result property="sessionStartTime"    column="session_start_time"    />
+        <result property="sessionEndTime"    column="session_end_time"    />
+        <result property="plannedDuration"    column="planned_duration"    />
+        <result property="actualDuration"    column="actual_duration"    />
+        <result property="sessionStatus"    column="session_status"    />
+        <result property="sessionType"    column="session_type"    />
+        <result property="monitoringConfig"    column="monitoring_config"    />
+        <result property="avgTemperature"    column="avg_temperature"    />
+        <result property="avgHumidity"    column="avg_humidity"    />
+        <result property="avgLightIntensity"    column="avg_light_intensity"    />
+        <result property="avgSoundLevel"    column="avg_sound_level"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceVersion"    column="device_version"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="totalEvents"    column="total_events"    />
+        <result property="totalMice"    column="total_mice"    />
+        <result property="dataQualityScore"    column="data_quality_score"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysBehaviorSessionVo">
+        select session_id, session_code, experiment_id, cage_id, session_start_time, session_end_time, planned_duration, actual_duration, session_status, session_type, monitoring_config, avg_temperature, avg_humidity, avg_light_intensity, avg_sound_level, device_id, device_version, operator_id, total_events, total_mice, data_quality_score, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_behavior_session
+    </sql>
+
+    <select id="selectSysBehaviorSessionList" parameterType="SysBehaviorSession" resultMap="SysBehaviorSessionResult">
+        <include refid="selectSysBehaviorSessionVo"/>
+        <where>  
+            <if test="sessionCode != null  and sessionCode != ''"> and session_code = #{sessionCode}</if>
+            <if test="experimentId != null "> and experiment_id = #{experimentId}</if>
+            <if test="cageId != null "> and cage_id = #{cageId}</if>
+            <if test="sessionStartTime != null "> and session_start_time = #{sessionStartTime}</if>
+            <if test="sessionEndTime != null "> and session_end_time = #{sessionEndTime}</if>
+            <if test="plannedDuration != null "> and planned_duration = #{plannedDuration}</if>
+            <if test="actualDuration != null "> and actual_duration = #{actualDuration}</if>
+            <if test="sessionStatus != null  and sessionStatus != ''"> and session_status = #{sessionStatus}</if>
+            <if test="sessionType != null  and sessionType != ''"> and session_type = #{sessionType}</if>
+            <if test="monitoringConfig != null  and monitoringConfig != ''"> and monitoring_config = #{monitoringConfig}</if>
+            <if test="avgTemperature != null "> and avg_temperature = #{avgTemperature}</if>
+            <if test="avgHumidity != null "> and avg_humidity = #{avgHumidity}</if>
+            <if test="avgLightIntensity != null "> and avg_light_intensity = #{avgLightIntensity}</if>
+            <if test="avgSoundLevel != null "> and avg_sound_level = #{avgSoundLevel}</if>
+            <if test="deviceId != null  and deviceId != ''"> and device_id = #{deviceId}</if>
+            <if test="deviceVersion != null  and deviceVersion != ''"> and device_version = #{deviceVersion}</if>
+            <if test="operatorId != null  and operatorId != ''"> and operator_id = #{operatorId}</if>
+            <if test="totalEvents != null "> and total_events = #{totalEvents}</if>
+            <if test="totalMice != null "> and total_mice = #{totalMice}</if>
+            <if test="dataQualityScore != null "> and data_quality_score = #{dataQualityScore}</if>
+            <if test="buildTime != null "> and build_time = #{buildTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysBehaviorSessionBySessionId" parameterType="Long" resultMap="SysBehaviorSessionResult">
+        <include refid="selectSysBehaviorSessionVo"/>
+        where session_id = #{sessionId}
+    </select>
+
+    <insert id="insertSysBehaviorSession" parameterType="SysBehaviorSession" useGeneratedKeys="true" keyProperty="sessionId">
+        insert into sys_behavior_session
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sessionCode != null and sessionCode != ''">session_code,</if>
+            <if test="experimentId != null">experiment_id,</if>
+            <if test="cageId != null">cage_id,</if>
+            <if test="sessionStartTime != null">session_start_time,</if>
+            <if test="sessionEndTime != null">session_end_time,</if>
+            <if test="plannedDuration != null">planned_duration,</if>
+            <if test="actualDuration != null">actual_duration,</if>
+            <if test="sessionStatus != null">session_status,</if>
+            <if test="sessionType != null">session_type,</if>
+            <if test="monitoringConfig != null">monitoring_config,</if>
+            <if test="avgTemperature != null">avg_temperature,</if>
+            <if test="avgHumidity != null">avg_humidity,</if>
+            <if test="avgLightIntensity != null">avg_light_intensity,</if>
+            <if test="avgSoundLevel != null">avg_sound_level,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="deviceVersion != null">device_version,</if>
+            <if test="operatorId != null">operator_id,</if>
+            <if test="totalEvents != null">total_events,</if>
+            <if test="totalMice != null">total_mice,</if>
+            <if test="dataQualityScore != null">data_quality_score,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sessionCode != null and sessionCode != ''">#{sessionCode},</if>
+            <if test="experimentId != null">#{experimentId},</if>
+            <if test="cageId != null">#{cageId},</if>
+            <if test="sessionStartTime != null">#{sessionStartTime},</if>
+            <if test="sessionEndTime != null">#{sessionEndTime},</if>
+            <if test="plannedDuration != null">#{plannedDuration},</if>
+            <if test="actualDuration != null">#{actualDuration},</if>
+            <if test="sessionStatus != null">#{sessionStatus},</if>
+            <if test="sessionType != null">#{sessionType},</if>
+            <if test="monitoringConfig != null">#{monitoringConfig},</if>
+            <if test="avgTemperature != null">#{avgTemperature},</if>
+            <if test="avgHumidity != null">#{avgHumidity},</if>
+            <if test="avgLightIntensity != null">#{avgLightIntensity},</if>
+            <if test="avgSoundLevel != null">#{avgSoundLevel},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="deviceVersion != null">#{deviceVersion},</if>
+            <if test="operatorId != null">#{operatorId},</if>
+            <if test="totalEvents != null">#{totalEvents},</if>
+            <if test="totalMice != null">#{totalMice},</if>
+            <if test="dataQualityScore != null">#{dataQualityScore},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBehaviorSession" parameterType="SysBehaviorSession">
+        update sys_behavior_session
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sessionCode != null and sessionCode != ''">session_code = #{sessionCode},</if>
+            <if test="experimentId != null">experiment_id = #{experimentId},</if>
+            <if test="cageId != null">cage_id = #{cageId},</if>
+            <if test="sessionStartTime != null">session_start_time = #{sessionStartTime},</if>
+            <if test="sessionEndTime != null">session_end_time = #{sessionEndTime},</if>
+            <if test="plannedDuration != null">planned_duration = #{plannedDuration},</if>
+            <if test="actualDuration != null">actual_duration = #{actualDuration},</if>
+            <if test="sessionStatus != null">session_status = #{sessionStatus},</if>
+            <if test="sessionType != null">session_type = #{sessionType},</if>
+            <if test="monitoringConfig != null">monitoring_config = #{monitoringConfig},</if>
+            <if test="avgTemperature != null">avg_temperature = #{avgTemperature},</if>
+            <if test="avgHumidity != null">avg_humidity = #{avgHumidity},</if>
+            <if test="avgLightIntensity != null">avg_light_intensity = #{avgLightIntensity},</if>
+            <if test="avgSoundLevel != null">avg_sound_level = #{avgSoundLevel},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="deviceVersion != null">device_version = #{deviceVersion},</if>
+            <if test="operatorId != null">operator_id = #{operatorId},</if>
+            <if test="totalEvents != null">total_events = #{totalEvents},</if>
+            <if test="totalMice != null">total_mice = #{totalMice},</if>
+            <if test="dataQualityScore != null">data_quality_score = #{dataQualityScore},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where session_id = #{sessionId}
+    </update>
+
+    <delete id="deleteSysBehaviorSessionBySessionId" parameterType="Long">
+        delete from sys_behavior_session where session_id = #{sessionId}
+    </delete>
+
+    <delete id="deleteSysBehaviorSessionBySessionIds" parameterType="String">
+        delete from sys_behavior_session where session_id in 
+        <foreach item="sessionId" collection="array" open="(" separator="," close=")">
+            #{sessionId}
+        </foreach>
+    </delete>
+
+</mapper>

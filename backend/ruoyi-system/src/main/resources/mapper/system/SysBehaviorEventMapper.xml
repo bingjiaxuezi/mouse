@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBehaviorEventMapper">
+    
+    <resultMap type="SysBehaviorEvent" id="SysBehaviorEventResult">
+        <result property="eventId"    column="event_id"    />
+        <result property="sessionId"    column="session_id"    />
+        <result property="mouseId"    column="mouse_id"    />
+        <result property="behaviorTypeId"    column="behavior_type_id"    />
+        <result property="eventStartTime"    column="event_start_time"    />
+        <result property="eventEndTime"    column="event_end_time"    />
+        <result property="durationSeconds"    column="duration_seconds"    />
+        <result property="intensityLevel"    column="intensity_level"    />
+        <result property="confidenceScore"    column="confidence_score"    />
+        <result property="detectionMethod"    column="detection_method"    />
+        <result property="startXCoordinate"    column="start_x_coordinate"    />
+        <result property="startYCoordinate"    column="start_y_coordinate"    />
+        <result property="endXCoordinate"    column="end_x_coordinate"    />
+        <result property="endYCoordinate"    column="end_y_coordinate"    />
+        <result property="maxVelocity"    column="max_velocity"    />
+        <result property="avgVelocity"    column="avg_velocity"    />
+        <result property="maxAcceleration"    column="max_acceleration"    />
+        <result property="distanceTraveled"    column="distance_traveled"    />
+        <result property="interactionTargetMouseId"    column="interaction_target_mouse_id"    />
+        <result property="interactionType"    column="interaction_type"    />
+        <result property="anomalyFlag"    column="anomaly_flag"    />
+        <result property="qualityScore"    column="quality_score"    />
+        <result property="validationStatus"    column="validation_status"    />
+        <result property="validatorId"    column="validator_id"    />
+        <result property="validationTime"    column="validation_time"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap id="SysBehaviorEventSysBehaviorSessionResult" type="SysBehaviorEvent" extends="SysBehaviorEventResult">
+        <collection property="sysBehaviorSessionList" ofType="SysBehaviorSession" column="event_id" select="selectSysBehaviorSessionList" />
+    </resultMap>
+
+    <resultMap type="SysBehaviorSession" id="SysBehaviorSessionResult">
+        <result property="sessionId"    column="session_id"    />
+        <result property="sessionCode"    column="session_code"    />
+        <result property="experimentId"    column="experiment_id"    />
+        <result property="cageId"    column="cage_id"    />
+        <result property="sessionStartTime"    column="session_start_time"    />
+        <result property="sessionEndTime"    column="session_end_time"    />
+        <result property="plannedDuration"    column="planned_duration"    />
+        <result property="actualDuration"    column="actual_duration"    />
+        <result property="sessionStatus"    column="session_status"    />
+        <result property="sessionType"    column="session_type"    />
+        <result property="monitoringConfig"    column="monitoring_config"    />
+        <result property="avgTemperature"    column="avg_temperature"    />
+        <result property="avgHumidity"    column="avg_humidity"    />
+        <result property="avgLightIntensity"    column="avg_light_intensity"    />
+        <result property="avgSoundLevel"    column="avg_sound_level"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceVersion"    column="device_version"    />
+        <result property="operatorId"    column="operator_id"    />
+        <result property="totalEvents"    column="total_events"    />
+        <result property="totalMice"    column="total_mice"    />
+        <result property="dataQualityScore"    column="data_quality_score"    />
+        <result property="extendInfo"    column="extend_info"    />
+        <result property="extendConfig"    column="extend_config"    />
+        <result property="extendData"    column="extend_data"    />
+        <result property="extendInfo1"    column="extend_info1"    />
+        <result property="extendInfo2"    column="extend_info2"    />
+        <result property="extendInfo3"    column="extend_info3"    />
+        <result property="extendInfo4"    column="extend_info4"    />
+        <result property="extendInfo5"    column="extend_info5"    />
+        <result property="buildBy"    column="build_by"    />
+        <result property="buildTime"    column="build_time"    />
+        <result property="modifyBy"    column="modify_by"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysBehaviorEventVo">
+        select event_id, session_id, mouse_id, behavior_type_id, event_start_time, event_end_time, duration_seconds, intensity_level, confidence_score, detection_method, start_x_coordinate, start_y_coordinate, end_x_coordinate, end_y_coordinate, max_velocity, avg_velocity, max_acceleration, distance_traveled, interaction_target_mouse_id, interaction_type, anomaly_flag, quality_score, validation_status, validator_id, validation_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark from sys_behavior_event
+    </sql>
+
+    <select id="selectSysBehaviorEventList" parameterType="SysBehaviorEvent" resultMap="SysBehaviorEventResult">
+        <include refid="selectSysBehaviorEventVo"/>
+        <where>  
+            <if test="sessionId != null "> and session_id = #{sessionId}</if>
+            <if test="mouseId != null "> and mouse_id = #{mouseId}</if>
+            <if test="behaviorTypeId != null "> and behavior_type_id = #{behaviorTypeId}</if>
+            <if test="eventStartTime != null "> and event_start_time = #{eventStartTime}</if>
+            <if test="eventEndTime != null "> and event_end_time = #{eventEndTime}</if>
+            <if test="durationSeconds != null "> and duration_seconds = #{durationSeconds}</if>
+            <if test="intensityLevel != null  and intensityLevel != ''"> and intensity_level = #{intensityLevel}</if>
+            <if test="confidenceScore != null "> and confidence_score = #{confidenceScore}</if>
+            <if test="detectionMethod != null  and detectionMethod != ''"> and detection_method = #{detectionMethod}</if>
+            <if test="startXCoordinate != null "> and start_x_coordinate = #{startXCoordinate}</if>
+            <if test="startYCoordinate != null "> and start_y_coordinate = #{startYCoordinate}</if>
+            <if test="endXCoordinate != null "> and end_x_coordinate = #{endXCoordinate}</if>
+            <if test="endYCoordinate != null "> and end_y_coordinate = #{endYCoordinate}</if>
+            <if test="maxVelocity != null "> and max_velocity = #{maxVelocity}</if>
+            <if test="avgVelocity != null "> and avg_velocity = #{avgVelocity}</if>
+            <if test="maxAcceleration != null "> and max_acceleration = #{maxAcceleration}</if>
+            <if test="distanceTraveled != null "> and distance_traveled = #{distanceTraveled}</if>
+            <if test="interactionTargetMouseId != null "> and interaction_target_mouse_id = #{interactionTargetMouseId}</if>
+            <if test="interactionType != null  and interactionType != ''"> and interaction_type = #{interactionType}</if>
+            <if test="anomalyFlag != null  and anomalyFlag != ''"> and anomaly_flag = #{anomalyFlag}</if>
+            <if test="qualityScore != null "> and quality_score = #{qualityScore}</if>
+            <if test="validationStatus != null  and validationStatus != ''"> and validation_status = #{validationStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysBehaviorEventByEventId" parameterType="Long" resultMap="SysBehaviorEventSysBehaviorSessionResult">
+        select event_id, session_id, mouse_id, behavior_type_id, event_start_time, event_end_time, duration_seconds, intensity_level, confidence_score, detection_method, start_x_coordinate, start_y_coordinate, end_x_coordinate, end_y_coordinate, max_velocity, avg_velocity, max_acceleration, distance_traveled, interaction_target_mouse_id, interaction_type, anomaly_flag, quality_score, validation_status, validator_id, validation_time, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark
+        from sys_behavior_event
+        where event_id = #{eventId}
+    </select>
+
+    <select id="selectSysBehaviorSessionList" resultMap="SysBehaviorSessionResult">
+        select session_id, session_code, experiment_id, cage_id, session_start_time, session_end_time, planned_duration, actual_duration, session_status, session_type, monitoring_config, avg_temperature, avg_humidity, avg_light_intensity, avg_sound_level, device_id, device_version, operator_id, total_events, total_mice, data_quality_score, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark
+        from sys_behavior_session
+        where session_id = #{session_id}
+    </select>
+
+    <insert id="insertSysBehaviorEvent" parameterType="SysBehaviorEvent" useGeneratedKeys="true" keyProperty="eventId">
+        insert into sys_behavior_event
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sessionId != null">session_id,</if>
+            <if test="mouseId != null">mouse_id,</if>
+            <if test="behaviorTypeId != null">behavior_type_id,</if>
+            <if test="eventStartTime != null">event_start_time,</if>
+            <if test="eventEndTime != null">event_end_time,</if>
+            <if test="durationSeconds != null">duration_seconds,</if>
+            <if test="intensityLevel != null">intensity_level,</if>
+            <if test="confidenceScore != null">confidence_score,</if>
+            <if test="detectionMethod != null">detection_method,</if>
+            <if test="startXCoordinate != null">start_x_coordinate,</if>
+            <if test="startYCoordinate != null">start_y_coordinate,</if>
+            <if test="endXCoordinate != null">end_x_coordinate,</if>
+            <if test="endYCoordinate != null">end_y_coordinate,</if>
+            <if test="maxVelocity != null">max_velocity,</if>
+            <if test="avgVelocity != null">avg_velocity,</if>
+            <if test="maxAcceleration != null">max_acceleration,</if>
+            <if test="distanceTraveled != null">distance_traveled,</if>
+            <if test="interactionTargetMouseId != null">interaction_target_mouse_id,</if>
+            <if test="interactionType != null">interaction_type,</if>
+            <if test="anomalyFlag != null">anomaly_flag,</if>
+            <if test="qualityScore != null">quality_score,</if>
+            <if test="validationStatus != null">validation_status,</if>
+            <if test="validatorId != null">validator_id,</if>
+            <if test="validationTime != null">validation_time,</if>
+            <if test="extendInfo != null">extend_info,</if>
+            <if test="extendConfig != null">extend_config,</if>
+            <if test="extendData != null">extend_data,</if>
+            <if test="extendInfo1 != null">extend_info1,</if>
+            <if test="extendInfo2 != null">extend_info2,</if>
+            <if test="extendInfo3 != null">extend_info3,</if>
+            <if test="extendInfo4 != null">extend_info4,</if>
+            <if test="extendInfo5 != null">extend_info5,</if>
+            <if test="buildBy != null">build_by,</if>
+            <if test="buildTime != null">build_time,</if>
+            <if test="modifyBy != null">modify_by,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sessionId != null">#{sessionId},</if>
+            <if test="mouseId != null">#{mouseId},</if>
+            <if test="behaviorTypeId != null">#{behaviorTypeId},</if>
+            <if test="eventStartTime != null">#{eventStartTime},</if>
+            <if test="eventEndTime != null">#{eventEndTime},</if>
+            <if test="durationSeconds != null">#{durationSeconds},</if>
+            <if test="intensityLevel != null">#{intensityLevel},</if>
+            <if test="confidenceScore != null">#{confidenceScore},</if>
+            <if test="detectionMethod != null">#{detectionMethod},</if>
+            <if test="startXCoordinate != null">#{startXCoordinate},</if>
+            <if test="startYCoordinate != null">#{startYCoordinate},</if>
+            <if test="endXCoordinate != null">#{endXCoordinate},</if>
+            <if test="endYCoordinate != null">#{endYCoordinate},</if>
+            <if test="maxVelocity != null">#{maxVelocity},</if>
+            <if test="avgVelocity != null">#{avgVelocity},</if>
+            <if test="maxAcceleration != null">#{maxAcceleration},</if>
+            <if test="distanceTraveled != null">#{distanceTraveled},</if>
+            <if test="interactionTargetMouseId != null">#{interactionTargetMouseId},</if>
+            <if test="interactionType != null">#{interactionType},</if>
+            <if test="anomalyFlag != null">#{anomalyFlag},</if>
+            <if test="qualityScore != null">#{qualityScore},</if>
+            <if test="validationStatus != null">#{validationStatus},</if>
+            <if test="validatorId != null">#{validatorId},</if>
+            <if test="validationTime != null">#{validationTime},</if>
+            <if test="extendInfo != null">#{extendInfo},</if>
+            <if test="extendConfig != null">#{extendConfig},</if>
+            <if test="extendData != null">#{extendData},</if>
+            <if test="extendInfo1 != null">#{extendInfo1},</if>
+            <if test="extendInfo2 != null">#{extendInfo2},</if>
+            <if test="extendInfo3 != null">#{extendInfo3},</if>
+            <if test="extendInfo4 != null">#{extendInfo4},</if>
+            <if test="extendInfo5 != null">#{extendInfo5},</if>
+            <if test="buildBy != null">#{buildBy},</if>
+            <if test="buildTime != null">#{buildTime},</if>
+            <if test="modifyBy != null">#{modifyBy},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBehaviorEvent" parameterType="SysBehaviorEvent">
+        update sys_behavior_event
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sessionId != null">session_id = #{sessionId},</if>
+            <if test="mouseId != null">mouse_id = #{mouseId},</if>
+            <if test="behaviorTypeId != null">behavior_type_id = #{behaviorTypeId},</if>
+            <if test="eventStartTime != null">event_start_time = #{eventStartTime},</if>
+            <if test="eventEndTime != null">event_end_time = #{eventEndTime},</if>
+            <if test="durationSeconds != null">duration_seconds = #{durationSeconds},</if>
+            <if test="intensityLevel != null">intensity_level = #{intensityLevel},</if>
+            <if test="confidenceScore != null">confidence_score = #{confidenceScore},</if>
+            <if test="detectionMethod != null">detection_method = #{detectionMethod},</if>
+            <if test="startXCoordinate != null">start_x_coordinate = #{startXCoordinate},</if>
+            <if test="startYCoordinate != null">start_y_coordinate = #{startYCoordinate},</if>
+            <if test="endXCoordinate != null">end_x_coordinate = #{endXCoordinate},</if>
+            <if test="endYCoordinate != null">end_y_coordinate = #{endYCoordinate},</if>
+            <if test="maxVelocity != null">max_velocity = #{maxVelocity},</if>
+            <if test="avgVelocity != null">avg_velocity = #{avgVelocity},</if>
+            <if test="maxAcceleration != null">max_acceleration = #{maxAcceleration},</if>
+            <if test="distanceTraveled != null">distance_traveled = #{distanceTraveled},</if>
+            <if test="interactionTargetMouseId != null">interaction_target_mouse_id = #{interactionTargetMouseId},</if>
+            <if test="interactionType != null">interaction_type = #{interactionType},</if>
+            <if test="anomalyFlag != null">anomaly_flag = #{anomalyFlag},</if>
+            <if test="qualityScore != null">quality_score = #{qualityScore},</if>
+            <if test="validationStatus != null">validation_status = #{validationStatus},</if>
+            <if test="validatorId != null">validator_id = #{validatorId},</if>
+            <if test="validationTime != null">validation_time = #{validationTime},</if>
+            <if test="extendInfo != null">extend_info = #{extendInfo},</if>
+            <if test="extendConfig != null">extend_config = #{extendConfig},</if>
+            <if test="extendData != null">extend_data = #{extendData},</if>
+            <if test="extendInfo1 != null">extend_info1 = #{extendInfo1},</if>
+            <if test="extendInfo2 != null">extend_info2 = #{extendInfo2},</if>
+            <if test="extendInfo3 != null">extend_info3 = #{extendInfo3},</if>
+            <if test="extendInfo4 != null">extend_info4 = #{extendInfo4},</if>
+            <if test="extendInfo5 != null">extend_info5 = #{extendInfo5},</if>
+            <if test="buildBy != null">build_by = #{buildBy},</if>
+            <if test="buildTime != null">build_time = #{buildTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where event_id = #{eventId}
+    </update>
+
+    <delete id="deleteSysBehaviorEventByEventId" parameterType="Long">
+        delete from sys_behavior_event where event_id = #{eventId}
+    </delete>
+
+    <delete id="deleteSysBehaviorEventByEventIds" parameterType="String">
+        delete from sys_behavior_event where event_id in 
+        <foreach item="eventId" collection="array" open="(" separator="," close=")">
+            #{eventId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSysBehaviorSessionBySessionIds" parameterType="String">
+        delete from sys_behavior_session where session_id in 
+        <foreach item="sessionId" collection="array" open="(" separator="," close=")">
+            #{sessionId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSysBehaviorSessionBySessionId" parameterType="Long">
+        delete from sys_behavior_session where session_id = #{sessionId}
+    </delete>
+
+    <insert id="batchSysBehaviorSession">
+        insert into sys_behavior_session( session_id, session_code, experiment_id, cage_id, session_start_time, session_end_time, planned_duration, actual_duration, session_status, session_type, monitoring_config, avg_temperature, avg_humidity, avg_light_intensity, avg_sound_level, device_id, device_version, operator_id, total_events, total_mice, data_quality_score, extend_info, extend_config, extend_data, extend_info1, extend_info2, extend_info3, extend_info4, extend_info5, build_by, build_time, modify_by, modify_time, del_flag, remark) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.sessionId}, #{item.sessionCode}, #{item.experimentId}, #{item.cageId}, #{item.sessionStartTime}, #{item.sessionEndTime}, #{item.plannedDuration}, #{item.actualDuration}, #{item.sessionStatus}, #{item.sessionType}, #{item.monitoringConfig}, #{item.avgTemperature}, #{item.avgHumidity}, #{item.avgLightIntensity}, #{item.avgSoundLevel}, #{item.deviceId}, #{item.deviceVersion}, #{item.operatorId}, #{item.totalEvents}, #{item.totalMice}, #{item.dataQualityScore}, #{item.extendInfo}, #{item.extendConfig}, #{item.extendData}, #{item.extendInfo1}, #{item.extendInfo2}, #{item.extendInfo3}, #{item.extendInfo4}, #{item.extendInfo5}, #{item.buildBy}, #{item.buildTime}, #{item.modifyBy}, #{item.modifyTime}, #{item.delFlag}, #{item.remark})
+        </foreach>
+    </insert>
+
+</mapper>
